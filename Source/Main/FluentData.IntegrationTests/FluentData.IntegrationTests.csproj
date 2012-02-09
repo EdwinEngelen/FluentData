@@ -83,7 +83,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Providers\SqlServerCompact\Data\FluentDB.sdf">
+    <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
