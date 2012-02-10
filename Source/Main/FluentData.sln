@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData", "FluentData\FluentData.csproj", "{B5AE821B-7728-49B3-9119-3BBC4C8E58E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.IntegrationTests", "FluentData.IntegrationTests\FluentData.IntegrationTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SystemTests", "FluentData.IntegrationTests\FluentData.SystemTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D8DF561-3D0D-420E-AFF4-4FC88848D632}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,12 +23,12 @@ Global
 		SccProjectUniqueName1 = FluentData\\FluentData.csproj
 		SccProjectName1 = FluentData
 		SccLocalPath1 = FluentData
-		SccProjectUniqueName2 = FluentData.IntegrationTests\\FluentData.IntegrationTests.csproj
-		SccProjectName2 = FluentData.IntegrationTests
-		SccLocalPath2 = FluentData.IntegrationTests
-		SccProjectUniqueName3 = FluentData.UnitTests\\FluentData.UnitTests.csproj
-		SccProjectName3 = FluentData.UnitTests
-		SccLocalPath3 = FluentData.UnitTests
+		SccProjectUniqueName2 = FluentData.UnitTests\\FluentData.UnitTests.csproj
+		SccProjectName2 = FluentData.UnitTests
+		SccLocalPath2 = FluentData.UnitTests
+		SccProjectUniqueName3 = FluentData.IntegrationTests\\FluentData.SystemTests.csproj
+		SccProjectName3 = FluentData.IntegrationTests
+		SccLocalPath3 = FluentData.IntegrationTests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = FluentData.vsmdi
