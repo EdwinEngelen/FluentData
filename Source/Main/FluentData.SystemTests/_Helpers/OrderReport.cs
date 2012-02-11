@@ -11,6 +11,7 @@ namespace FluentData._Helpers
 
 	public class OrderLine
 	{
+		public int OrderLineId { get; set; }
 		public Product Product { get; set; }
 	}
 }

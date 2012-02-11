@@ -10,6 +10,7 @@ namespace FluentData
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
+		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
 		IDbContext ThrowExceptionIfAutoMapFails { get; }
 		IDbContext UseTransaction { get; }
 		IInsertBuilder Insert(string tableName);

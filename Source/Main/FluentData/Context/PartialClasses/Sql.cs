@@ -55,5 +55,11 @@ namespace FluentData
 				command.Parameters(parameters);
 			return command;
 		}
+
+		public IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
+		{
+			var command = CreateCommand.UseMultipleResultset.Sql(sql, mappingExpressions);
+			return command;
+		}
 	}
 }

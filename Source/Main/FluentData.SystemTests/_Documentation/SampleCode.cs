@@ -1,4 +1,5 @@
-﻿using FluentData._Helpers;
+﻿using System.Collections.Generic;
+using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FluentData._Documentation
@@ -14,11 +15,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Get_a_single_product()
 		{
-			var productId = 1;
-
-			var product = Context().Sql(@"select *	from Product where ProductId = @0")
-					.Parameters(productId)
-					.QuerySingle<Product>();
+			Product product = Context().Sql(@"select *	from Product where ProductId = 1").QuerySingle<Product>();
 
 			Assert.IsNotNull(product);
 		}
@@ -26,18 +23,18 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Get_many_products()
 		{
-			var products = Context().Sql(@"select *	from Product;")
-					.Query<Product>();
+			List<Product> products = Context().Sql(@"select * from Product").Query<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
 
 		[TestMethod]
-		public void Create_a_new_product()
+		public void Insert_a_new_product()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
-					.Parameters("The Warren Buffet Way", 1)
-					.ExecuteReturnLastId();
+			var productId = Context().Insert("Product")
+										.Column("Name", "The Warren Buffet Way")
+										.Column("CategoryId", 1)
+										.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -45,26 +42,43 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_existing_product()
 		{
-			var rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1")
-					.Parameters("The Warren Buffet Way", 1)
-					.Execute();
+			var rowsAffected = Context().Update("Product")
+									.Column("Name", "The Warren Buffet Way")
+									.Column("CategoryId", 1)
+									.Where("ProductId", 1)
+									.Execute();
+
+			Assert.IsTrue(rowsAffected > 0);
 		}
 
 		[TestMethod]
 		public void Delete_a_product()
 		{
-			var product = new Product();
-			product.Name = "The Warren Buffet Way";
-			product.CategoryId = 1;
+			var productId = Context().Insert("Product")
+										.Column("Name", "The Warren Buffet Way")
+										.Column("CategoryId", 1)
+										.ExecuteReturnLastId();
 
-			var productId = Context().Insert<Product>("Product", product)
-								.IgnoreProperty(x => x.ProductId)
-								.AutoMap()
-								.ExecuteReturnLastId();
+			var rowsAffected = Context().Delete("Product").Where("ProductId", productId).Execute();
 
-			var rowsAffected = Context().Sql("delete from Product where ProductId = @0")
-					.Parameters(productId)
-					.Execute();
+			Assert.IsTrue(rowsAffected > 0);
+		}
+
+		[TestMethod]
+		public void Parameters_indexed()
+		{
+			Product product = Context().Sql(@"select *	from Product where ProductId = @0", 1).QuerySingle<Product>();
+
+			Assert.IsNotNull(product);
+		}
+
+		[TestMethod]
+		public void Parameters_named()
+		{
+			Product product = Context().Sql(@"select *	from Product where ProductId = @ProductId")
+											.Parameter("ProductId", 1).QuerySingle<Product>();
+
+			Assert.IsNotNull(product);
 		}
 	}
 }
