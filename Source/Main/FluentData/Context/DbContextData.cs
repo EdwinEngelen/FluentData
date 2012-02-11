@@ -4,22 +4,22 @@ namespace FluentData
 {
 	public class DbContextData
 	{
-		public bool UseTransaction;
-		public IDbConnection Connection;
-		public IsolationLevel IsolationLevel;
-		public IDbTransaction Transaction;
-		public TransactionStates TransactionState;
-		public IDbProvider DbProvider;
-		public string ConnectionString;
-		public IEntityFactory EntityFactory;
-		public DbProviderTypes Provider;
-		public bool ThrowExceptionIfAutoMapFails;
+		public bool UseTransaction { get; set; }
+		public IDbConnection Connection { get; set; }
+		public IsolationLevel IsolationLevel { get; set; }
+		public IDbTransaction Transaction { get; set; }
+		public TransactionStates TransactionState { get; set; }
+		public IDbProvider DbProvider { get; set; }
+		public string ConnectionString { get; set; }
+		public IEntityFactory EntityFactory { get; set; }
+		public DbProviderTypes Provider { get; set; }
+		public bool ThrowExceptionIfAutoMapFails { get; set; }
 
 		public DbContextData()
 		{
 			ThrowExceptionIfAutoMapFails = false;
 			UseTransaction = false;
-			IsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+			IsolationLevel = IsolationLevel.ReadCommitted;
 			EntityFactory = new EntityFactory();
 		}
 	}

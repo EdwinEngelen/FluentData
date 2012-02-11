@@ -20,13 +20,6 @@ namespace FluentData
 			_data.QueryExecuter = new QueryExecuter(_data);
 		}
 
-		public IDbCommand Sql(string sql)
-		{
-			if (!string.IsNullOrEmpty(sql))
-				_data.Sql = new StringBuilder(sql);
-			return this;
-		}
-
 		internal IDbCommand UseMultipleResultset
 		{
 			get

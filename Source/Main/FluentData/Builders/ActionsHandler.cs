@@ -34,7 +34,7 @@ namespace FluentData
 				ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
 		}
 
-		internal void ColumnValueAction<T, TProp>(Expression<Func<T, TProp>> expression, bool propertyNameIsParameterName)
+		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
 		{
 			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
 
@@ -82,7 +82,7 @@ namespace FluentData
 			}
 		}
 
-		internal void AutoMapIgnorePropertyAction<T, TProp>(Expression<Func<T, TProp>> expression)
+		internal void AutoMapIgnorePropertyAction<T>(Expression<Func<T, object>> expression)
 		{
 			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
 			_data.IgnoreProperties.Add(propertyName);
@@ -128,7 +128,7 @@ namespace FluentData
 			AutoMapIgnorePropertyAction(columnName);
 		}
 
-		internal void WhereAction<T, TProp>(Expression<Func<T, TProp>> expression)
+		internal void WhereAction<T>(Expression<Func<T, object>> expression)
 		{
 			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
 			var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, propertyName);

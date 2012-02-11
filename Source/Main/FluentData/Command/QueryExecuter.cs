@@ -48,7 +48,7 @@ namespace FluentData
 					if (_data.DbContextData.Transaction == null)
 					{
 						_data.InnerCommand.Connection.Open();
-						_data.DbContextData.Transaction = _data.DbContextData.Connection.BeginTransaction(_data.DbContextData.IsolationLevel);
+						_data.DbContextData.Transaction = _data.DbContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.DbContextData.IsolationLevel);
 					}
 					_data.InnerCommand.Transaction = _data.DbContextData.Transaction;
 				}

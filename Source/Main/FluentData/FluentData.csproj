@@ -90,6 +90,7 @@
     <Compile Include="Command\Parameter.cs" />
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
+    <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
     <Compile Include="Command\PartialClasses\Parameters.cs" />
     <Compile Include="Command\PartialClasses\Query.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Context\EntityFactory.cs" />
     <Compile Include="Context\IDbContext.cs" />
     <Compile Include="Context\IEntityFactory.cs" />
+    <Compile Include="Context\IsolationLevel.cs" />
     <Compile Include="Context\PartialClasses\AutoMapper.cs" />
     <Compile Include="Context\PartialClasses\Builders.cs" />
     <Compile Include="Context\PartialClasses\ConnectionStrings.cs" />

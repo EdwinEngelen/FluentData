@@ -6,7 +6,7 @@ namespace FluentData
 	public interface IDeleteBuilder<T>
 	{
 		int Execute();
-		IDeleteBuilder<T> Where<TProp>(Expression<Func<T, TProp>> expression);
+		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression);
 		IDeleteBuilder<T> Where(string columnName, object value);
 	}
 }

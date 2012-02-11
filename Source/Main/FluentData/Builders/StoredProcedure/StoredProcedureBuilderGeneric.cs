@@ -23,13 +23,13 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> IgnoreProperty<TProp>(Expression<Func<T, TProp>> expression)
+		public IStoredProcedureBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression)
 		{
-			Actions.AutoMapIgnorePropertyAction<T, TProp>(expression);
+			Actions.AutoMapIgnorePropertyAction<T>(expression);
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> Parameter<TProp>(Expression<Func<T, TProp>> expression)
+		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression)
 		{
 			Actions.ColumnValueAction(expression, true);
 

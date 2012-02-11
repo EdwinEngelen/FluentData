@@ -23,13 +23,13 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilder<T> IgnoreProperty<TProp>(Expression<Func<T, TProp>> expression)
+		public IUpdateBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression)
 		{
 			Actions.AutoMapIgnorePropertyAction(expression);
 			return this;
 		}
 
-		public IUpdateBuilder<T> Column<TProp>(Expression<Func<T, TProp>> expression)
+		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression)
 		{
 			Actions.ColumnValueAction(expression, false);
 			return this;
@@ -41,7 +41,7 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilder<T> Where<TProp>(Expression<Func<T, TProp>> expression)
+		public IUpdateBuilder<T> Where(Expression<Func<T, object>> expression)
 		{
 			Actions.WhereAction(expression);
 			return this;
@@ -53,7 +53,7 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.IgnoreProperty<TProp>(Expression<Func<T, TProp>> expression)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.IgnoreProperty(Expression<Func<T, object>> expression)
 		{
 			Actions.AutoMapIgnorePropertyAction(expression);
 			return this;
@@ -65,7 +65,7 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column<TProp>(Expression<Func<T, TProp>> expression)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
 		{
 			Actions.ColumnValueAction(expression, false);
 			return this;

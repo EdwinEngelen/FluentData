@@ -7,10 +7,10 @@ namespace FluentData
 	{
 		int Execute();
 		IUpdateBuilder<T> AutoMap();
-		IUpdateBuilder<T> IgnoreProperty<TProp>(Expression<Func<T, TProp>> expression);
-		IUpdateBuilder<T> Where<TProp>(Expression<Func<T, TProp>> expression);
+		IUpdateBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression);
+		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression);
 		IUpdateBuilder<T> Where(string columnName, object value);
 		IUpdateBuilder<T> Column(string columnName, object value);
-		IUpdateBuilder<T> Column<TProp>(Expression<Func<T, TProp>> expression);
+		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression);
 	}
 }

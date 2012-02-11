@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace FluentData
 {
@@ -41,6 +42,7 @@ namespace FluentData
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper);
 		T QueryValue<T>();
 		IDbCommand Sql(string sql);
+		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 }

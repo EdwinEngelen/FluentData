@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace FluentData
 {
@@ -31,6 +33,13 @@ namespace FluentData
 			var command = CreateCommand.Sql(sql);
 			if (parameters != null)
 				command.Parameters(parameters);
+			return command;
+		}
+
+		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
+		{
+			var command = CreateCommand.Sql(sql, mappingExpressions);
+			
 			return command;
 		}
 

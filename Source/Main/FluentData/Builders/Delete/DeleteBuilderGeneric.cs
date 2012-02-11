@@ -10,7 +10,7 @@ namespace FluentData
 		{
 			Data.Item = item;
 		}
-		public IDeleteBuilder<T> Where<TProp>(Expression<Func<T, TProp>> expression)
+		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression)
 		{
 			Actions.ColumnValueAction(expression, false);
 			return this;

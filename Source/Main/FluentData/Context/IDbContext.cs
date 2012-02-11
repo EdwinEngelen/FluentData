@@ -1,13 +1,13 @@
 using System;
-using System.Data;
 using System.Dynamic;
-using FluentData;
+using System.Linq.Expressions;
 
 namespace FluentData
 {
 	public interface IDbContext : IDisposable
 	{
 		IDbCommand Sql(string sql, params object[] parameters);
+		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
 		IDbContext ThrowExceptionIfAutoMapFails { get; }

@@ -9,7 +9,7 @@ namespace FluentData
 {
 	internal static class ReflectionHelper
 	{
-		public static object GetPropertyValueFromExpression<T, TProp>(object item, Expression<Func<T, TProp>> expression)
+		public static object GetPropertyValueFromExpression<T>(object item, Expression<Func<T, object>> expression)
 		{
 			var propertyPath = expression.Body.ToString().Replace(expression.Parameters[0] + ".", string.Empty);
 
@@ -30,11 +30,33 @@ namespace FluentData
 			return item;
 		}
 
-		public static string GetPropertyNameFromExpression<T, TProp>(Expression<Func<T, TProp>> expression)
+		public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> expression)
 		{
-			var propertyPath = expression.Body.ToString().Replace(expression.Parameters[0] + ".", string.Empty);
+			string propertyPath = null;
+			if (expression.Body is UnaryExpression)
+			{
+				var unaryExpression = (UnaryExpression) expression.Body;
+				if (unaryExpression.NodeType == ExpressionType.Convert)
+					propertyPath = unaryExpression.Operand.ToString();
+			}
+
+			if (propertyPath == null)
+				propertyPath = expression.Body.ToString();
+
+			propertyPath = propertyPath.Replace(expression.Parameters[0] + ".", string.Empty);
 
 			return propertyPath;
+		}
+
+		public static List<string> GetPropertyNamesFromExpressions<T>(Expression<Func<T, object>>[] expressions)
+		{
+			var propertyNames = new List<string>();
+			foreach (var expression in expressions)
+			{
+				var propertyName = GetPropertyNameFromExpression(expression);
+				propertyNames.Add(propertyName);
+			}
+			return propertyNames;
 		}
 
 		public static object GetPropertyValue(object item, PropertyInfo property)

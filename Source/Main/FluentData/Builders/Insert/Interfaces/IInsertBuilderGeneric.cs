@@ -19,8 +19,8 @@ namespace FluentData
 		/// <param name="identityColumnName">Name of the column with the auto/sequence number.</param>
 		TReturn ExecuteReturnLastId<TReturn>(string identityColumnName);
 		IInsertBuilder<T> AutoMap();
-		IInsertBuilder<T> IgnoreProperty<TProp>(Expression<Func<T, TProp>> expression);
+		IInsertBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression);
 		IInsertBuilder<T> Column(string columnName, object value);
-		IInsertBuilder<T> Column<TProp>(Expression<Func<T, TProp>> expression);
+		IInsertBuilder<T> Column(Expression<Func<T, object>> expression);
 	}
 }
