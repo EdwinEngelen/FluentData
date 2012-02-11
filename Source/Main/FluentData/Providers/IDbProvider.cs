@@ -11,6 +11,8 @@ namespace FluentData
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
+		bool SupportsBindByNameForText { get; }
+		bool SupportsBindByNameForStoredProcedure { get; }
 		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
 		string GetSqlForInsertBuilder(BuilderData data);
@@ -20,6 +22,5 @@ namespace FluentData
 		DataTypes GetDbTypeForClrType(Type clrType);
 		void FixInStatement(StringBuilder sql, ParameterCollection dbCommand);
 		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
-		void PrepareCommandBeforeExecute(DbCommandData data);
 	}
 }

@@ -38,6 +38,16 @@ namespace FluentData.Providers.Oracle
 			get { return true; }
 		}
 
+		public bool SupportsBindByNameForText
+		{
+			get { return true; }
+		}
+
+		public bool SupportsBindByNameForStoredProcedure
+		{
+			get { return false; }
+		}
+
 		public IDbConnection CreateConnection(string connectionString)
 		{
 			return ConnectionCreator.CreateConnection(ProviderName, connectionString);
@@ -80,46 +90,7 @@ namespace FluentData.Providers.Oracle
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			var lastInsertedParameterName = GetParameterName(GlobalConstants.LastInsertedIdParameterName);
-			bool found = false;
-
-			foreach (DbParameter parameter in data.InnerCommand.Parameters)
-			{
-				if (parameter.ParameterName == lastInsertedParameterName)
-					found = true;
-			}
-
-			if (!found)
-			{
-				data.Command.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
-				data.Sql.Append(string.Format(" returning {0} into :LastInsertedId", identityColumnName));
-			}
-
-			T lastId = default(T);
-
-			data.QueryExecuter.ExecuteQueryHandler(false, () =>
-			{
-				lastId = Execute<T>(data);
-			});
-
-			return lastId;
-		}
-
-		public void PrepareCommandBeforeExecute(DbCommandData data)
-		{
-			if (data.InnerCommand.CommandType == CommandType.Text)
-			{
-				dynamic innerCommand = data.InnerCommand;
-				innerCommand.BindByName = true;
-			}
-		}
-
-		private T Execute<T>(DbCommandData data)
-		{
-			object recordsAffected = data.InnerCommand.ExecuteNonQuery();
-
-			var parameter = (IDbDataParameter) data.InnerCommand.Parameters[":" + GlobalConstants.LastInsertedIdParameterName];
-			return (T) parameter.Value;
+			return new OracleQueryExecuter().ExecuteReturnLastId<T>(this, data, identityColumnName);
 		}
 	}
 }

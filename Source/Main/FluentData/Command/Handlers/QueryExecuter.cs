@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace FluentData
 {
@@ -41,7 +42,7 @@ namespace FluentData
 			else
 			{
 				FixSql();
-				FixParameterType();
+				new ParameterHandler().FixParameterType(_data);
 
 				if (_data.DbContextData.UseTransaction)
 				{
@@ -58,9 +59,15 @@ namespace FluentData
 				if (useReader)
 					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
 
+				if ((_data.InnerCommand.CommandType == CommandType.Text && _data.DbContextData.DbProvider.SupportsBindByNameForText)
+					|| (_data.InnerCommand.CommandType == CommandType.StoredProcedure && _data.DbContextData.DbProvider.SupportsBindByNameForStoredProcedure))
+				{
+					dynamic innerCommand = _data.InnerCommand;
+					innerCommand.BindByName = true;
+				}
+
 				_queryAlreadyExecuted = true;
 			}
-			_data.DbContextData.DbProvider.PrepareCommandBeforeExecute(_data);
 		}
 
 		private void HandleQueryFinally()
@@ -92,32 +99,6 @@ namespace FluentData
 		{
 			_data.DbContextData.DbProvider.FixInStatement(_data.Sql, _data.Parameters);
 			_data.InnerCommand.CommandText = _data.Sql.ToString();
-		}
-
-		private void FixParameterType()
-		{
-			foreach (var parameter in _data.Parameters)
-			{
-				if (parameter.Direction == ParameterDirection.Input
-					&& parameter.DataTypes == DataTypes.Object)
-				{
-					if (parameter.Value == null)
-						parameter.Value = DBNull.Value;
-					else
-					{
-						parameter.DataTypes = _data.DbContextData.DbProvider.GetDbTypeForClrType(parameter.Value.GetType());
-						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDbException(string.Format("The parameter {0} is off a type that is not supported.", parameter.ParameterName));
-					}
-				}
-
-				var dbParameter = _data.InnerCommand.CreateParameter();
-				dbParameter.DbType = (System.Data.DbType) parameter.DataTypes;
-				dbParameter.ParameterName = _data.DbContextData.DbProvider.GetParameterName(parameter.ParameterName);
-				dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
-				dbParameter.Value = parameter.Value;
-				_data.InnerCommand.Parameters.Add(dbParameter);
-			}
 		}
 	}
 }

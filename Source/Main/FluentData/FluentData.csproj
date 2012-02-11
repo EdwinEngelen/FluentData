@@ -90,6 +90,7 @@
     <Compile Include="Command\Parameter.cs" />
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
+    <Compile Include="Command\Handlers\ParameterHandler.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
     <Compile Include="Command\PartialClasses\Parameters.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Command\Queries\GenericQueryHandler.cs" />
     <Compile Include="Command\Queries\QueryComplexHandler.cs" />
     <Compile Include="Command\Queries\QueryValueHandler.cs" />
-    <Compile Include="Command\QueryExecuter.cs" />
+    <Compile Include="Command\Handlers\QueryExecuter.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />
     <Compile Include="Context\DbContext.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Providers\Oracle\Builders\InsertBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Oracle\Builders\UpdateBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Oracle\OracleProvider.cs" />
+    <Compile Include="Providers\Oracle\OracleQueryExecuter.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServer\Builders\DeleteBuilderSqlGenerator.cs" />
     <Compile Include="Providers\SqlServer\Builders\InsertBuilderSqlGenerator.cs" />

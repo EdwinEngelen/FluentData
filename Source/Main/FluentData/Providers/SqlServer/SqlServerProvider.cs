@@ -37,6 +37,16 @@ namespace FluentData.Providers.SqlServer
 			get { return true; }
 		}
 
+		public bool SupportsBindByNameForText
+		{
+			get { return false; }
+		}
+
+		public bool SupportsBindByNameForStoredProcedure
+		{
+			get { return false; }
+		}
+
 		public IDbConnection CreateConnection(string connectionString)
 		{
 			return ConnectionCreator.CreateConnection(ProviderName, connectionString);
