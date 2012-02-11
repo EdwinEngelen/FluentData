@@ -16,7 +16,7 @@ namespace FluentData
 			_data.DbContextData = dbContextData;
 			_data.InnerCommand = dbCommand;
 			_data.Command = this;
-			_data.QueryExecuter = new QueryExecuter(_data);
+			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data);
 		}
 
 		internal IDbCommand UseMultipleResultset

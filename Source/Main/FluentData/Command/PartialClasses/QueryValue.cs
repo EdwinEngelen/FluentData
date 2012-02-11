@@ -6,7 +6,7 @@
 		{
 			T value = default(T);
 
-			_data.QueryExecuter.ExecuteQueryHandler(true,
+			_data.ExecuteQueryHandler.ExecuteQuery(true,
 				() =>
 				{
 					value = new QueryValueHandler<T>(_data).Execute();

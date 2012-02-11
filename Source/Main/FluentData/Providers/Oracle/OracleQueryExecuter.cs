@@ -24,7 +24,7 @@ namespace FluentData.Providers.Oracle
 
 			var lastId = default(T);
 
-			data.QueryExecuter.ExecuteQueryHandler(false, () =>
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				data.InnerCommand.ExecuteNonQuery();
 

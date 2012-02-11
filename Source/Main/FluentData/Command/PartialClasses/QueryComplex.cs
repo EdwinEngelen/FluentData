@@ -10,7 +10,7 @@ namespace FluentData
 		{
 			TList items = default(TList);
 
-			_data.QueryExecuter.ExecuteQueryHandler(true, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				items = new QueryComplexHandler<TEntity, TList>(_data).Execute(customMapper);
 			});

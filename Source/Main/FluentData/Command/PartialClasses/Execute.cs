@@ -10,7 +10,7 @@
 		{
 			int recordsAffected = 0;
 
-			_data.QueryExecuter.ExecuteQueryHandler(false, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				recordsAffected = new ExecuteHandler(_data).Execute<int>();
 			});

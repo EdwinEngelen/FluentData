@@ -3,17 +3,17 @@ using System.Data;
 
 namespace FluentData
 {
-	internal class QueryExecuter
+	internal class ExecuteQueryHandler
 	{
 		private readonly DbCommandData _data;
 		private bool _queryAlreadyExecuted;
 
-		public QueryExecuter(DbCommandData data)
+		public ExecuteQueryHandler(DbCommandData data)
 		{
 			_data = data;
 		}
 
-		internal void ExecuteQueryHandler(bool useReader, Action action)
+		internal void ExecuteQuery(bool useReader, Action action)
 		{
 			try
 			{

@@ -106,7 +106,7 @@ namespace FluentData.Providers.SqlServer
 
 			T lastId = default(T);
 
-			data.QueryExecuter.ExecuteQueryHandler(false, () =>
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				lastId = Execute<T>(data);
 			});

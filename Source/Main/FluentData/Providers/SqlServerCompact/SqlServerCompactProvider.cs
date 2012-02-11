@@ -91,7 +91,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			var lastId = default(T);
 
-			data.QueryExecuter.ExecuteQueryHandler(false, () =>
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				lastId = HandleExecuteReturnLastId<T>(data);
 			});

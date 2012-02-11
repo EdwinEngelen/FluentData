@@ -8,7 +8,7 @@ namespace FluentData
 		{
 			List<dynamic> items = null;
 
-			_data.QueryExecuter.ExecuteQueryHandler(true, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				items = new DynamicQueryHandler(_data).ExecuteList();
 			});
@@ -20,7 +20,7 @@ namespace FluentData
 		{
 			dynamic item = null;
 
-			_data.QueryExecuter.ExecuteQueryHandler(true, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				item = new DynamicQueryHandler(_data).ExecuteSingle();
 			});

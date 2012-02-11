@@ -12,7 +12,7 @@ namespace FluentData
 		{
 			TList items = default(TList);
 
-			_data.QueryExecuter.ExecuteQueryHandler(true, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				items = new GenericQueryHandler<TEntity>(_data).ExecuteList<TList>(autoMap, customMapperReader, customMapperDynamic);
 			});

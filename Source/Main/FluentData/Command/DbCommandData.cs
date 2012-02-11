@@ -12,7 +12,7 @@ namespace FluentData
 		public IDataReader Reader { get; set; }
 		public IDbCommand Command { get; set; }
 		public ParameterCollection Parameters { get; set; }
-		internal QueryExecuter QueryExecuter;
+		internal ExecuteQueryHandler ExecuteQueryHandler;
 		public DbCommandTypes DbCommandType { get; set; }
 
 		public DbCommandData()

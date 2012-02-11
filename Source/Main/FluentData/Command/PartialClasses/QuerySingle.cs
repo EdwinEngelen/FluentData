@@ -8,7 +8,7 @@ namespace FluentData
 		{
 			TEntity item = default(TEntity);
 
-			_data.QueryExecuter.ExecuteQueryHandler(true, () =>
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				item = new GenericQueryHandler<TEntity>(_data).ExecuteSingle(autoMap, customMapper);
 			});
