@@ -100,7 +100,7 @@ namespace FluentData.Providers.SqlServer
 
 			if (!found)
 			{
-				data.Command.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
+				data.DbCommand.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
 				data.Sql.Append(";set @LastInsertedId = SCOPE_IDENTITY();");
 			}
 

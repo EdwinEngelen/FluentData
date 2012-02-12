@@ -15,7 +15,7 @@ namespace FluentData
 			_data.DbContext = dbContext;
 			_data.DbContextData = dbContextData;
 			_data.InnerCommand = dbCommand;
-			_data.Command = this;
+			_data.DbCommand = this;
 			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data);
 		}
 
@@ -24,7 +24,7 @@ namespace FluentData
 			get
 			{
 				if (!_data.DbContextData.DbProvider.SupportsMultipleResultset)
-					throw new FluentDbException("The selected database does not support multiple resultset");
+					throw new FluentDataException("The selected database does not support multiple resultset");
 
 				_data.MultipleResultset = true;
 				return this;

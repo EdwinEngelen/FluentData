@@ -155,7 +155,7 @@ namespace FluentData.Providers.SqlServerCompact
 				var command = Context().MultiResultSql();
 				Assert.Fail();
 			}
-			catch (FluentDbException ex)
+			catch (FluentDataException ex)
 			{
 				if (!ex.Message.Contains("The selected database does not support"))
 					Assert.Fail();
@@ -296,7 +296,7 @@ namespace FluentData.Providers.SqlServerCompact
 			{
 				var rowsAffected = Context().StoredProcedure("").Execute();
 			}
-			catch (FluentDbException ex)
+			catch (FluentDataException ex)
 			{
 				if (!ex.Message.Contains("The selected database does not support"))
 					Assert.Fail();

@@ -18,7 +18,7 @@ namespace FluentData.Providers.Oracle
 
 			if (!found)
 			{
-				data.Command.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
+				data.DbCommand.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
 				data.Sql.Append(string.Format(" returning {0} into :LastInsertedId", identityColumnName));
 			}
 

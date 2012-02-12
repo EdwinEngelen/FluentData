@@ -2,13 +2,13 @@
 
 namespace FluentData
 {
-	public class FluentDbException : Exception
+	public class FluentDataException : Exception
 	{
-		public FluentDbException(string message)
+		public FluentDataException(string message)
 			: base(message)
 		{
 		}
-		public FluentDbException(string message, Exception innerException)
+		public FluentDataException(string message, Exception innerException)
 			: base(message, innerException)
 		{
 		}

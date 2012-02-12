@@ -40,6 +40,15 @@ namespace FluentData._Documentation
 		}
 
 		[TestMethod]
+		public void Insert_a_new_product_sql()
+		{
+			var productId = Context().Sql(@"insert into Product(Name, CategoryId)
+											values('The Warren Buffet Way', 1);").ExecuteReturnLastId();
+
+			Assert.IsTrue(productId > 0);
+		}
+
+		[TestMethod]
 		public void Update_existing_product()
 		{
 			var rowsAffected = Context().Update("Product")
@@ -47,6 +56,29 @@ namespace FluentData._Documentation
 									.Column("CategoryId", 1)
 									.Where("ProductId", 1)
 									.Execute();
+
+			Assert.IsTrue(rowsAffected > 0);
+		}
+
+		[TestMethod]
+		public void Update_existing_product_sql()
+		{
+			var rowsAffected = Context().Sql(@"update Product
+												set Name = 'The Warren Buffet Way', CategoryId = 1
+												where ProductId = 1").Execute();
+
+			Assert.IsTrue(rowsAffected > 0);
+		}
+
+		[TestMethod]
+		public void Delete_a_product_sql()
+		{
+			var productId = Context().Insert("Product")
+										.Column("Name", "The Warren Buffet Way")
+										.Column("CategoryId", 1)
+										.ExecuteReturnLastId();
+
+			var rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId).Execute();
 
 			Assert.IsTrue(rowsAffected > 0);
 		}

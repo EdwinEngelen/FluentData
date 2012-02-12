@@ -37,7 +37,7 @@ namespace FluentData
 				if (_data.MultipleResultset)
 					_data.Reader.NextResult();
 				else
-					throw new FluentDbException("A query has already been executed on this command object. Please create a new command object.");
+					throw new FluentDataException("A query has already been executed on this command object. Please create a new command object.");
 			}
 			else
 			{

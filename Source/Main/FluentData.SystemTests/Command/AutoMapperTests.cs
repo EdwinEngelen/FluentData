@@ -47,7 +47,7 @@ namespace FluentData.Command
 
 				Assert.Fail();
 			}
-			catch (FluentDbException exception)
+			catch (FluentDataException exception)
 			{
 				Assert.AreEqual("Could not map: CategoryIdNotExist", exception.Message);
 			}

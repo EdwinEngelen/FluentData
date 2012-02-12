@@ -48,7 +48,7 @@ namespace FluentData
 		private void VerifyStoredProcedureSupport()
 		{
 			if (!ContextData.DbProvider.SupportsStoredProcedures)
-				throw new FluentDbException("The selected database does not support stored procedures.");
+				throw new FluentDataException("The selected database does not support stored procedures.");
 		}
 
 		public IStoredProcedureBuilder StoredProcedure(string storedProcedureName)

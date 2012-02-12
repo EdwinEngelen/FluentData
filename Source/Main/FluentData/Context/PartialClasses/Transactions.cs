@@ -22,7 +22,7 @@
 			VerifyTransactionSupport();
 
 			if (ContextData.TransactionState == TransactionStates.Rollbacked)
-				throw new FluentDbException("The transaction has already been rolledback");
+				throw new FluentDataException("The transaction has already been rolledback");
 
 			ContextData.Transaction.Commit();
 			ContextData.TransactionState = TransactionStates.Commited;
@@ -34,7 +34,7 @@
 			VerifyTransactionSupport();
 
 			if (ContextData.TransactionState == TransactionStates.Commited)
-				throw new FluentDbException("The transaction has already been commited");
+				throw new FluentDataException("The transaction has already been commited");
 
 			ContextData.Transaction.Rollback();
 			ContextData.TransactionState = TransactionStates.Rollbacked;
@@ -45,7 +45,7 @@
 		private void VerifyTransactionSupport()
 		{
 			if (!ContextData.UseTransaction)
-				throw new FluentDbException("Transaction support has not been enabled.");
+				throw new FluentDataException("Transaction support has not been enabled.");
 		}
 	}
 }

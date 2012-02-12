@@ -39,7 +39,7 @@ namespace FluentData
 		{
 			var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
 			if (settings == null)
-				throw new FluentDbException("A connectionstring with the specified name was not found in the .config file");
+				throw new FluentDataException("A connectionstring with the specified name was not found in the .config file");
 			return settings.ConnectionString;
 		}
 	}

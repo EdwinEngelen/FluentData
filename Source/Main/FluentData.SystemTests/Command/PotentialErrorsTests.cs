@@ -16,7 +16,7 @@ namespace FluentData.Command
 
 				Assert.Fail();
 			}
-			catch (FluentDbException)
+			catch (FluentDataException)
 			{
 				
 			}

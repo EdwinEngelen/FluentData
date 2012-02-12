@@ -11,7 +11,7 @@
 			{
 				if (Data.Columns.Count == 0
 					|| Data.Wheres.Count == 0)
-					throw new FluentDbException("Columns or where filter have not yet been added.");
+					throw new FluentDataException("Columns or where filter have not yet been added.");
 
 				Data.DbCommand.Sql(Data.DbProvider.GetSqlForUpdateBuilder(Data));
 				return Data.DbCommand;

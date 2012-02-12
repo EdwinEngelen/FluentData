@@ -5,6 +5,7 @@ namespace FluentData
 {
 	public interface IBaseStoredProcedureBuilder
 	{
+		TValue ParameterValue<TValue>(string name);
 		int Execute();
 		List<dynamic> Query();
 		TList Query<TEntity, TList>() where TList : IList<TEntity>;

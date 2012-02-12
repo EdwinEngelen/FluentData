@@ -17,7 +17,7 @@ namespace FluentData
 					{
 						parameter.DataTypes = data.DbContextData.DbProvider.GetDbTypeForClrType(parameter.Value.GetType());
 						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDbException(string.Format("The parameter {0} is off a type that is not supported.", parameter.ParameterName));
+							throw new FluentDataException(string.Format("The parameter {0} is off a type that is not supported.", parameter.ParameterName));
 					}
 				}
 

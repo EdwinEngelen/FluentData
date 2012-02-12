@@ -32,7 +32,7 @@ namespace FluentData
 					wasMapped = HandleSimpleField(item, field, value);
 
 				if (!wasMapped && _dbContextData.ThrowExceptionIfAutoMapFails)
-					throw new FluentDbException("Could not map: " + field.Name);
+					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
 
@@ -140,7 +140,7 @@ namespace FluentData
 			}
 			catch (Exception exception)
 			{
-				throw new FluentDbException("Could not map: " + property.Name, exception);
+				throw new FluentDataException("Could not map: " + property.Name, exception);
 			}
 		}	
 	}

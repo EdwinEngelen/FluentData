@@ -55,6 +55,9 @@
     <Compile Include="Builders\Insert\InsertBuilderDynamicTests.cs" />
     <Compile Include="Builders\Insert\InsertBuilderGenericTests.cs" />
     <Compile Include="Builders\Insert\InsertBuilderTests.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureDynamicTests.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderGenericTests.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderDynamicTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderGenericTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderTests.cs" />
@@ -85,9 +88,7 @@
   <ItemGroup>
     <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Builders\StoredProcedure\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
