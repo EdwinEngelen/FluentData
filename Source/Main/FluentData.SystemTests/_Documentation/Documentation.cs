@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class DocumentationCode : IDbProviderTests
+	public class Documentation : IDbProviderTests
 	{
 		protected IDbContext GetContext()
 		{

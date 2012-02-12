@@ -47,6 +47,11 @@ namespace FluentData.Providers.SqlServer
 			get { return false; }
 		}
 
+		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		{
+			get { return true; }
+		}
+
 		public IDbConnection CreateConnection(string connectionString)
 		{
 			return ConnectionCreator.CreateConnection(ProviderName, connectionString);

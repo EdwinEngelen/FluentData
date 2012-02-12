@@ -91,6 +91,7 @@
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\Handlers\ParameterHandler.cs" />
+    <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
     <Compile Include="Command\PartialClasses\Parameters.cs" />

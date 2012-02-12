@@ -34,7 +34,7 @@ namespace FluentData
 		{
 			if (_queryAlreadyExecuted)
 			{
-				if (_data.MultipleResultset)
+				if (_data.UseMultipleResultsets)
 					_data.Reader.NextResult();
 				else
 					throw new FluentDataException("A query has already been executed on this command object. Please create a new command object.");
@@ -72,7 +72,7 @@ namespace FluentData
 
 		private void HandleQueryFinally()
 		{
-			if (!_data.MultipleResultset)
+			if (!_data.UseMultipleResultsets)
 			{
 				if (_data.Reader != null)
 					_data.Reader.Close();

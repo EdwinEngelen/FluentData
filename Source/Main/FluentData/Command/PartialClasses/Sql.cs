@@ -35,5 +35,10 @@ namespace FluentData
 			}
 			return this;
 		}
+
+		public string GetSql()
+		{
+			return _data.Sql.ToString();
+		}
 	}
 }

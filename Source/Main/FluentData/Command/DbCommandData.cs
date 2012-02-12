@@ -9,7 +9,7 @@ namespace FluentData
 		public DbContextData DbContextData { get; set; }
 		public System.Data.IDbCommand InnerCommand { get; set; }
 		public StringBuilder Sql { get; set; }
-		public bool MultipleResultset { get; set; }
+		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
 		public ParameterCollection Parameters { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;

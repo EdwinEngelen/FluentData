@@ -14,15 +14,7 @@ namespace FluentData
 		int Execute();
 		int ExecuteReturnLastId();
 		T ExecuteReturnLastId<T>();
-		/// <summary>
-		/// Only needed for Oracle.
-		/// </summary>
-		/// <param name="identityColumnName">Name of the column with the auto/sequence number.</param>
 		int ExecuteReturnLastId(string identityColumnName);
-		/// <summary>
-		/// Only needed for Oracle.
-		/// </summary>
-		/// <param name="identityColumnName">Name of the column with the auto/sequence number.</param>
 		T ExecuteReturnLastId<T>(string identityColumnName);
 		List<dynamic> Query();
 		TList Query<TEntity, TList>() where TList : IList<TEntity>;
@@ -43,6 +35,7 @@ namespace FluentData
 		T QueryValue<T>();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
+		string GetSql();
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 }

@@ -258,7 +258,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1)")
 								.Parameters("The Warren Buffet Way", 1)
-								.ExecuteReturnLastId("ProductId");
+								.ExecuteReturnLastId();
 
 			var rowsAffected = Context().Delete("Product")
 									.Where("ProductId", productId)

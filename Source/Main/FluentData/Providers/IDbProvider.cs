@@ -13,6 +13,7 @@ namespace FluentData
 		bool SupportsStoredProcedures { get; }
 		bool SupportsBindByNameForText { get; }
 		bool SupportsBindByNameForStoredProcedure { get; }
+		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
 		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
 		string GetSqlForInsertBuilder(BuilderData data);

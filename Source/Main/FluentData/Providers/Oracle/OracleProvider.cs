@@ -48,6 +48,11 @@ namespace FluentData.Providers.Oracle
 			get { return false; }
 		}
 
+		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		{
+			get { return false; }
+		}
+
 		public IDbConnection CreateConnection(string connectionString)
 		{
 			return ConnectionCreator.CreateConnection(ProviderName, connectionString);

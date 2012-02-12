@@ -26,7 +26,7 @@ namespace FluentData
 				if (!_data.DbContextData.DbProvider.SupportsMultipleResultset)
 					throw new FluentDataException("The selected database does not support multiple resultset");
 
-				_data.MultipleResultset = true;
+				_data.UseMultipleResultsets = true;
 				return this;
 			}
 		}

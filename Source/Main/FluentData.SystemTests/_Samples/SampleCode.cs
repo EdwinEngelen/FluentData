@@ -2,7 +2,7 @@
 using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData._Documentation
+namespace FluentData._Samples
 {
 	[TestClass]
 	public class SampleCode
