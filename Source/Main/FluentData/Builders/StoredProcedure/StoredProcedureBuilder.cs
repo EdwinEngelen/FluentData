@@ -13,9 +13,9 @@
 			return this;
 		}
 
-		public IStoredProcedureBuilder ParameterOut(string name, DataTypes parameterType)
+		public IStoredProcedureBuilder ParameterOut(string name, DataTypes parameterType, int size = 0)
 		{
-			Actions.ParameterOutputAction(name, parameterType);
+			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
 	}

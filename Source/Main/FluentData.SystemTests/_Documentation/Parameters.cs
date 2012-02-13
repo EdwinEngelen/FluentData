@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FluentData._Documentation
 {
@@ -6,17 +7,18 @@ namespace FluentData._Documentation
 	public class Parameters : BaseDocumentation
 	{
 		[TestMethod]
-		public void Unnamed_parameters_one()
+		public void Indexed_parameters()
 		{
-			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle();
+			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query();
 
-			Assert.IsNotNull(product);
+			Assert.AreEqual(2, products.Count);
 		}
 
 		[TestMethod]
-		public void Unnamed_parameters_many()
+		public void Indexed_parameters_alternative()
 		{
-			var products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query();
+			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1")
+										.Parameters(1, 2).Query();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -24,12 +26,33 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Named_parameters()
 		{
-			var products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
+			dynamic products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
 									.Query();
 
 			Assert.AreEqual(2, products.Count);
+		}
+
+		[TestMethod]
+		public void List_of_parameters_in_query()
+		{
+			List<int> ids = new List<int>() { 1, 2, 3, 4 };
+
+			dynamic products = Context().Sql("select * from Product where ProductId in(@0)", ids).Query();
+
+			Assert.AreEqual(4, products.Count);
+		}
+
+		[TestMethod]
+		public void Out_parameter()
+		{
+			var command = Context().Sql("select @ProductName = Name from Product where ProductId=1")
+							.ParameterOut("ProductName", DataTypes.String, 100);
+			command.Execute();
+			string productName = command.ParameterValue<string>("ProductName");
+
+			Assert.IsNotNull(productName);
 		}
 	}
 }

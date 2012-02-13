@@ -9,7 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_sql()
 		{
-			var rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1")
+			int rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1")
 								.Parameters("The Warren Buffet Way", 1)
 								.Execute();
 
@@ -19,7 +19,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_builder()
 		{
-			var rowsAffected = Context().Update("Product")
+			int rowsAffected = Context().Update("Product")
 								.Column("Name", "The Warren Buffet Way")
 								.Where("ProductId", 1)
 								.Execute();
@@ -30,12 +30,11 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_builder_automapping()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
+			Product product = Context().Sql("select * from Product where ProductId = 1")
 								.QuerySingle<Product>();
-
 			product.Name = "The Warren Buffet Way";
 
-			var rowsAffected = Context().Update<Product>("Product", product)
+			int rowsAffected = Context().Update<Product>("Product", product)
 										.Where(x => x.ProductId)
 										.AutoMap()
 										.Execute();

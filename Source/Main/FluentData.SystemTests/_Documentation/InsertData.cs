@@ -6,11 +6,10 @@ namespace FluentData._Documentation
 	[TestClass]
 	public class InsertData : BaseDocumentation
 	{
-
 		[TestMethod]
 		public void Insert_data_sql()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
+			int productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
 							.Parameters("The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
@@ -20,9 +19,9 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Insert_data_builder_no_automapping()
 		{
-			var productId = Context().Insert("Product")
-								.Column("CategoryId", 1)
+			int productId = Context().Insert("Product")
 								.Column("Name", "The Warren Buffet Way")
+								.Column("CategoryId", 1)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -31,16 +30,16 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Insert_data_builder_automapping()
 		{
-			var product = new Product();
-			product.CategoryId = 1;
+			Product product = new Product();
 			product.Name = "The Warren Buffet Way";
+			product.CategoryId = 1;
 
-			var productId = Context().Insert<Product>("Product", product)
+			product.ProductId = Context().Insert<Product>("Product", product)
 								.IgnoreProperty(x => x.ProductId)
 								.AutoMap()
 								.ExecuteReturnLastId();
 
-			Assert.IsTrue(productId > 0);
+			Assert.IsTrue(product.ProductId > 0);
 		}
 	}
 }

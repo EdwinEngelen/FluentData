@@ -36,9 +36,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType)
+		public IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType, int size = 0)
 		{
-			Actions.ParameterOutputAction(name, parameterType);
+			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
 	}

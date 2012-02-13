@@ -8,6 +8,6 @@ namespace FluentData
 		IStoredProcedureBuilderDynamic IgnoreProperty(string name);
 		IStoredProcedureBuilderDynamic AutoMap();
 		IStoredProcedureBuilderDynamic Parameter(string name, object value);
-		IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType);
+		IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 }

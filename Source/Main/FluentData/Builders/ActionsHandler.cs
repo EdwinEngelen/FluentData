@@ -93,7 +93,7 @@ namespace FluentData
 			_data.IgnoreProperties.Add(name);
 		}
 
-		internal void ParameterAction(string name, object value, DataTypes dataTypes, ParameterDirection direction, bool isId)
+		internal void ParameterAction(string name, object value, DataTypes dataTypes, ParameterDirection direction, bool isId, int size = 0)
 		{
 			var parameter = new Parameter();
 			parameter.ParameterName = name;
@@ -101,14 +101,15 @@ namespace FluentData
 			parameter.DataTypes = dataTypes;
 			parameter.Direction = direction;
 			parameter.IsId = isId;
+			parameter.Size = size;
 
 			_data.Parameters.Add(parameter);
 			_data.DbCommand.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction);
 		}
 
-		internal void ParameterOutputAction(string name, DataTypes dataTypes)
+		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
 		{
-			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false);
+			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
 		}
 
 		internal void ParametersAction(object[] parameters)

@@ -18,7 +18,15 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_many_strongly_typed()
 		{
-			var products = Context().Sql("select * from Product").Query<Product>();
+			List<Product> products = Context().Sql("select * from Product").Query<Product>();
+
+			Assert.IsTrue(products.Count > 0);
+		}
+
+		[TestMethod]
+		public void Query_many_strongly_typed_custom_collection()
+		{
+			ProductionCollection products = Context().Sql("select * from Product").Query<Product, ProductionCollection>();
 
 			Assert.IsTrue(products.Count > 0);
 		}

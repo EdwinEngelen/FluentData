@@ -11,13 +11,14 @@ namespace FluentData
 			return this;
 		}
 
-		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction)
+		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
 		{
 			var parameter = new Parameter();
 			parameter.DataTypes = parameterType;
 			parameter.ParameterName = name;
 			parameter.Direction = direction;
 			parameter.Value = value;
+			parameter.Size = size;
 			_data.Parameters.Add(parameter);
 			return this;
 		}
@@ -28,11 +29,11 @@ namespace FluentData
 			return this;
 		}
 
-		public IDbCommand ParameterOut(string name, DataTypes parameterType)
+		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
 			if (!_data.DbContextData.DbProvider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
-			Parameter(name, null, parameterType, ParameterDirection.Output);
+			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
 		}
 

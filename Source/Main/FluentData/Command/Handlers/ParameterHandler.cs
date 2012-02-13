@@ -26,6 +26,8 @@ namespace FluentData
 				dbParameter.ParameterName = data.DbContextData.DbProvider.GetParameterName(parameter.ParameterName);
 				dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
 				dbParameter.Value = parameter.Value;
+				if (parameter.Size > 0)
+					dbParameter.Size = parameter.Size;
 				data.InnerCommand.Parameters.Add(dbParameter);
 			}
 		}

@@ -29,9 +29,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType)
+		public IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0)
 		{
-			Actions.ParameterOutputAction(name, parameterType);
+			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
 	}

@@ -3,10 +3,10 @@
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class Transaction : BaseDocumentation
+	public class Transactions : BaseDocumentation
 	{
 		[TestMethod]
-		public void Transactions()
+		public void Test_transactions()
 		{
 			using (var db = Context().UseTransaction)
 			{

@@ -9,21 +9,21 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Stored_procedure_sql()
 		{
-			var rowsAffected = Context().Sql("execute ProductUpdate @ProductId = @0, @Name = @1")
-										.Parameters(1, "The Warren Buffet Way")
-										.Execute();
+var rowsAffected = Context().Sql("execute ProductUpdate @ProductId = @0, @Name = @1")
+							.Parameters(1, "The Warren Buffet Way")
+							.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
 		}
 
 		[TestMethod]
-		public void Stored_procedure()
+		public void Stored_procedure_sql_stored_procedure_command_type()
 		{
-			var rowsAffected = Context().Sql("ProductUpdate")
-										.CommandType(DbCommandTypes.StoredProcedure)
-										.Parameter("ProductId", 1)
-										.Parameter("Name", "The Warren Buffet Way")
-										.Execute();
+var rowsAffected = Context().Sql("ProductUpdate")
+							.CommandType(DbCommandTypes.StoredProcedure)
+							.Parameter("ProductId", 1)
+							.Parameter("Name", "The Warren Buffet Way")
+							.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
 		}

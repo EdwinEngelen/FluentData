@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using FluentData._Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FluentData._Documentation
 {
@@ -10,10 +12,10 @@ namespace FluentData._Documentation
 		{
 			using (var command = Context().MultiResultSql())
 			{
-				var categories = command.Sql(@"select * from Category;
-												select * from Product;").Query();
+				List<Category> categories = command.Sql(@"select * from Category;
+												select * from Product;").Query<Category>();
 
-				var products = command.Query();
+				List<Product> products = command.Query<Product>();
 
 				Assert.IsTrue(categories.Count > 0);
 				Assert.IsTrue(products.Count > 0);

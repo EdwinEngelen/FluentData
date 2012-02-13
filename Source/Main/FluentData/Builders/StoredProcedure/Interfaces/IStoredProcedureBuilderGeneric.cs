@@ -10,6 +10,6 @@ namespace FluentData
 		IStoredProcedureBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression);
 		IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression);
 		IStoredProcedureBuilder<T> Parameter(string name, object value);
-		IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType);
+		IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 }

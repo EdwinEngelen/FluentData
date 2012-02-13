@@ -7,6 +7,7 @@
 		public object Value { get; set; }
 		public ParameterDirection Direction { get; set; }
 		public bool IsId { get; set; }
+		public int Size { get; set; }
 
 		public string GetParameterName(IDbProvider provider)
 		{
