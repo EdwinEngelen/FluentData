@@ -1,48 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FluentData._Documentation
 {
 	[TestClass]
-	class DeleteData
+	public class DeleteData : BaseDocumentation
 	{
 		[TestMethod]
-		public void Test_sql()
+		public void Delete_data_sql()
 		{
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
+							.Parameters("The Warren Buffet Way", 1)
+							.ExecuteReturnLastId();
 
+			var rowsAffected = Context().Sql("delete from Product where ProductId = @0")
+									.Parameters(productId)
+									.Execute();
+
+			Assert.AreEqual(1, rowsAffected);
 		}
 
 		[TestMethod]
-		public void Test_builder_manual()
+		public void Delete_data_builder()
 		{
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
+							.Parameters("The Warren Buffet Way", 1)
+							.ExecuteReturnLastId();
 
-		}
+			var rowsAffected = Context().Delete("Product")
+										.Where("ProductId", productId)
+										.Execute();
 
-		[TestMethod]
-		public void Test_builder_manual_generic_type()
-		{
-
-		}
-
-		[TestMethod]
-		public void Test_builder_manual_dynamic_type()
-		{
-
-		}
-
-		[TestMethod]
-		public void Test_builder_automap_generic_type()
-		{
-
-		}
-
-		[TestMethod]
-		public void Test_builder_automap_dynamic_type()
-		{
-
+			Assert.AreEqual(1, rowsAffected);
 		}
 	}
 }

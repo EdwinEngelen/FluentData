@@ -1,11 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FluentData._Documentation
 {
-	public class MultipleResultsets
+	[TestClass]
+	public class MultipleResultsets : BaseDocumentation
 	{
+		[TestMethod]
+		public void MultipleResultset()
+		{
+			using (var command = Context().MultiResultSql())
+			{
+				var categories = command.Sql(@"select * from Category;
+												select * from Product;").Query();
+
+				var products = command.Query();
+
+				Assert.IsTrue(categories.Count > 0);
+				Assert.IsTrue(products.Count > 0);
+			}
+		}
 	}
 }

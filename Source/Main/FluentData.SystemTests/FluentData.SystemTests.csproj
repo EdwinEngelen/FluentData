@@ -72,17 +72,17 @@
     <Compile Include="Providers\SqlAzure\SqlServerTests.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactTests.cs" />
     <Compile Include="Providers\SqlServer\SqlServerTests.cs" />
+    <Compile Include="_Documentation\BaseDocumentation.cs" />
     <Compile Include="_Documentation\DeleteData.cs" />
-    <Compile Include="_Documentation\Documentation.cs" />
     <Compile Include="_Documentation\InsertData.cs" />
     <Compile Include="_Documentation\InsertUpdateData.cs" />
     <Compile Include="_Documentation\Mapping.cs" />
     <Compile Include="_Documentation\MultipleResultsets.cs" />
     <Compile Include="_Documentation\Parameters.cs" />
-    <Compile Include="_Documentation\QueryMany.cs" />
+    <Compile Include="_Documentation\Query.cs" />
     <Compile Include="_Documentation\QuerySingle.cs" />
     <Compile Include="_Documentation\StoredProcedure.cs" />
-    <Compile Include="_Samples\SampleCode.cs" />
+    <Compile Include="_Documentation\SampleCode.cs" />
     <Compile Include="_Documentation\Transaction.cs" />
     <Compile Include="_Documentation\UpdateData.cs" />
     <Compile Include="_Helpers\Category.cs" />
@@ -100,7 +100,9 @@
   <ItemGroup>
     <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="_Samples\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
