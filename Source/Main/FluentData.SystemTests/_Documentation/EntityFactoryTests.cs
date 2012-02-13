@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class EntityFactory : BaseDocumentation
+	public class EntityFactoryTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Test()

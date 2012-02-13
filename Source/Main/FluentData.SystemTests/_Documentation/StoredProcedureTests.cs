@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class StoredProcedure : BaseDocumentation
+	public class StoredProcedureTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Stored_procedure_sql()

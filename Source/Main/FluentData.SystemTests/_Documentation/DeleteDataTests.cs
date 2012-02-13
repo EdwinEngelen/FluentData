@@ -3,7 +3,7 @@
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class DeleteData : BaseDocumentation
+	public class DeleteDataTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Delete_data_sql()

@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class InsertData : BaseDocumentation
+	public class InsertDataTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Insert_data_sql()

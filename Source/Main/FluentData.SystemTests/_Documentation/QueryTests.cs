@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class Query : BaseDocumentation
+	public class QueryTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Query_many_dynamic()

@@ -3,7 +3,7 @@
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class Transactions : BaseDocumentation
+	public class TransactionsTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Test_transactions()

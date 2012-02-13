@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class Parameters : BaseDocumentation
+	public class ParametersTests : BaseDocumentation
 	{
 		[TestMethod]
 		public void Indexed_parameters()
