@@ -5,7 +5,7 @@ namespace FluentData._Helpers
 	{
 		public static IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlServer", DbProviderTypes.SqlServer).ThrowExceptionIfAutoMapFails;
+			return new DbContext().ConnectionStringName("SqlServer", DbProviderTypes.SqlServer);
 		}
 
 		public static Product GetProduct(IDbContext context, int productId)

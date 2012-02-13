@@ -2,11 +2,11 @@
 {
 	public partial class DbContext : IDbContext
 	{
-		public IDbContext ThrowExceptionIfAutoMapFails
+		public IDbContext IgnoreIfAutoMapFails
 		{
 			get
 			{
-				ContextData.ThrowExceptionIfAutoMapFails = true;
+				ContextData.IgnoreIfAutoMapFails = true;
 				return this;
 			}
 		}

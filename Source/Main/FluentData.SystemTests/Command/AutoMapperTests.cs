@@ -25,25 +25,21 @@ namespace FluentData.Command
 		}
 
 		[TestMethod]
-		public void Test_same_fields_and_properties_automap_must_not_fail()
+		public void Test_same_columns_and_properties_automap_must_not_fail()
 		{
-			var result = TestHelper.Context().ThrowExceptionIfAutoMapFails
-									.Sql(@"select CategoryId, Name
-											from Category")
-									.Query<Category>();
+			var result = TestHelper.Context().Sql(@"select CategoryId, Name
+											from Category").Query<Category>();
 
 			Assert.IsTrue(result.Count > 0);
 		}
 
 		[TestMethod]
-		public void Test_same_fields_and_properties_automap_must_fail()
+		public void Test_different_columns_and_properties_automap_must_fail()
 		{
 			try
 			{
-				var result = TestHelper.Context().ThrowExceptionIfAutoMapFails
-													.Sql(@"select CategoryId as CategoryIdNotExist, Name
-											from Category")
-													.Query<Category>();
+				var result = TestHelper.Context().Sql(@"select CategoryId as CategoryIdNotExist, Name
+															from Category").Query<Category>();
 
 				Assert.Fail();
 			}
@@ -51,6 +47,13 @@ namespace FluentData.Command
 			{
 				Assert.AreEqual("Could not map: CategoryIdNotExist", exception.Message);
 			}
+		}
+
+		[TestMethod]
+		public void Test_different_columns_and_properties_automap_must_not_fail()
+		{
+			var result = TestHelper.Context().IgnoreIfAutoMapFails.Sql(@"select CategoryId as CategoryIdNotExist, Name
+														from Category").Query<Category>();
 		}
 	}
 }

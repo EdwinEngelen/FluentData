@@ -11,7 +11,7 @@ namespace FluentData
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
-		IDbContext ThrowExceptionIfAutoMapFails { get; }
+		IDbContext IgnoreIfAutoMapFails { get; }
 		IDbContext UseTransaction { get; }
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);

@@ -13,11 +13,11 @@ namespace FluentData
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
 		public DbProviderTypes Provider { get; set; }
-		public bool ThrowExceptionIfAutoMapFails { get; set; }
+		public bool IgnoreIfAutoMapFails { get; set; }
 
 		public DbContextData()
 		{
-			ThrowExceptionIfAutoMapFails = false;
+			IgnoreIfAutoMapFails = false;
 			UseTransaction = false;
 			IsolationLevel = IsolationLevel.ReadCommitted;
 			EntityFactory = new EntityFactory();
