@@ -100,9 +100,7 @@
   <ItemGroup>
     <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="_Samples\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
