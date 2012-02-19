@@ -13,7 +13,7 @@ namespace FluentData
 			product.Name = "TestProduct";
 			product.Category = new Category();
 			product.CategoryId = 1;
-
+			
 			using (var context = TestHelper.Context().UseTransaction)
 			{
 				var storedProcedure = context.StoredProcedure<Product>("ProductInsert", product)

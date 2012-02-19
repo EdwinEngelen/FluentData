@@ -18,7 +18,7 @@ namespace FluentData._Documentation
 
 		public class CustomEntityFactory : IEntityFactory
 		{
-		public virtual object Resolve(Type type)
+		public virtual object Create(Type type)
 		{
 			return Activator.CreateInstance(type);
 		}

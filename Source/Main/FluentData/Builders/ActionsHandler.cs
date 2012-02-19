@@ -28,7 +28,7 @@ namespace FluentData
 			else
 				parameterName = "c" + _data.Columns.Count.ToString();
 
-			_data.Columns.Add(new TableColumn(columnName, isSql, value, parameterName));
+			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
 			if (!isSql)
 				ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
@@ -122,10 +122,10 @@ namespace FluentData
 
 		internal void WhereAction(string columnName, object value)
 		{
-			var parameterName = "id" + _data.Wheres.Count().ToString();
+			var parameterName = "id" + _data.Where.Count().ToString();
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
 
-			_data.Wheres.Add(new TableColumn(columnName, false, value, parameterName));
+			_data.Where.Add(new TableColumn(columnName, value, parameterName));
 			AutoMapIgnorePropertyAction(columnName);
 		}
 

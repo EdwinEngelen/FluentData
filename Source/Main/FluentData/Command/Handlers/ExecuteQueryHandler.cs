@@ -59,13 +59,6 @@ namespace FluentData
 				if (useReader)
 					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
 
-				if ((_data.InnerCommand.CommandType == CommandType.Text && _data.DbContextData.DbProvider.SupportsBindByNameForText)
-					|| (_data.InnerCommand.CommandType == CommandType.StoredProcedure && _data.DbContextData.DbProvider.SupportsBindByNameForStoredProcedure))
-				{
-					dynamic innerCommand = _data.InnerCommand;
-					innerCommand.BindByName = true;
-				}
-
 				_queryAlreadyExecuted = true;
 			}
 		}

@@ -126,21 +126,19 @@
     <Compile Include="Core\GlobalConstants.cs" />
     <Compile Include="Core\ReflectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\Common\ConnectionCreator.cs" />
+    <Compile Include="Providers\Common\ConnectionFactory.cs" />
     <Compile Include="Providers\Common\DbTypeMapper.cs" />
+    <Compile Include="Providers\Common\Builders\DeleteBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\FixSqlInStatement.cs" />
+    <Compile Include="Providers\Common\Builders\InsertBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\Common\Builders\UpdateBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\MySql\MySqlProvider.cs" />
     <Compile Include="Providers\DbProviderFactory.cs" />
     <Compile Include="Providers\DbProviderTypes.cs" />
     <Compile Include="Providers\IDbProvider.cs" />
-    <Compile Include="Providers\Oracle\Builders\DeleteBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\Oracle\Builders\InsertBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\Oracle\Builders\UpdateBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Oracle\OracleProvider.cs" />
     <Compile Include="Providers\Oracle\OracleQueryExecuter.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
-    <Compile Include="Providers\SqlServer\Builders\DeleteBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\SqlServer\Builders\InsertBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\SqlServer\Builders\UpdateBuilderSqlGenerator.cs" />
     <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />
   </ItemGroup>
   <ItemGroup>

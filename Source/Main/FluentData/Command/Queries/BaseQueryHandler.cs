@@ -23,7 +23,7 @@ namespace FluentData
 			if (type == typeof(List<TEntity>))
 				item = Activator.CreateInstance(type);
 			else
-				item = Data.DbContextData.EntityFactory.Resolve(type);
+				item = Data.DbContextData.EntityFactory.Create(type);
 
 			return (TList) item;
 		}
@@ -35,7 +35,7 @@ namespace FluentData
 			if (type == typeof(List<TEntity>))
 				item = Activator.CreateInstance(type);
 			else
-				item = Data.DbContextData.EntityFactory.Resolve(type);
+				item = Data.DbContextData.EntityFactory.Create(type);
 
 			return item;
 		}

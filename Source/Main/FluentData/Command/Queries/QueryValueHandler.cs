@@ -1,4 +1,5 @@
-﻿namespace FluentData
+﻿using System;
+namespace FluentData
 {
 	internal class QueryValueHandler<T> : BaseQueryHandler
 	{
@@ -12,8 +13,13 @@
 			T value = default(T);
 
 			if (Data.Reader.Read())
-				value = (T) Data.Reader.GetValue(0);
-
+			{
+				if (Data.Reader.GetFieldType(0) == typeof(T))
+					value = (T) Data.Reader.GetValue(0);
+				else
+					value = (T) Convert.ChangeType(Data.Reader.GetValue(0), typeof(T));
+			}
+			
 			return value;
 		}
 	}

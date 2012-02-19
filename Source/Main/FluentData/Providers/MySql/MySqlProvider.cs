@@ -4,18 +4,17 @@ using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.Oracle
+namespace FluentData.Providers.MySql
 {
-	internal class OracleProvider : IDbProvider
+	internal class MySqlProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
 			get
 			{
-				return "Oracle.DataAccess.Client";
+				return "MySql.Data.MySqlClient";
 			} 
 		}
-
 		public bool SupportsOutputParameters
 		{
 			get { return true; }
@@ -23,7 +22,7 @@ namespace FluentData.Providers.Oracle
 
 		public bool SupportsMultipleResultset
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public bool SupportsMultipleQueries
@@ -38,7 +37,7 @@ namespace FluentData.Providers.Oracle
 
 		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -48,22 +47,22 @@ namespace FluentData.Providers.Oracle
 
 		public string GetParameterName(string parameterName)
 		{
-			return ":" + parameterName;
+			return "@" + parameterName;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql(":", data);
+			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql(":", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql(":", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -83,16 +82,33 @@ namespace FluentData.Providers.Oracle
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			return new OracleQueryExecuter().ExecuteReturnLastId<T>(this, data, identityColumnName);
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
+
+			data.Sql.Append("select LAST_INSERT_ID() as `LastInsertedId`");
+
+			T lastId = default(T);
+
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			{
+				lastId = Execute<T>(data);
+			});
+
+			return lastId;
 		}
 
 		public void BeforeDbCommandExecute(DbCommandData data)
 		{
-			if (data.InnerCommand.CommandType == CommandType.Text)
-			{
-				dynamic innerCommand = data.InnerCommand;
-				innerCommand.BindByName = true;
-			}
+		}
+
+		private T Execute<T>(DbCommandData data)
+		{
+			object value = data.InnerCommand.ExecuteScalar();
+
+			if (value.GetType() == typeof(T))
+				return (T) value;
+			
+			return (T) Convert.ChangeType(value, typeof(T));
 		}
 	}
 }

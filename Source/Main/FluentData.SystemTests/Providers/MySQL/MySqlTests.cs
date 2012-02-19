@@ -2,21 +2,20 @@
 using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers.SqlAzure
+namespace FluentData.Providers.MySql
 {
 	[TestClass]
-	public class SqlAzureTests : IDbProviderTests
+	public class MySqlTests : IDbProviderTests
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlAzure", DbProviderTypes.SqlAzure);
+			return new DbContext().ConnectionStringName("MySql", DbProviderTypes.MySql);
 		}
 
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Category")
-									.Query();
+			var products = Context().Sql("select * from Product").Query();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -24,8 +23,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void Query_single_dynamic()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
-									.QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle();
 
 			Assert.IsNotNull(product);
 		}
@@ -33,8 +31,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void Query_many_strongly_typed()
 		{
-			var products = Context().Sql("select * from Product")
-									.Query<Product>();
+			var products = Context().Sql("select * from Product").Query<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -42,8 +39,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void Query_single_strongly_typed()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
-									.QuerySingle<Product>();
+			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle<Product>();
 
 			Assert.IsNotNull(product);
 		}
@@ -58,6 +54,23 @@ namespace FluentData.Providers.SqlAzure
 											inner join Category c on p.CategoryId = c.CategoryId
 											where ProductId = 1")
 									.QuerySingle<Product>();
+
+			Assert.IsNotNull(product);
+			Assert.IsNotNull(product.Category);
+			Assert.IsNotNull(product.Category.Name);
+		}
+
+		[TestMethod]
+		public void Query_auto_mapping_alias2()
+		{
+			var product = Context().Sql<Product>(@"select p.*,
+														c.CategoryId as {0},
+														c.Name as {1}
+													from Product p
+													inner join Category c on p.CategoryId = c.CategoryId
+													where ProductId = 1",
+														x => x.Category.CategoryId,
+														x => x.Category.Name).QuerySingle<Product>();
 
 			Assert.IsNotNull(product);
 			Assert.IsNotNull(product.Category);
@@ -106,9 +119,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void Unnamed_parameters_one()
 		{
-			var product = Context().Sql("select * from Product where ProductId = @0")
-									.Parameters(1)
-									.QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle();
 
 			Assert.IsNotNull(product);
 		}
@@ -117,7 +128,7 @@ namespace FluentData.Providers.SqlAzure
 		public void Unnamed_parameters_many()
 		{
 			var products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1")
-									.Parameters(1, 3)
+									.Parameters(1, 2)
 									.Query();
 
 			Assert.AreEqual(2, products.Count);
@@ -128,7 +139,7 @@ namespace FluentData.Providers.SqlAzure
 		{
 			var products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
-									.Parameter("ProductId2", 3)
+									.Parameter("ProductId2", 2)
 									.Query();
 
 			Assert.AreEqual(2, products.Count);
@@ -137,7 +148,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void In_query()
 		{
-			var ids = new List<int>() { 1, 3, 4, 6 };
+			var ids = new List<int>() { 1, 2, 3, 4 };
 
 			var products = Context().Sql("select * from Product where ProductId in(@0)")
 									.Parameters(ids)
@@ -149,12 +160,11 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql())
-			{
-				var categories = command.Sql(@"select * from Category;
-									select * from Product;").Query();
-
-				var products = command.Query();
+				using (var command = Context().MultiResultSql())
+				{
+					var categories = command.Sql(@"select * from Category;
+													select * from Product;").Query();
+					var products = command.Query();
 
 				Assert.IsTrue(categories.Count > 0);
 				Assert.IsTrue(products.Count > 0);
@@ -268,12 +278,12 @@ namespace FluentData.Providers.SqlAzure
 			using (var context = Context().UseTransaction)
 			{
 				context.Sql("update Product set Name = @0 where ProductId = @1")
-						.Parameters("The Warren Buffet Way", 1)
-						.Execute();
+							.Parameters("The Warren Buffet Way", 1)
+							.Execute();
 
 				context.Sql("update Product set Name = @0 where ProductId = @1")
-						.Parameters("Bill Gates Bio", 2)
-						.Execute();
+							.Parameters("Bill Gates Bio", 2)
+							.Execute();
 
 				context.Commit();
 			}
@@ -282,20 +292,10 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void Stored_procedure_sql()
 		{
-			var rowsAffected = Context().Sql("execute ProductUpdate @ProductId = @0, @Name = @1")
-										.Parameters(1, "The Warren Buffet Way")
-										.Execute();
-
-			Assert.AreEqual(1, rowsAffected);
-		}
-
-		[TestMethod]
-		public void Stored_procedure()
-		{
 			var rowsAffected = Context().Sql("ProductUpdate")
 										.CommandType(DbCommandTypes.StoredProcedure)
-										.Parameter("ProductId", 1)
-										.Parameter("Name", "The Warren Buffet Way")
+										.Parameter("ParamProductId", 1)
+										.Parameter("ParamName", "The Warren Buffet Way")
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -305,8 +305,8 @@ namespace FluentData.Providers.SqlAzure
 		public void Stored_procedure_builder()
 		{
 			var rowsAffected = Context().StoredProcedure("ProductUpdate")
-										.Parameter("Name", "The Warren Buffet Way")
-										.Parameter("ProductId", 1).Execute();
+										.Parameter("ParamName", "The Warren Buffet Way")
+										.Parameter("ParamProductId", 1).Execute();
 
 			Assert.AreEqual(1, rowsAffected);
 		}
@@ -316,11 +316,12 @@ namespace FluentData.Providers.SqlAzure
 		{
 		    var product = Context().Sql("select * from Product where ProductId = 1")
 		                    .QuerySingle<Product>();
-
 		    product.Name = "The Warren Buffet Way";
 
-		    var rowsAffected = Context().StoredProcedure<Product>("ProductUpdate", product)
-											.IgnoreProperty(x => x.CategoryId)
+			var mysqlProduct = new MySqlProduct(product);
+
+			var rowsAffected = Context().StoredProcedure<MySqlProduct>("ProductUpdate", mysqlProduct)
+											.IgnoreProperty(x => x.ParamCategoryId)
 											.AutoMap().Execute();
 
 		    Assert.AreEqual(1, rowsAffected);
@@ -333,9 +334,10 @@ namespace FluentData.Providers.SqlAzure
 							.QuerySingle<Product>();
 			product.Name = "The Warren Buffet Way";
 
-			var rowsAffected = Context().StoredProcedure<Product>("ProductUpdate", product)
-											.Parameter(x => x.ProductId)
-											.Parameter(x => x.Name).Execute();
+			var mysqlProduct = new MySqlProduct(product);
+			var rowsAffected = Context().StoredProcedure<MySqlProduct>("ProductUpdate", mysqlProduct)
+											.Parameter(x => x.ParamProductId)
+											.Parameter(x => x.ParamName).Execute();
 
 			Assert.AreEqual(1, rowsAffected);
 		}

@@ -35,7 +35,6 @@ namespace FluentData
 		T QueryValue<T>();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
-		string GetSql();
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 }

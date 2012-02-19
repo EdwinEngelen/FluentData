@@ -67,6 +67,8 @@
     <Compile Include="Command\SqlTests.cs" />
     <Compile Include="Context\TransactionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\MySql\MySqlProduct.cs" />
+    <Compile Include="Providers\MySql\MySqlTests.cs" />
     <Compile Include="Providers\IDbProviderTests.cs" />
     <Compile Include="Providers\Oracle\OracleTests.cs" />
     <Compile Include="Providers\SqlAzure\SqlServerTests.cs" />

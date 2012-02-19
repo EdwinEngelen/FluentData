@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace FluentData.Providers.Common
 {
-	internal class ConnectionCreator
+	internal class ConnectionFactory
 	{
 		public static IDbConnection CreateConnection(string providerName, string connectionString)
 		{

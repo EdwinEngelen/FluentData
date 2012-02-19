@@ -87,7 +87,7 @@ namespace FluentData
 
 			if (instance == null)
 			{
-				instance = EntityFactory.Resolve(property.PropertyType);
+				instance = EntityFactory.Create(property.PropertyType);
 
 				property.SetValue(item, instance, null);
 			}

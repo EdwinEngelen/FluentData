@@ -32,7 +32,7 @@ namespace FluentData
 
 			while (Data.Reader.Read())
 			{
-				var item = (TEntity) Data.DbContextData.EntityFactory.Resolve(typeof(TEntity));
+				var item = (TEntity) Data.DbContextData.EntityFactory.Create(typeof(TEntity));
 
 				if (autoMap)
 					autoMapper.AutoMap(item);
@@ -68,7 +68,7 @@ namespace FluentData
 
 			if (Data.Reader.Read())
 			{
-				item = (TEntity) Data.DbContextData.EntityFactory.Resolve(typeof(TEntity));
+				item = (TEntity) Data.DbContextData.EntityFactory.Create(typeof(TEntity));
 
 				if (autoMap)
 					autoMapper.AutoMap(item);

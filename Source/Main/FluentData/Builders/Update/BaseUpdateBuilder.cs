@@ -10,7 +10,7 @@
 			get
 			{
 				if (Data.Columns.Count == 0
-					|| Data.Wheres.Count == 0)
+					|| Data.Where.Count == 0)
 					throw new FluentDataException("Columns or where filter have not yet been added.");
 
 				Data.DbCommand.Sql(Data.DbProvider.GetSqlForUpdateBuilder(Data));

@@ -12,7 +12,7 @@ namespace FluentData
 		public DbCommandData DbData { get; set; }
 		public IDbProvider DbProvider { get; set; }
 		public IDbCommand DbCommand { get; set; }
-		public List<TableColumn> Wheres { get; set; }
+		public List<TableColumn> Where { get; set; }
 
 		public BuilderData(IDbProvider provider, IDbCommand command, string objectName)
 		{
@@ -22,7 +22,7 @@ namespace FluentData
 			Parameters = new List<Parameter>();
 			Columns = new List<TableColumn>();
 			IgnoreProperties = new HashSet<string>();
-			Wheres = new List<TableColumn>();
+			Where = new List<TableColumn>();
 		}
 	}
 }

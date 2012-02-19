@@ -3,7 +3,7 @@ using System.Data;
 using System.Text;
 using FluentData;
 using FluentData.Providers.Common;
-using FluentData.Providers.SqlServer.Builders;
+using FluentData.Providers.Common.Builders;
 
 namespace FluentData.Providers.SqlServerCompact
 {
@@ -37,16 +37,6 @@ namespace FluentData.Providers.SqlServerCompact
 			get { return false; }
 		}
 
-		public bool SupportsBindByNameForText
-		{
-			get { return false; }
-		}
-
-		public bool SupportsBindByNameForStoredProcedure
-		{
-			get { return false; }
-		}
-
 		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
 		{
 			get { return true; }
@@ -54,7 +44,7 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public IDbConnection CreateConnection(string connectionString)
 		{
-			return ConnectionCreator.CreateConnection(ProviderName, connectionString);
+			return ConnectionFactory.CreateConnection(ProviderName, connectionString);
 		}
 
 		public string GetParameterName(string parameterName)
@@ -64,17 +54,17 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql(data);
+			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql(data);
+			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql(data);
+			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -104,7 +94,7 @@ namespace FluentData.Providers.SqlServerCompact
 			return lastId;
 		}
 
-		public void PrepareCommandBeforeExecute(DbCommandData data)
+		public void BeforeDbCommandExecute(DbCommandData data)
 		{
 			
 		}
