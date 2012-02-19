@@ -91,7 +91,12 @@ namespace FluentData.Providers.MySql
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = Execute<T>(data);
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
 			});
 
 			return lastId;
@@ -99,16 +104,6 @@ namespace FluentData.Providers.MySql
 
 		public void BeforeDbCommandExecute(DbCommandData data)
 		{
-		}
-
-		private T Execute<T>(DbCommandData data)
-		{
-			object value = data.InnerCommand.ExecuteScalar();
-
-			if (value.GetType() == typeof(T))
-				return (T) value;
-			
-			return (T) Convert.ChangeType(value, typeof(T));
 		}
 	}
 }

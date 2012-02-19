@@ -84,26 +84,21 @@ namespace FluentData.Providers.SqlServer
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			var lastInsertedParameterName = GetParameterName(GlobalConstants.LastInsertedIdParameterName);
-			bool found = false;
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
 
-			foreach (DbParameter parameter in data.InnerCommand.Parameters)
-			{
-				if (parameter.ParameterName == lastInsertedParameterName)
-					found = true;
-			}
-
-			if (!found)
-			{
-				data.DbCommand.ParameterOut(GlobalConstants.LastInsertedIdParameterName, data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
-				data.Sql.Append(";set @LastInsertedId = SCOPE_IDENTITY();");
-			}
+			data.Sql.Append("select SCOPE_IDENTITY()");
 
 			T lastId = default(T);
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = Execute<T>(data);
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
 			});
 
 			return lastId;
@@ -111,14 +106,6 @@ namespace FluentData.Providers.SqlServer
 
 		public void BeforeDbCommandExecute(DbCommandData data)
 		{
-		}
-
-		private T Execute<T>(DbCommandData data)
-		{
-			data.InnerCommand.ExecuteNonQuery();
-
-			var parameter = (IDbDataParameter) data.InnerCommand.Parameters["@" + GlobalConstants.LastInsertedIdParameterName];
-			return (T) parameter.Value;
 		}
 	}
 }

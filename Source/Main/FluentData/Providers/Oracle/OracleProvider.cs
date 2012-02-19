@@ -83,7 +83,20 @@ namespace FluentData.Providers.Oracle
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			return new OracleQueryExecuter().ExecuteReturnLastId<T>(this, data, identityColumnName);
+			data.DbCommand.ParameterOut("FluentDataLastInsertedId", data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
+			data.Sql.Append(string.Format(" returning {0} into :FluentDataLastInsertedId", identityColumnName));
+
+			var lastId = default(T);
+
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			{
+				data.InnerCommand.ExecuteNonQuery();
+
+				var parameter = (IDbDataParameter) data.InnerCommand.Parameters[":FluentDataLastInsertedId"];
+				lastId = (T) parameter.Value;
+			});
+
+			return lastId;
 		}
 
 		public void BeforeDbCommandExecute(DbCommandData data)
