@@ -231,9 +231,9 @@ namespace FluentData.Providers.Oracle
 			product.Name = "The Warren Buffet Way";
 
 			var rowsAffected = Context().Update<Product>("Product", product)
-										.Where(x => x.ProductId)
 										.IgnoreProperty(x => x.CategoryId)
 										.AutoMap()
+										.Where(x => x.ProductId)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
