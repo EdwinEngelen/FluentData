@@ -140,7 +140,12 @@ namespace FluentData
 					if (propertyType != field.Type)
 					{
 						if (propertyType.IsEnum)
-							value = Enum.ToObject(propertyType, value);
+						{
+							if (field.Type == typeof(string))
+								value = Enum.Parse(propertyType, (string) value, true);
+							else
+								value = Enum.ToObject(propertyType, value);
+						}
 						else if (!ReflectionHelper.IsBasicClrType(propertyType))
 							return;
 						else if (propertyType == typeof(string))
