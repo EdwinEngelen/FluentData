@@ -61,11 +61,14 @@
     <Compile Include="Builders\Update\UpdateBuilderDynamicTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderGenericTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderTests.cs" />
-    <Compile Include="Command\AutoMapperTests.cs" />
+    <Compile Include="Features\AutoMapping\EnumTests.cs" />
     <Compile Include="Command\MultipleResultsetTests.cs" />
     <Compile Include="Command\PotentialErrorsTests.cs" />
     <Compile Include="Command\SqlTests.cs" />
     <Compile Include="Context\TransactionTests.cs" />
+    <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
+    <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
+    <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
     <Compile Include="Features\UsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\MySql\MySqlProduct.cs" />

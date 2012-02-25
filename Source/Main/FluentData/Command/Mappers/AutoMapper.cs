@@ -139,12 +139,12 @@ namespace FluentData
 
 					if (propertyType != field.Type)
 					{
-						if (!ReflectionHelper.IsBasicClrType(propertyType))
+						if (propertyType.IsEnum)
+							value = Enum.ToObject(propertyType, value);
+						else if (!ReflectionHelper.IsBasicClrType(propertyType))
 							return;
 						else if (propertyType == typeof(string))
 							value = value.ToString();
-						else if (propertyType.IsEnum)
-							value = Enum.ToObject(propertyType, value);
 						else
 							value = Convert.ChangeType(value, property.PropertyType);
 					}
