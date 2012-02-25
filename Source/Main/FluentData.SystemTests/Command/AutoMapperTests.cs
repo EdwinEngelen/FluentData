@@ -50,10 +50,26 @@ namespace FluentData.Command
 		}
 
 		[TestMethod]
-		public void Test_different_columns_and_properties_automap_must_not_fail()
+		public void Test_fieldname_propertyname_with_underscore()
 		{
-			var result = TestHelper.Context().IgnoreIfAutoMapFails.Sql(@"select CategoryId as CategoryIdNotExist, Name
-														from Category").Query<Category>();
+			var product = TestHelper.Context()
+										.Sql(@"select top 1
+													p.ProductId as product_Id,
+													p.Name,
+													c.CategoryId as Category_Id,
+													c.Name as Category_Name
+												from Product p
+												inner join Category c on p.CategoryId = c.CategoryId").QuerySingle<ProductWithUnderscore>();
+
+			Assert.IsFalse(string.IsNullOrEmpty(product.Category_Name));
+		}
+
+		public class ProductWithUnderscore
+		{
+			public int Product_Id { get; set; }
+			public string Name { get; set; }
+			public int Category_Id { get; set; }
+			public string Category_Name { get; set; }
 		}
 	}
 }

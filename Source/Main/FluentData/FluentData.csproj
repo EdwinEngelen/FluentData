@@ -139,9 +139,7 @@
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Command\Queries\Queries\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

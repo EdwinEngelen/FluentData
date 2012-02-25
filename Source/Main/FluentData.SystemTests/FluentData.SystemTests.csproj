@@ -66,6 +66,7 @@
     <Compile Include="Command\PotentialErrorsTests.cs" />
     <Compile Include="Command\SqlTests.cs" />
     <Compile Include="Context\TransactionTests.cs" />
+    <Compile Include="Features\UsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\MySql\MySqlProduct.cs" />
     <Compile Include="Providers\MySql\MySqlTests.cs" />

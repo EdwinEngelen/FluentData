@@ -11,14 +11,6 @@ namespace FluentData
 		public Type Type { get; set; }
 		private List<string> _nestedPropertyNames;
 
-		public bool IsComplex
-		{
-			get
-			{
-				return Name.Contains("_");
-			}
-		}
-
 		public string GetNestedName(int level)
 		{
 			if (_nestedPropertyNames == null)

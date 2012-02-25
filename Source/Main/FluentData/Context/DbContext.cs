@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System.Data;
+
+namespace FluentData
 {
 	public partial class DbContext : IDbContext
 	{
@@ -17,7 +19,8 @@
 					Rollback();
 			}
 
-			ContextData.Connection.Close();
+			if (ContextData.Connection != null)
+				ContextData.Connection.Close();
 		}
 	}
 }

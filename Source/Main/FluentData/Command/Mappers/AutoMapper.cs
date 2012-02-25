@@ -20,13 +20,13 @@ namespace FluentData
 
 		public void AutoMap(object item)
 		{
+			var properties = GetProperties(item);
 			foreach (var field in Fields)
 			{
-				var isDbNull = base._reader.IsDBNull(field.Index);
 				var value = base._reader.GetValue(field.Index);
 				bool wasMapped;
 
-				if (field.IsComplex)
+				if (IsComplex(field, properties))
 					wasMapped = HandleComplexField(0, item, field, value);
 				else
 					wasMapped = HandleSimpleField(item, field, value);
@@ -34,6 +34,20 @@ namespace FluentData
 				if (!wasMapped && !_dbContextData.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
+		}
+
+		private bool IsComplex(DataReaderField field, List<PropertyInfo> properties)
+		{
+			foreach (var property in properties)
+			{
+				if (property.Name.Equals(field.Name, StringComparison.CurrentCultureIgnoreCase))
+					return false;
+			}
+
+			if (field.Name.Contains("_"))
+				return true;
+
+			return false;
 		}
 
 		private bool HandleSimpleField(object item, DataReaderField field, object value)
