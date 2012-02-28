@@ -117,6 +117,16 @@ namespace FluentData.Providers.SqlServer
 		}
 
 		[TestMethod]
+		public void QueryValues()
+		{
+			var categories = Context().Sql("select CategoryId from Category order by CategoryId").QueryValues<int>();
+
+			Assert.AreEqual(2, categories.Count);
+			Assert.AreEqual(1, categories[0]);
+			Assert.AreEqual(2, categories[1]);
+		}
+
+		[TestMethod]
 		public void Unnamed_parameters_one()
 		{
 			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle();

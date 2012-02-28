@@ -107,6 +107,7 @@
     <Compile Include="Command\Queries\QueryComplexHandler.cs" />
     <Compile Include="Command\Queries\QueryValueHandler.cs" />
     <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
+    <Compile Include="Command\Queries\QueryValuesHandler.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />
     <Compile Include="Context\DbContext.cs" />

@@ -69,13 +69,14 @@
     <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
     <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
     <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
+    <Compile Include="Features\Queries\QueryValuesTests.cs" />
     <Compile Include="Features\UsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\MySql\MySqlProduct.cs" />
     <Compile Include="Providers\MySql\MySqlTests.cs" />
     <Compile Include="Providers\IDbProviderTests.cs" />
     <Compile Include="Providers\Oracle\OracleTests.cs" />
-    <Compile Include="Providers\SqlAzure\SqlServerTests.cs" />
+    <Compile Include="Providers\SqlAzure\SqlAzureTests.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactTests.cs" />
     <Compile Include="Providers\SqlServer\SqlServerTests.cs" />
     <Compile Include="_Documentation\BaseDocumentation.cs" />

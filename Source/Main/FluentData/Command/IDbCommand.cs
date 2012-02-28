@@ -33,6 +33,7 @@ namespace FluentData
 		TEntity QuerySingle<TEntity>();
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper);
 		T QueryValue<T>();
+		List<T> QueryValues<T>();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);

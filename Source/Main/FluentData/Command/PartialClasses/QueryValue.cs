@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System.Collections.Generic;
+
+namespace FluentData
 {
 	internal partial class DbCommand
 	{
@@ -13,6 +15,19 @@
 				});
 
 			return value;
+		}
+
+		public List<T> QueryValues<T>()
+		{
+			List<T> values = null;
+
+			_data.ExecuteQueryHandler.ExecuteQuery(true,
+				() =>
+				{
+					values = new QueryValuesHandler<T>(_data).Execute();
+				});
+
+			return values;
 		}
 	}
 }

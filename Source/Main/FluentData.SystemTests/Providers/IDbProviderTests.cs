@@ -22,6 +22,7 @@ namespace FluentData.Providers
 		void Query_single_dynamic();
 		void Query_single_strongly_typed();
 		void QueryValue();
+		void QueryValues();
 		void Stored_procedure_builder();
 		void Stored_procedure_sql();
 		void StoredProcedure_builder_automapping();
