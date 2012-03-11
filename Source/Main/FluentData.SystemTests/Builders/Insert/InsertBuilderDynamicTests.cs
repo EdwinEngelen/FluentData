@@ -38,8 +38,7 @@ namespace FluentData
 			using (var context = TestHelper.Context().UseTransaction)
 			{
 				product.ProductId = context.Insert("Product", (ExpandoObject) product)
-									.IgnoreProperty("ProductId")
-									.AutoMap()
+									.AutoMap("ProductId")
 									.ExecuteReturnLastId();
 
 				var createdProduct = TestHelper.GetProduct(context, product.ProductId);

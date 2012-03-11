@@ -15,11 +15,11 @@ namespace FluentData
 				if (ContextData.UseTransaction)
 				{
 					if (ContextData.Connection == null)
-						ContextData.Connection = ContextData.DbProvider.CreateConnection(ContextData.ConnectionString);
+						ContextData.Connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
 					connection = ContextData.Connection;
 				}
 				else
-					connection = ContextData.DbProvider.CreateConnection(ContextData.ConnectionString);
+					connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
 
 				var cmd = connection.CreateCommand();
 				cmd.Connection = connection;

@@ -21,14 +21,5 @@ namespace FluentData._Documentation
 
 			Assert.IsNotNull(product);
 		}
-
-		[TestMethod]
-		public void QueryValue()
-		{
-			int categoryId = Context().Sql("select CategoryId from Product where ProductId = 1")
-										.QueryValue<int>();
-
-			Assert.AreEqual(1, categoryId);
-		}
 	}
 }

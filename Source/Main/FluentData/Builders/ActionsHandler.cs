@@ -48,15 +48,24 @@ namespace FluentData
 			ColumnAction(propertyName, false, propertyValue, true);
 		}
 
-		internal void AutoMapColumnsAction(bool propertyNameIsParameterName)
+		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
 			var properties = ReflectionHelper.GetProperties(_data.Item);
+			var ignorePropertyNames = new HashSet<string>();
+			if (ignorePropertyExpressions != null)
+			{
+				foreach (var ignorePropertyExpression in ignorePropertyExpressions)
+				{
+					var ignorePropertyName = ReflectionHelper.GetPropertyNameFromExpression(ignorePropertyExpression);
+					ignorePropertyNames.Add(ignorePropertyName);
+				}
+			}
 
 			foreach (var property in properties)
 			{
 				var propertyType = ReflectionHelper.GetPropertyType(property);
 
-				var ignoreProperty = _data.IgnoreProperties.SingleOrDefault(x => x.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase));
+				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase));
 
 				if (ignoreProperty == null
 					&& ReflectionHelper.IsBasicClrType(propertyType))
@@ -66,31 +75,26 @@ namespace FluentData
 			}
 		}
 
-		internal void AutoMapDynamicTypeColumnsAction(bool propertyNameIsParameterName)
+		internal void AutoMapDynamicTypeColumnsAction(bool propertyNameIsParameterName, params string[] ignorePropertyExpressions)
 		{
 			var properties = (IDictionary<string, object>) _data.Item;
+			var ignorePropertyNames = new HashSet<string>();
+			if (ignorePropertyExpressions != null)
+			{
+				foreach (var ignorePropertyExpression in ignorePropertyExpressions)
+					ignorePropertyNames.Add(ignorePropertyExpression);
+			}
 
 			foreach (var property in properties)
 			{
-				var ignoreProperty = _data.IgnoreProperties.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
+				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
 
 				if (ignoreProperty == null
-					&& property.GetType().Namespace.ToString().StartsWith("System"))
+					&& ReflectionHelper.IsBasicClrType(property.Value.GetType()))
 				{
 					ColumnAction(property.Key, false, property.Value, propertyNameIsParameterName);
 				}
 			}
-		}
-
-		internal void AutoMapIgnorePropertyAction<T>(Expression<Func<T, object>> expression)
-		{
-			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
-			_data.IgnoreProperties.Add(propertyName);
-		}
-
-		internal void AutoMapIgnorePropertyAction(string name)
-		{
-			_data.IgnoreProperties.Add(name);
 		}
 
 		internal void ParameterAction(string name, object value, DataTypes dataTypes, ParameterDirection direction, bool isId, int size = 0)
@@ -104,7 +108,7 @@ namespace FluentData
 			parameter.Size = size;
 
 			_data.Parameters.Add(parameter);
-			_data.DbCommand.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction);
+			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
@@ -126,7 +130,6 @@ namespace FluentData
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
-			AutoMapIgnorePropertyAction(columnName);
 		}
 
 		internal void WhereAction<T>(Expression<Func<T, object>> expression)

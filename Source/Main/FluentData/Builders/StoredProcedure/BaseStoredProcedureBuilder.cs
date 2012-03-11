@@ -12,9 +12,9 @@ namespace FluentData
 		{
 			get
 			{
-				Data.DbCommand.CommandType(DbCommandTypes.StoredProcedure);
-				Data.DbCommand.Sql(Data.DbProvider.GetSqlForStoredProcedureBuilder(Data));
-				return Data.DbCommand;
+				Data.Command.CommandType(DbCommandTypes.StoredProcedure);
+				Data.Command.Sql(Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+				return Data.Command;
 			}
 		}
 
@@ -123,6 +123,11 @@ namespace FluentData
 		public T QueryValue<T>()
 		{
 			return Command.QueryValue<T>();
+		}
+
+		public List<T> QueryValues<T>()
+		{
+			return Command.QueryValues<T>();
 		}
 	}
 }

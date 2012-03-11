@@ -47,8 +47,7 @@ var rowsAffected = Context().Sql("ProductUpdate")
 			product.Name = "The Warren Buffet Way";
 
 			var rowsAffected = Context().StoredProcedure<Product>("ProductUpdate", product)
-											.IgnoreProperty(x => x.CategoryId)
-											.AutoMap().Execute();
+											.AutoMap(x => x.CategoryId).Execute();
 
 			Assert.AreEqual(1, rowsAffected);
 		}

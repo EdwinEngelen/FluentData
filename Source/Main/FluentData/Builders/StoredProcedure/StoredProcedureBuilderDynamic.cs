@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq.Expressions;
 
 namespace FluentData
 {
@@ -17,15 +19,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilderDynamic IgnoreProperty(string name)
+		public IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapIgnorePropertyAction(name);
-			return this;
-		}
-
-		public IStoredProcedureBuilderDynamic AutoMap()
-		{
-			Actions.AutoMapDynamicTypeColumnsAction(true);
+			Actions.AutoMapDynamicTypeColumnsAction(true, ignoreProperties);
 			return this;
 		}
 

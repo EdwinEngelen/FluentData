@@ -12,18 +12,18 @@ namespace FluentData
 			DbContextData dbContextData)
 		{
 			_data = new DbCommandData();
-			_data.DbContext = dbContext;
-			_data.DbContextData = dbContextData;
+			_data.Context = dbContext;
+			_data.ContextData = dbContextData;
 			_data.InnerCommand = dbCommand;
-			_data.DbCommand = this;
-			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data);
+			_data.Command = this;
+			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data, this);
 		}
 
 		internal IDbCommand UseMultipleResultset
 		{
 			get
 			{
-				if (!_data.DbContextData.DbProvider.SupportsMultipleResultset)
+				if (!_data.ContextData.Provider.SupportsMultipleResultset)
 					throw new FluentDataException("The selected database does not support multiple resultset");
 
 				_data.UseMultipleResultsets = true;
@@ -33,9 +33,20 @@ namespace FluentData
 
 		public IDbCommand CommandType(DbCommandTypes dbCommandType)
 		{
-			_data.DbCommandType = dbCommandType;
+			_data.CommandType = dbCommandType;
 			_data.InnerCommand.CommandType = (System.Data.CommandType) dbCommandType;
 			return this;
+		}
+
+		internal void ClosePrivateConnection()
+		{
+			if (!_data.ContextData.UseTransaction)
+			{
+				_data.InnerCommand.Connection.Close();
+
+				if (_data.ContextData.OnConnectionClosed != null)
+					_data.ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(_data.InnerCommand.Connection));
+			}
 		}
 
 		public void Dispose()
@@ -43,8 +54,7 @@ namespace FluentData
 			if (_data.Reader != null)
 				_data.Reader.Close();
 
-			if (!_data.DbContextData.UseTransaction)
-				_data.InnerCommand.Connection.Close();
+			ClosePrivateConnection();
 		}
 	}
 }

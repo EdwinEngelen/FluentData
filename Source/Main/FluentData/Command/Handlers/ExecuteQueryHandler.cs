@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Data;
 
 namespace FluentData
 {
 	internal class ExecuteQueryHandler
 	{
 		private readonly DbCommandData _data;
+		private readonly DbCommand _command;
 		private bool _queryAlreadyExecuted;
 
-		public ExecuteQueryHandler(DbCommandData data)
+		public ExecuteQueryHandler(DbCommandData data, DbCommand command)
 		{
 			_data = data;
+			_command = command;
 		}
 
 		internal void ExecuteQuery(bool useReader, Action action)
@@ -18,7 +19,11 @@ namespace FluentData
 			try
 			{
 				PrepareDbCommand(useReader);
+
 				action();
+
+				if (_data.ContextData.OnExecuted != null)
+					_data.ContextData.OnExecuted(new OnExecutedEventArgs(_data.InnerCommand));
 			}
 			catch (Exception exception)
 			{
@@ -44,17 +49,29 @@ namespace FluentData
 				FixSql();
 				new ParameterHandler().FixParameterType(_data);
 
-				if (_data.DbContextData.UseTransaction)
+				if (_data.ContextData.CommandTimeout != Int32.MinValue)
+					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
+
+				if (_data.ContextData.OnConnectionOpening != null)
+					_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
+
+				if (_data.ContextData.UseTransaction)
 				{
-					if (_data.DbContextData.Transaction == null)
+					if (_data.ContextData.Transaction == null)
 					{
 						_data.InnerCommand.Connection.Open();
-						_data.DbContextData.Transaction = _data.DbContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.DbContextData.IsolationLevel);
+						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
 					}
-					_data.InnerCommand.Transaction = _data.DbContextData.Transaction;
+					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
 				}
 				else
 					_data.InnerCommand.Connection.Open();
+
+				if (_data.ContextData.OnConnectionOpened != null)
+					_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
+
+				if (_data.ContextData.OnExecuting != null)
+					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
 
 				if (useReader)
 					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
@@ -70,8 +87,7 @@ namespace FluentData
 				if (_data.Reader != null)
 					_data.Reader.Close();
 
-				if (!_data.DbContextData.UseTransaction)
-					_data.InnerCommand.Connection.Close();
+					_command.ClosePrivateConnection();
 			}
 		}
 
@@ -80,17 +96,21 @@ namespace FluentData
 			if (_data.Reader != null)
 				_data.Reader.Close();
 
-			if (_data.DbContextData.UseTransaction)
-				_data.DbContext.Rollback();
+			_command.ClosePrivateConnection();
+			if (_data.ContextData.UseTransaction)
+				_data.Context.CloseSharedConnection();
 
-			_data.InnerCommand.Connection.Close();
-
+			if (_data.ContextData.OnError != null)
+				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
+			
 			throw exception;
 		}
 
+
+
 		private void FixSql()
 		{
-			_data.DbContextData.DbProvider.FixInStatement(_data.Sql, _data.Parameters);
+			_data.ContextData.Provider.FixInStatement(_data.Sql, _data.Parameters);
 			_data.InnerCommand.CommandText = _data.Sql.ToString();
 		}
 	}

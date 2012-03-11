@@ -35,8 +35,7 @@ namespace FluentData._Documentation
 			product.CategoryId = 1;
 
 			product.ProductId = Context().Insert<Product>("Product", product)
-								.IgnoreProperty(x => x.ProductId)
-								.AutoMap()
+								.AutoMap(x => x.ProductId)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(product.ProductId > 0);

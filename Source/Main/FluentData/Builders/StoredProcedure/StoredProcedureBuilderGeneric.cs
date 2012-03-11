@@ -17,15 +17,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> AutoMap()
+		public IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(true);
-			return this;
-		}
-
-		public IStoredProcedureBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression)
-		{
-			Actions.AutoMapIgnorePropertyAction<T>(expression);
+			Actions.AutoMapColumnsAction(true, ignoreProperties);
 			return this;
 		}
 

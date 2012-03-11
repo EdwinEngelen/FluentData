@@ -36,7 +36,7 @@ namespace FluentData._Documentation
 
 			int rowsAffected = Context().Update<Product>("Product", product)
 										.Where(x => x.ProductId)
-										.AutoMap()
+										.AutoMap(x => x.ProductId)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);

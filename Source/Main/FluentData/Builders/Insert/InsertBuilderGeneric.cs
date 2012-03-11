@@ -23,27 +23,15 @@ namespace FluentData
 			return this;
 		}
 
-		public IInsertBuilder<T> AutoMap()
+		public IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false);
+			Actions.AutoMapColumnsAction(false, ignoreProperties);
 			return this;
 		}
 
-		public IInsertBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapIgnorePropertyAction<T>(expression);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap()
-		{
-			Actions.AutoMapColumnsAction(false);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.IgnoreProperty(Expression<Func<T, object>> expression)
-		{
-			Actions.AutoMapIgnorePropertyAction<T>(expression);
+			Actions.AutoMapColumnsAction(false, ignoreProperties);
 			return this;
 		}
 

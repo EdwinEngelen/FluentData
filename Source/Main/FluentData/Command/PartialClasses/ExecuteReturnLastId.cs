@@ -9,10 +9,10 @@
 
 		public T ExecuteReturnLastId<T>()
 		{
-			if (!_data.DbContextData.DbProvider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
+			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");
 
-			T lastId = _data.DbContextData.DbProvider.ExecuteReturnLastId<T>(_data, null);
+			T lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, null);
 
 			return lastId;
 		}
@@ -24,10 +24,10 @@
 
 		public T ExecuteReturnLastId<T>(string identityColumnName)
 		{
-			if (_data.DbContextData.DbProvider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
+			if (_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");
 
-			T lastId = _data.DbContextData.DbProvider.ExecuteReturnLastId<T>(_data, identityColumnName);
+			T lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
 
 			return lastId;
 		}

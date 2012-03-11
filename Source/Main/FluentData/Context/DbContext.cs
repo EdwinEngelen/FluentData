@@ -11,16 +11,26 @@ namespace FluentData
 			ContextData = new DbContextData();
 		}
 
-		public void Dispose()
+		internal void CloseSharedConnection()
 		{
+			if (ContextData.Connection == null)
+				return;
+
 			if (ContextData.UseTransaction)
 			{
 				if (ContextData.TransactionState == TransactionStates.None)
 					Rollback();
 			}
 
-			if (ContextData.Connection != null)
-				ContextData.Connection.Close();
+			ContextData.Connection.Close();
+
+			if (ContextData.OnConnectionClosed != null)
+				ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(ContextData.Connection));
+		}
+
+		public void Dispose()
+		{
+			CloseSharedConnection();
 		}
 	}
 }

@@ -210,8 +210,7 @@ namespace FluentData.Providers.MySql
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.IgnoreProperty(x => x.ProductId)
-								.AutoMap()
+								.AutoMap(x => x.ProductId)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -331,8 +330,7 @@ namespace FluentData.Providers.MySql
 			var mysqlProduct = new MySqlProduct(product);
 
 			var rowsAffected = Context().StoredProcedure<MySqlProduct>("ProductUpdate", mysqlProduct)
-											.IgnoreProperty(x => x.ParamCategoryId)
-											.AutoMap().Execute();
+											.AutoMap(x => x.ParamCategoryId).Execute();
 
 		    Assert.AreEqual(1, rowsAffected);
 		}

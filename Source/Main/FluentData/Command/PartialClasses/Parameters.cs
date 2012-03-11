@@ -31,7 +31,7 @@ namespace FluentData
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
-			if (!_data.DbContextData.DbProvider.SupportsOutputParameters)
+			if (!_data.ContextData.Provider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
 			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
@@ -39,7 +39,7 @@ namespace FluentData
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			outputParameterName = _data.DbContextData.DbProvider.GetParameterName(outputParameterName);
+			outputParameterName = _data.ContextData.Provider.GetParameterName(outputParameterName);
 			if (!_data.InnerCommand.Parameters.Contains(outputParameterName))
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 

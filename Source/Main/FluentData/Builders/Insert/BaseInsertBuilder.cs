@@ -9,8 +9,8 @@
 		{
 			get
 			{
-				Data.DbCommand.Sql(Data.DbProvider.GetSqlForInsertBuilder(Data));
-				return Data.DbCommand;
+				Data.Command.Sql(Data.Provider.GetSqlForInsertBuilder(Data));
+				return Data.Command;
 			}
 		}
 

@@ -6,13 +6,14 @@ namespace FluentData
 {
 	public interface IDbContext : IDisposable
 	{
+		IDbContext IgnoreIfAutoMapFails { get; }
+		IDbContext UseTransaction { get; }
+		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
-		IDbContext IgnoreIfAutoMapFails { get; }
-		IDbContext UseTransaction { get; }
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
 		IInsertBuilderDynamic Insert(string tableName, ExpandoObject item);
@@ -35,5 +36,11 @@ namespace FluentData
 		IDbContext IsolationLevel(IsolationLevel isolationLevel);
 		IDbContext Commit();
 		IDbContext Rollback();
+		IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action);
+		IDbContext OnConnectionOpened(Action<OnConnectionOpenedEventArgs> action);
+		IDbContext OnConnectionClosed(Action<OnConnectionClosedEventArgs> action);
+		IDbContext OnExecuting(Action<OnExecutingEventArgs> action);
+		IDbContext OnExecuted(Action<OnExecutedEventArgs> action);
+		IDbContext OnError(Action<OnErrorEventArgs> action);
 	}
 }

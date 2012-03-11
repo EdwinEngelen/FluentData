@@ -9,8 +9,8 @@
 		{
 			get
 			{
-				Data.DbCommand.Sql(Data.DbProvider.GetSqlForDeleteBuilder(Data));
-				return Data.DbCommand;
+				Data.Command.Sql(Data.Provider.GetSqlForDeleteBuilder(Data));
+				return Data.Command;
 			}
 		}
 

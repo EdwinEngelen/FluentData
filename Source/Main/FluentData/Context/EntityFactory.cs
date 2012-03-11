@@ -2,7 +2,7 @@
 
 namespace FluentData
 {
-	internal class EntityFactory : IEntityFactory
+	public class EntityFactory : IEntityFactory
 	{
 		public virtual object Create(Type type)
 		{

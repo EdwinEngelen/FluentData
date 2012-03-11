@@ -38,7 +38,6 @@
 
 			ContextData.Transaction.Rollback();
 			ContextData.TransactionState = TransactionStates.Rollbacked;
-			ContextData.Connection.Close();
 			return this;
 		}
 

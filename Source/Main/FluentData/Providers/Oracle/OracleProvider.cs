@@ -83,7 +83,7 @@ namespace FluentData.Providers.Oracle
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			data.DbCommand.ParameterOut("FluentDataLastInsertedId", data.DbContextData.DbProvider.GetDbTypeForClrType(typeof(T)));
+			data.Command.ParameterOut("FluentDataLastInsertedId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
 			data.Sql.Append(string.Format(" returning {0} into :FluentDataLastInsertedId", identityColumnName));
 
 			var lastId = default(T);
@@ -99,7 +99,7 @@ namespace FluentData.Providers.Oracle
 			return lastId;
 		}
 
-		public void BeforeDbCommandExecute(DbCommandData data)
+		public void OnCommandExecuting(DbCommandData data)
 		{
 			if (data.InnerCommand.CommandType == CommandType.Text)
 			{

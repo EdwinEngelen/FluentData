@@ -17,15 +17,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilder<T> AutoMap()
+		public IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false);
-			return this;
-		}
-
-		public IUpdateBuilder<T> IgnoreProperty(Expression<Func<T, object>> expression)
-		{
-			Actions.AutoMapIgnorePropertyAction(expression);
+			Actions.AutoMapColumnsAction(false, ignoreProperties);
 			return this;
 		}
 
@@ -47,15 +41,9 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap()
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.IgnoreProperty(Expression<Func<T, object>> expression)
-		{
-			Actions.AutoMapIgnorePropertyAction(expression);
+			Actions.AutoMapColumnsAction(false, ignoreProperties);
 			return this;
 		}
 

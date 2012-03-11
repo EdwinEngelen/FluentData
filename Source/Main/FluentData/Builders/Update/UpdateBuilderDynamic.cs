@@ -36,27 +36,15 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilderDynamic IgnoreProperty(string name)
+		public IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapIgnorePropertyAction(name);
+			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
 			return this;
 		}
 
-		public IUpdateBuilderDynamic AutoMap()
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false);
-			return this;
-		}
-
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.IgnoreProperty(string name)
-		{
-			Actions.AutoMapIgnorePropertyAction(name);
-			return this;
-		}
-
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap()
-		{
-			Actions.AutoMapDynamicTypeColumnsAction(false);
+			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
 			return this;
 		}
 

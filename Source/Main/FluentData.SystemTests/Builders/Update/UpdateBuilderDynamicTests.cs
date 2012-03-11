@@ -46,8 +46,7 @@ namespace FluentData
 				product.CategoryId = 2;
 
 				var rowsAffected = context.Update("Product", (ExpandoObject) product)
-											.IgnoreProperty("ProductId")
-											.AutoMap()
+											.AutoMap("ProductId")
 											.Where("ProductId")
 											.Execute();
 

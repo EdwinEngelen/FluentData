@@ -104,7 +104,7 @@ namespace FluentData.Providers.SqlServer
 			return lastId;
 		}
 
-		public void BeforeDbCommandExecute(DbCommandData data)
+		public void OnCommandExecuting(DbCommandData data)
 		{
 		}
 	}

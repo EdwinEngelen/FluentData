@@ -22,8 +22,8 @@ namespace FluentData
 			AutoMapper<TEntity> autoMapper = null;
 			if (autoMap)
 			{
-				autoMapper = new AutoMapper<TEntity>(Data.DbContextData);
-				autoMapper.EntityFactory = Data.DbContextData.EntityFactory;
+				autoMapper = new AutoMapper<TEntity>(Data.ContextData);
+				autoMapper.EntityFactory = Data.ContextData.EntityFactory;
 
 				autoMapper.Reader(Data.Reader);
 			}
@@ -32,7 +32,7 @@ namespace FluentData
 
 			while (Data.Reader.Read())
 			{
-				var item = (TEntity) Data.DbContextData.EntityFactory.Create(typeof(TEntity));
+				var item = (TEntity) Data.ContextData.EntityFactory.Create(typeof(TEntity));
 
 				if (autoMap)
 					autoMapper.AutoMap(item);
@@ -59,8 +59,8 @@ namespace FluentData
 			AutoMapper<TEntity> autoMapper = null;
 			if (autoMap)
 			{
-				autoMapper = new AutoMapper<TEntity>(Data.DbContextData);
-				autoMapper.EntityFactory = Data.DbContextData.EntityFactory;
+				autoMapper = new AutoMapper<TEntity>(Data.ContextData);
+				autoMapper.EntityFactory = Data.ContextData.EntityFactory;
 				autoMapper.Reader(Data.Reader);
 			}
 
@@ -68,7 +68,7 @@ namespace FluentData
 
 			if (Data.Reader.Read())
 			{
-				item = (TEntity) Data.DbContextData.EntityFactory.Create(typeof(TEntity));
+				item = (TEntity) Data.ContextData.EntityFactory.Create(typeof(TEntity));
 
 				if (autoMap)
 					autoMapper.AutoMap(item);

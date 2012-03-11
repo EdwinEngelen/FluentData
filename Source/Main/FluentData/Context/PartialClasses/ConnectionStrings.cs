@@ -7,8 +7,8 @@ namespace FluentData
 		private void ConnectionStringInternal(string connectionString, DbProviderTypes dbProviderType, IDbProvider dbProvider)
 		{
 			ContextData.ConnectionString = connectionString;
-			ContextData.Provider = dbProviderType;
-			ContextData.DbProvider = dbProvider;
+			ContextData.ProviderType = dbProviderType;
+			ContextData.Provider = dbProvider;
 		}
 
 		public IDbContext ConnectionString(string connectionString, DbProviderTypes dbProviderType)

@@ -102,7 +102,7 @@ namespace FluentData.Providers.MySql
 			return lastId;
 		}
 
-		public void BeforeDbCommandExecute(DbCommandData data)
+		public void OnCommandExecuting(DbCommandData data)
 		{
 		}
 	}

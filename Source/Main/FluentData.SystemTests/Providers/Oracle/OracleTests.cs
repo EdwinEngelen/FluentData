@@ -204,8 +204,7 @@ namespace FluentData.Providers.Oracle
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.IgnoreProperty(x => x.ProductId)
-								.AutoMap()
+								.AutoMap(x => x.ProductId)
 								.ExecuteReturnLastId("ProductId");
 
 			Assert.IsTrue(productId > 0);
@@ -241,8 +240,7 @@ namespace FluentData.Providers.Oracle
 			product.Name = "The Warren Buffet Way";
 
 			var rowsAffected = Context().Update<Product>("Product", product)
-										.IgnoreProperty(x => x.CategoryId)
-										.AutoMap()
+										.AutoMap(x => x.CategoryId)
 										.Where(x => x.ProductId)
 										.Execute();
 
