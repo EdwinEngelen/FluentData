@@ -118,9 +118,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Providers\Access\Data\FluentData.accdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
   </ItemGroup>
   <ItemGroup />
