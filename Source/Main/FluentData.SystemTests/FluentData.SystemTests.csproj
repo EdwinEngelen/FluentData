@@ -80,6 +80,7 @@
     <Compile Include="Features\Queries\QueryValuesTests.cs" />
     <Compile Include="Features\UsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\Access\AccessTests.cs" />
     <Compile Include="Providers\MySql\MySqlProduct.cs" />
     <Compile Include="Providers\MySql\MySqlTests.cs" />
     <Compile Include="Providers\IDbProviderTests.cs" />
@@ -117,6 +118,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Providers\Access\Data\FluentData.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
   </ItemGroup>
   <ItemGroup />

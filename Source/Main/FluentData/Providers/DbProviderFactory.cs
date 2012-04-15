@@ -1,4 +1,5 @@
-﻿using FluentData.Providers.MySql;
+﻿using FluentData.Providers.Access;
+using FluentData.Providers.MySql;
 using FluentData.Providers.Oracle;
 using FluentData.Providers.SqlServer;
 using FluentData.Providers.SqlServerCompact;
@@ -24,6 +25,9 @@ namespace FluentData
 					break;
 				case DbProviderTypes.MySql:
 					provider = new MySqlProvider();
+					break;
+				case DbProviderTypes.Access:
+					provider = new AccessProvider();
 					break;
 			}
 

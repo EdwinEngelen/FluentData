@@ -7,6 +7,7 @@
 		SqlServerCompact40 = 2,
 		SqlAzure = 3,
 		Oracle = 4,
-		MySql = 5
+		MySql = 5,
+		Access = 6
 	}
 }
