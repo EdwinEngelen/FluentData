@@ -47,13 +47,11 @@
   <ItemGroup>
     <Compile Include="Builders\ActionsHandler.cs" />
     <Compile Include="Builders\BuilderData.cs" />
-    <Compile Include="Builders\IDbTableInfo.cs" />
     <Compile Include="Builders\Delete\BaseDeleteBuilder.cs" />
     <Compile Include="Builders\Delete\DeleteBuilder.cs" />
     <Compile Include="Builders\Delete\DeleteBuilderGeneric.cs" />
     <Compile Include="Builders\Delete\Interfaces\IDeleteBuilder.cs" />
     <Compile Include="Builders\Delete\Interfaces\IDeleteBuilderGeneric.cs" />
-    <Compile Include="Builders\IDbColumnInfo.cs" />
     <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilder.cs" />
     <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilderDynamic.cs" />
     <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilderGeneric.cs" />
