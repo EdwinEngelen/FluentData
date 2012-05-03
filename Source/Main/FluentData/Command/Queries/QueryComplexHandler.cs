@@ -3,19 +3,15 @@ using System.Collections.Generic;
 
 namespace FluentData
 {
-	internal class QueryComplexHandler<TEntity, TList> : BaseQueryHandler
+	internal class QueryComplexHandler<TEntity, TList>
 		where TList : IList<TEntity>
 	{
-		public QueryComplexHandler(DbCommandData data) : base(data)
+		public TList Execute(DbCommandData data, Action<IDataReader, IList<TEntity>> customMapper)
 		{
-		}
+			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-		public TList Execute(Action<IDataReader, IList<TEntity>> customMapper)
-		{
-			var items = ResolveList<TList, TEntity>();
-
-			while (Data.Reader.Read())
-				customMapper(Data.Reader, items);
+			while (data.Reader.Read())
+				customMapper(data.Reader, items);
 
 			return items;
 		}

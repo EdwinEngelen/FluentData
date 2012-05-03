@@ -10,7 +10,7 @@ namespace FluentData
 		protected IDataReader _reader;
 		protected List<DataReaderField> Fields;
 
-		internal T Reader(IDataReader reader)
+		protected T Reader(IDataReader reader)
 		{
 			_reader = reader;
 			Fields = GetDataReaderFields();

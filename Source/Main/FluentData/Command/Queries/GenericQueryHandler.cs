@@ -3,47 +3,34 @@ using System.Collections.Generic;
 
 namespace FluentData
 {
-	internal class GenericQueryHandler<TEntity> : BaseQueryHandler
+	internal class GenericQueryHandler<TEntity>
 	{
-		public GenericQueryHandler(DbCommandData data)
-			: base(data)
-		{
-		}
-
-		internal TList ExecuteList<TList>(
-									bool autoMap,
+		internal TList ExecuteListReader<TList>(
+									DbCommandData data,
 									Action<IDataReader, TEntity> customMapperReader,
 									Action<dynamic, TEntity> customMapperDynamic
 					)
 			where TList : IList<TEntity>
 		{
-			var items = ResolveList<TList, TEntity>();
+			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			AutoMapper<TEntity> autoMapper = null;
-			if (autoMap)
+			var autoMapper = new AutoMapper<TEntity>(data);
+
+			DynamicTypAutoMapper dynamicAutoMapper = null;
+
+			while (data.Reader.Read())
 			{
-				autoMapper = new AutoMapper<TEntity>(Data.ContextData);
-				autoMapper.EntityFactory = Data.ContextData.EntityFactory;
+				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-				autoMapper.Reader(Data.Reader);
-			}
-
-			DynamicTypAutoMapper dynamicAutoMapper = null;			
-
-			while (Data.Reader.Read())
-			{
-				var item = (TEntity) Data.ContextData.EntityFactory.Create(typeof(TEntity));
-
-				if (autoMap)
-					autoMapper.AutoMap(item);
+				autoMapper.AutoMap(item);
 
 				if (customMapperReader != null)
-					customMapperReader(Data.Reader, item);
+					customMapperReader(data.Reader, item);
 
 				if (customMapperDynamic != null)
 				{
 					if (dynamicAutoMapper == null)
-						dynamicAutoMapper = new DynamicTypAutoMapper().Reader(Data.Reader);
+						dynamicAutoMapper = new DynamicTypAutoMapper(data);
 					var dynamicObject = dynamicAutoMapper.AutoMap();
 					customMapperDynamic(dynamicObject, item);
 				}
@@ -54,27 +41,31 @@ namespace FluentData
 			return items;
 		}
 
-		internal TEntity ExecuteSingle(bool autoMap, Action<IDataReader, TEntity> customMapper)
+		internal TEntity ExecuteSingle(DbCommandData data,
+										Action<IDataReader, TEntity> customMapper,
+										Action<dynamic, TEntity> customMapperDynamic)
 		{
 			AutoMapper<TEntity> autoMapper = null;
-			if (autoMap)
+
+			autoMapper = new AutoMapper<TEntity>(data);
+
+			var item = default(TEntity);
+
+			if (data.Reader.Read())
 			{
-				autoMapper = new AutoMapper<TEntity>(Data.ContextData);
-				autoMapper.EntityFactory = Data.ContextData.EntityFactory;
-				autoMapper.Reader(Data.Reader);
-			}
+				item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-			TEntity item = default(TEntity);
-
-			if (Data.Reader.Read())
-			{
-				item = (TEntity) Data.ContextData.EntityFactory.Create(typeof(TEntity));
-
-				if (autoMap)
-					autoMapper.AutoMap(item);
+				autoMapper.AutoMap(item);
 
 				if (customMapper != null)
-					customMapper(Data.Reader, item);
+					customMapper(data.Reader, item);
+
+				if (customMapperDynamic != null)
+				{
+					var dynamicAutoMapper = new DynamicTypAutoMapper(data);
+					var dynamicObject = dynamicAutoMapper.AutoMap();
+					customMapperDynamic(dynamicObject, item);
+				}
 			}
 
 			return item;

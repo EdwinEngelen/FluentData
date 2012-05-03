@@ -61,7 +61,12 @@ namespace FluentData
 
 		public static object GetPropertyValue(object item, PropertyInfo property)
 		{
-			return property.GetValue(item, null);
+			var value = property.GetValue(item, null);
+
+			if (property.PropertyType.IsEnum)
+				return (int) value;
+
+			return value;
 		}
 
 		public static object GetPropertyValue(object item, string propertyName)

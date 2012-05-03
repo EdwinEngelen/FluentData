@@ -4,26 +4,33 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		private TEntity QuerySingle<TEntity>(bool autoMap, Action<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingle<TEntity>()
 		{
-			TEntity item = default(TEntity);
+			return QuerySingle<TEntity>(null);
+		}
+
+		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper)
+		{
+			var item = default(TEntity);
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new GenericQueryHandler<TEntity>(_data).ExecuteSingle(autoMap, customMapper);
+				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, customMapper, null);
 			});
 
 			return item;
 		}
 
-		public TEntity QuerySingle<TEntity>()
+		public TEntity QuerySingle<TEntity>(Action<dynamic, TEntity> customMapper)
 		{
-			return QuerySingle<TEntity>(true, null);
-		}
+			var item = default(TEntity);
 
-		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper)
-		{
-			return QuerySingle<TEntity>(true, customMapper);
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			{
+				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, null, customMapper);
+			});
+
+			return item;
 		}
 	}
 }

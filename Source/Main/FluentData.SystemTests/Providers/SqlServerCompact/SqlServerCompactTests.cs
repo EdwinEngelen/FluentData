@@ -74,10 +74,12 @@ namespace FluentData.Providers.SqlServerCompact
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_dynamic(dynamic row, Product product)
+		public Product Custom_mapper_using_dynamic(dynamic row)
 		{
+			var product = new Product();
 			product.ProductId = row.ProductId;
 			product.Name = row.Name;
+			return product;
 		}
 
 		[TestMethod]
@@ -89,10 +91,12 @@ namespace FluentData.Providers.SqlServerCompact
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_datareader(IDataReader row, Product product)
+		public Product Custom_mapper_using_datareader(IDataReader row)
 		{
+			var product = new Product();
 			product.ProductId = row.GetInt32("ProductId");
 			product.Name = row.GetString("Name");
+			return product;
 		}
 
 		[TestMethod]

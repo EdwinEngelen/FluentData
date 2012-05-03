@@ -3,20 +3,15 @@ using System.Dynamic;
 
 namespace FluentData
 {
-	internal class DynamicQueryHandler : BaseQueryHandler
+	internal class DynamicQueryHandler
 	{
-		public DynamicQueryHandler(DbCommandData data) : base(data)
-		{
-		}
-
-		public List<dynamic> ExecuteList()
+		public List<dynamic> ExecuteList(DbCommandData data)
 		{
 			var items = new List<dynamic>();
 
-			var autoMapper = new DynamicTypAutoMapper()
-									.Reader(Data.Reader);
+			var autoMapper = new DynamicTypAutoMapper(data);
 
-			while (Data.Reader.Read())
+			while (data.Reader.Read())
 			{
 				var item = autoMapper.AutoMap();
 
@@ -26,14 +21,13 @@ namespace FluentData
 			return items;
 		}
 
-		public dynamic ExecuteSingle()
+		public dynamic ExecuteSingle(DbCommandData data)
 		{
-			var autoMapper = new DynamicTypAutoMapper()
-									.Reader(Data.Reader);
+			var autoMapper = new DynamicTypAutoMapper(data);
 
 			ExpandoObject item = null;
 
-			if (Data.Reader.Read())
+			if (data.Reader.Read())
 				item = autoMapper.AutoMap();
 
 			return item;

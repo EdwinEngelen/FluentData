@@ -8,7 +8,6 @@ namespace FluentData.Core
 	[TestClass]
 	public class ExpressionTests
 	{
-
 		[TestMethod]
 		public void GetPropertyNameFromExpression()
 		{
@@ -39,8 +38,14 @@ namespace SomeNamespace
 {
 	public class Category
 	{
-		public int CategoryId { get; set; }
+		public Categories CategoryId { get; set; }
 		public Category Parent { get; set; }
 		public string Name { get; set; }
+	}
+
+	public enum Categories
+	{
+		Books = 1,
+		Movies = 2
 	}
 }

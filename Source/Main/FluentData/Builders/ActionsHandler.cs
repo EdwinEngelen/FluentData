@@ -28,6 +28,12 @@ namespace FluentData
 			else
 				parameterName = "c" + _data.Columns.Count.ToString();
 
+			if (value != null)
+			{
+				if (value.GetType().IsEnum)
+					value = (int) value;
+			}
+
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
 			if (!isSql)

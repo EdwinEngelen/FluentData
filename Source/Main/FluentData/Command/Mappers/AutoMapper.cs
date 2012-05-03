@@ -7,15 +7,14 @@ namespace FluentData
 {
 	internal class AutoMapper<T> : BaseMapper<AutoMapper<T>>
 	{
-		private readonly DbContextData _dbContextData;
+		private readonly DbCommandData _dbCommandData;
 		private readonly Dictionary<Type, List<PropertyInfo>> _cachedProperties;
 
-		internal IEntityFactory EntityFactory { get; set; }
-
-		internal AutoMapper(DbContextData dbContextData)
+		internal AutoMapper(DbCommandData dbCommandData)
 		{
-			_dbContextData = dbContextData;
+			_dbCommandData = dbCommandData;
 			_cachedProperties = new Dictionary<Type, List<PropertyInfo>>();
+			Reader(dbCommandData.Reader);
 		}
 
 		public void AutoMap(object item)
@@ -31,7 +30,7 @@ namespace FluentData
 				else
 					wasMapped = HandleSimpleField(item, field, value);
 
-				if (!wasMapped && !_dbContextData.IgnoreIfAutoMapFails)
+				if (!wasMapped && !_dbCommandData.ContextData.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
@@ -101,7 +100,7 @@ namespace FluentData
 
 			if (instance == null)
 			{
-				instance = EntityFactory.Create(property.PropertyType);
+				instance = _dbCommandData.ContextData.EntityFactory.Create(property.PropertyType);
 
 				property.SetValue(item, instance, null);
 			}

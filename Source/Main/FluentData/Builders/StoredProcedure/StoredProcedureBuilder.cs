@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System;
+
+namespace FluentData
 {
 	internal class StoredProcedureBuilder : BaseStoredProcedureBuilder, IStoredProcedureBuilder
 	{
@@ -18,5 +20,5 @@
 			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
-	}
+	}	
 }

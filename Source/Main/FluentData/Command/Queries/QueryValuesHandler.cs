@@ -3,25 +3,20 @@ using System.Collections.Generic;
 
 namespace FluentData
 {
-	internal class QueryValuesHandler<T> : BaseQueryHandler
+	internal class QueryValuesHandler<T>
 	{
-		public QueryValuesHandler(DbCommandData data)
-			: base(data)
-		{
-		}
-
-		public List<T> Execute()
+		public List<T> Execute(DbCommandData data)
 		{
 			var items = new List<T>();
 
-			while (Data.Reader.Read())
+			while (data.Reader.Read())
 			{
 				T value;
 
-				if (Data.Reader.GetFieldType(0) == typeof(T))
-					value = (T) Data.Reader.GetValue(0);
+				if (data.Reader.GetFieldType(0) == typeof(T))
+					value = (T) data.Reader.GetValue(0);
 				else
-					value = (T) Convert.ChangeType(Data.Reader.GetValue(0), typeof(T));
+					value = (T) Convert.ChangeType(data.Reader.GetValue(0), typeof(T));
 
 				items.Add(value);
 			}

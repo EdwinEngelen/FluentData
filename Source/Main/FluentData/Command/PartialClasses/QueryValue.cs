@@ -11,7 +11,7 @@ namespace FluentData
 			_data.ExecuteQueryHandler.ExecuteQuery(true,
 				() =>
 				{
-					value = new QueryValueHandler<T>(_data).Execute();
+					value = new QueryValueHandler<T>().Execute(_data);
 				});
 
 			return value;
@@ -24,7 +24,7 @@ namespace FluentData
 			_data.ExecuteQueryHandler.ExecuteQuery(true,
 				() =>
 				{
-					values = new QueryValuesHandler<T>(_data).Execute();
+					values = new QueryValuesHandler<T>().Execute(_data);
 				});
 
 			return values;

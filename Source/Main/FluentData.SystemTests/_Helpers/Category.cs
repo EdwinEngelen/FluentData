@@ -5,7 +5,7 @@
 		public Category()
 		{
 		}
-		public int CategoryId { get; set; }
+		public Categories CategoryId { get; set; }
 		public string Name { get; set; }
 		public int ProductCount { get; set; }
 	}

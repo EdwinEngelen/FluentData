@@ -10,7 +10,7 @@ namespace FluentData
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new DynamicQueryHandler(_data).ExecuteList();
+				items = new DynamicQueryHandler().ExecuteList(_data);
 			});
 
 			return items;
@@ -22,7 +22,7 @@ namespace FluentData
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new DynamicQueryHandler(_data).ExecuteSingle();
+				item = new DynamicQueryHandler().ExecuteSingle(_data);
 			});
 
 			return item;

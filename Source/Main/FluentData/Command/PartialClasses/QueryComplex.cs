@@ -12,7 +12,7 @@ namespace FluentData
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryComplexHandler<TEntity, TList>(_data).Execute(customMapper);
+				items = new QueryComplexHandler<TEntity, TList>().Execute(_data, customMapper);
 			});
 
 			return items;

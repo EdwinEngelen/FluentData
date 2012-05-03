@@ -70,6 +70,11 @@
     <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
     <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
     <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
+    <Compile Include="Features\Queries\QueryNoAutoMapTests.cs" />
+    <Compile Include="Features\Queries\QueryComplexTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Features\Queries\QuerySingleNoAutoMapTests.cs" />
     <Compile Include="Features\Settings\CommandTimeoutTests.cs" />
     <Compile Include="Features\Events\OnConnectionClosedTests.cs" />
     <Compile Include="Features\Events\OnConnectionOpenedTests.cs" />
@@ -104,6 +109,7 @@
     <Compile Include="_Documentation\SampleCodeTests.cs" />
     <Compile Include="_Documentation\TransactionsTests.cs" />
     <Compile Include="_Documentation\UpdateDataTests.cs" />
+    <Compile Include="_Helpers\Categories.cs" />
     <Compile Include="_Helpers\Category.cs" />
     <Compile Include="_Helpers\Order.cs" />
     <Compile Include="_Helpers\OrderReport.cs" />

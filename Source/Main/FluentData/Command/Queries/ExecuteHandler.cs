@@ -1,15 +1,10 @@
 ﻿namespace FluentData
 {
-	internal class ExecuteHandler : BaseQueryHandler
+	internal class ExecuteHandler
 	{
-		public ExecuteHandler(DbCommandData data)
-			: base(data)
+		public T Execute<T>(DbCommandData data)
 		{
-		}
-
-		public T Execute<T>()
-		{
-			object recordsAffected = Data.InnerCommand.ExecuteNonQuery();
+			object recordsAffected = data.InnerCommand.ExecuteNonQuery();
 
 			return (T) recordsAffected;
 		}

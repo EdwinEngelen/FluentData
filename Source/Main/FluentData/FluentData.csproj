@@ -91,6 +91,8 @@
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\Handlers\ParameterHandler.cs" />
+    <Compile Include="Command\PartialClasses\QueryNoAutoMap.cs" />
+    <Compile Include="Command\PartialClasses\QuerySingleNoAutoMap.cs" />
     <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
@@ -100,13 +102,14 @@
     <Compile Include="Command\PartialClasses\QueryDynamic.cs" />
     <Compile Include="Command\PartialClasses\QuerySingle.cs" />
     <Compile Include="Command\PartialClasses\QueryValue.cs" />
-    <Compile Include="Command\Queries\BaseQueryHandler.cs" />
+    <Compile Include="Command\Queries\QueryNoAutoMapHandler.cs" />
+    <Compile Include="Command\Queries\QuerySingleNoAutoMapHandler.cs" />
     <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />
     <Compile Include="Command\Queries\GenericQueryHandler.cs" />
     <Compile Include="Command\Queries\QueryComplexHandler.cs" />
-    <Compile Include="Command\Queries\QueryValueHandler.cs" />
     <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
+    <Compile Include="Command\Queries\QueryValueHandler.cs" />
     <Compile Include="Command\Queries\QueryValuesHandler.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />

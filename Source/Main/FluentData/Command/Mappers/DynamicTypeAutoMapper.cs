@@ -5,6 +5,11 @@ namespace FluentData
 {
 	internal class DynamicTypAutoMapper : BaseMapper<DynamicTypAutoMapper>
 	{
+		public DynamicTypAutoMapper(DbCommandData dbCommandData)
+		{
+			base.Reader(dbCommandData.Reader);
+		}
+
 		public ExpandoObject AutoMap()
 		{
 			var item = new ExpandoObject();

@@ -106,8 +106,6 @@ namespace FluentData
 			throw exception;
 		}
 
-
-
 		private void FixSql()
 		{
 			_data.ContextData.Provider.FixInStatement(_data.Sql, _data.Parameters);

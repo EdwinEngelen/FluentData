@@ -25,18 +25,22 @@
 				throw new FluentDataException("The transaction has already been rolledback");
 
 			ContextData.Transaction.Commit();
-			ContextData.TransactionState = TransactionStates.Commited;
+			ContextData.TransactionState = TransactionStates.Committed;
 			return this;
 		}
 
 		public IDbContext Rollback()
 		{
+			if (ContextData.TransactionState == TransactionStates.Rollbacked)
+				return this;
+
 			VerifyTransactionSupport();
 
-			if (ContextData.TransactionState == TransactionStates.Commited)
+			if (ContextData.TransactionState == TransactionStates.Committed)
 				throw new FluentDataException("The transaction has already been commited");
 
-			ContextData.Transaction.Rollback();
+			if (ContextData.Transaction != null)
+				ContextData.Transaction.Rollback();
 			ContextData.TransactionState = TransactionStates.Rollbacked;
 			return this;
 		}
