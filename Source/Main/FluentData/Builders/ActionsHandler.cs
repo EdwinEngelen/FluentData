@@ -44,7 +44,13 @@ namespace FluentData
 		{
 			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
 
-			ColumnAction(propertyName, false, ReflectionHelper.GetPropertyValue(_data.Item, propertyName), propertyNameIsParameterName);
+			var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, propertyName);
+			if (propertyName.Contains("."))
+			{
+				propertyName = propertyName.Substring(propertyName.LastIndexOf(".") + 1);
+			}
+
+			ColumnAction(propertyName, false, propertyValue, propertyNameIsParameterName);
 		}
 
 		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)

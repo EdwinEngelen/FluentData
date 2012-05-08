@@ -13,8 +13,8 @@ namespace FluentData
 			product.Name = "TestProduct";
 			product.Category = new Category();
 			product.CategoryId = 1;
-			
-			using (var context = TestHelper.Context().UseTransaction)
+
+			using (var context = TestHelper.Context().UseTransaction(true))
 			{
 				var storedProcedure = context.StoredProcedure<Product>("ProductInsert", product)
 							.ParameterOut("ProductId", DataTypes.Int32)
@@ -35,7 +35,7 @@ namespace FluentData
 			product.Name = "TestProduct";
 			product.CategoryId = 1;
 
-			using (var context = TestHelper.Context().UseTransaction)
+			using (var context = TestHelper.Context().UseTransaction(true))
 			{
 				var storedProcedure = context.StoredProcedure<Product>("ProductInsert", product)
 					.ParameterOut("ProductId", DataTypes.Int32)

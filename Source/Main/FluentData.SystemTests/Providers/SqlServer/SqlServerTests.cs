@@ -288,7 +288,7 @@ namespace FluentData.Providers.SqlServer
 		[TestMethod]
 		public void Transactions()
 		{
-			using (var context = Context().UseTransaction)
+			using (var context = Context().UseTransaction(true))
 			{
 				context.Sql("update Product set Name = @0 where ProductId = @1")
 							.Parameters("The Warren Buffet Way", 1)

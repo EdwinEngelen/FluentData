@@ -46,7 +46,7 @@ namespace FluentData.Features.Events
 			var eventFiredCounter = 0;
 			var connectionState = ConnectionState.Open;
 
-			using (var context = TestHelper.Context().UseTransaction.OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
+			using (var context = TestHelper.Context().UseTransaction(true).OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
 			{
 				context.Sql("select top 1 * from product").Query();
 				context.Sql("select top 1 * from product").Query();

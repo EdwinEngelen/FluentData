@@ -2,13 +2,10 @@
 {
 	public partial class DbContext : IDbContext
 	{
-		public IDbContext UseTransaction
+		public IDbContext UseTransaction(bool useTransaction)
 		{
-			get
-			{
-				ContextData.UseTransaction = true;
-				return this;
-			}
+			ContextData.UseTransaction = useTransaction;
+			return this;
 		}
 
 		public IDbContext IsolationLevel(IsolationLevel isolationLevel)

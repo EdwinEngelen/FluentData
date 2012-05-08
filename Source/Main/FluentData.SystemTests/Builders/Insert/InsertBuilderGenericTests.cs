@@ -13,7 +13,7 @@ namespace FluentData
 			product.CategoryId = 1;
 			product.Name = "TestProduct";
 
-			using (var context = TestHelper.Context().UseTransaction)
+			using (var context = TestHelper.Context().UseTransaction(true))
 			{
 				product.ProductId = context.Insert<Product>("Product", product)
 									.Column("Name", "TestProduct")
@@ -34,7 +34,7 @@ namespace FluentData
 			product.CategoryId = 1;
 			product.Name = "TestProduct";
 
-			using (var context = TestHelper.Context().UseTransaction)
+			using (var context = TestHelper.Context().UseTransaction(true))
 			{
 				product.ProductId = context.Insert<Product>("Product", product)
 									.AutoMap(x => x.ProductId)

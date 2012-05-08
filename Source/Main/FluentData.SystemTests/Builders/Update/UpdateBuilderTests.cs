@@ -9,7 +9,7 @@ namespace FluentData
 		[TestMethod]
 		public void Test()
 		{
-			using (var context = TestHelper.Context().UseTransaction)
+			using (var context = TestHelper.Context().UseTransaction(true))
 			{
 				var productId = TestHelper.InsertProduct(context, "OldTestProduct", 1);
 

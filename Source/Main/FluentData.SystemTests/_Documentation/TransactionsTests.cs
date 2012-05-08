@@ -8,7 +8,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Test_transactions()
 		{
-			using (var db = Context().UseTransaction)
+			using (var db = Context().UseTransaction(true))
 			{
 				db.Sql("update Product set Name = @0 where ProductId = @1")
 							.Parameters("The Warren Buffet Way", 1)

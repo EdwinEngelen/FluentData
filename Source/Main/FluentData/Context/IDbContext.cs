@@ -7,7 +7,7 @@ namespace FluentData
 	public interface IDbContext : IDisposable
 	{
 		IDbContext IgnoreIfAutoMapFails { get; }
-		IDbContext UseTransaction { get; }
+		IDbContext UseTransaction(bool useTransaction);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);

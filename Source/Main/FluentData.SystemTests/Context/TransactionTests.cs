@@ -9,7 +9,7 @@ namespace FluentData.Context
 		[TestMethod]
 		public void Update_data_rollback()
 		{
-			using (var db = TestHelper.Context().UseTransaction)
+			using (var db = TestHelper.Context().UseTransaction(true))
 			{
 				var category = db.Sql("select * from Category where CategoryId = 1").QuerySingle();
 				Assert.AreEqual("Books", category.Name);
