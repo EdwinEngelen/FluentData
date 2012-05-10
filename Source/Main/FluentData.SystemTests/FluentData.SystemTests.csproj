@@ -70,6 +70,8 @@
     <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
     <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
     <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
+    <Compile Include="Features\Builders\Update\AutoMapTests.cs" />
+    <Compile Include="Features\Builders\Insert\AutoMapTests.cs" />
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
     <Compile Include="Features\Queries\QueryNoAutoMapTests.cs" />
     <Compile Include="Features\Queries\QueryComplexTests.cs">
@@ -116,6 +118,7 @@
     <Compile Include="_Helpers\OrderReport.cs" />
     <Compile Include="_Helpers\Product.cs" />
     <Compile Include="_Helpers\ProductionCollection.cs" />
+    <Compile Include="_Helpers\ProductWithCategoryEnum.cs" />
     <Compile Include="_Helpers\TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>

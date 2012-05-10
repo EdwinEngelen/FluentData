@@ -82,7 +82,8 @@ namespace FluentData
 				if (ignoreProperty == null
 					&& ReflectionHelper.IsBasicClrType(propertyType))
 				{
-					ColumnAction(property.Name, false, ReflectionHelper.GetPropertyValue(_data.Item, property), propertyNameIsParameterName);
+					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property);
+					ColumnAction(property.Name, false, propertyValue, propertyNameIsParameterName);
 				}
 			}
 		}

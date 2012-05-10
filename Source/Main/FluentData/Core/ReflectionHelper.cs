@@ -139,6 +139,9 @@ namespace FluentData
 
 		public static bool IsBasicClrType(Type type)
 		{
+			if (type.IsEnum)
+				return true;
+
 			var types = new HashSet<Type>();
 			types.Add(typeof(bool));
 			types.Add(typeof(byte));
