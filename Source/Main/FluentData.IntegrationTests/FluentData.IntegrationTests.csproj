@@ -72,6 +72,7 @@
     <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
     <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
     <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
+    <Compile Include="Features\Builders\StoredProcedure\ParameterTests.cs" />
     <Compile Include="Features\Builders\Update\AutoMapTests.cs" />
     <Compile Include="Features\Builders\Insert\AutoMapTests.cs" />
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
