@@ -9,7 +9,7 @@ namespace FluentData.Providers.MySql
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("MySql", DbProviderTypes.MySql);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("MySql"), DbProviderTypes.MySql);
 		}
 
 		[TestMethod]

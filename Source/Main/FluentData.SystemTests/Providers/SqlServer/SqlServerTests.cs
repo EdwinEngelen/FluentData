@@ -9,7 +9,7 @@ namespace FluentData.Providers.SqlServer
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlServer", DbProviderTypes.SqlServer);
+			return TestHelper.Context();
 		}
 
 		[TestMethod]

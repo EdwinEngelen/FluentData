@@ -14,9 +14,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.UnitTests", "Flu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SystemTests", "FluentData.SystemTests\FluentData.SystemTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SingleFile", "FluentData.SingleFile\FluentData.SingleFile.csproj", "{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs17
 		SccLocalPath0 = .
@@ -29,6 +31,9 @@ Global
 		SccProjectUniqueName3 = FluentData.SystemTests\\FluentData.SystemTests.csproj
 		SccProjectName3 = FluentData.SystemTests
 		SccLocalPath3 = FluentData.SystemTests
+		SccProjectUniqueName4 = FluentData.SingleFile\\FluentData.SingleFile.csproj
+		SccProjectName4 = FluentData.SingleFile
+		SccLocalPath4 = FluentData.SingleFile
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = FluentData.vsmdi
@@ -50,6 +55,10 @@ Global
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

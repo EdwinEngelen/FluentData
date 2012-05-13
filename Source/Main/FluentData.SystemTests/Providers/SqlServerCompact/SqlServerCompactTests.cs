@@ -10,7 +10,7 @@ namespace FluentData.Providers.SqlServerCompact
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlServerCompact40", DbProviderTypes.SqlServerCompact40);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlServerCompact40"), DbProviderTypes.SqlServerCompact40);
 		}
 
 		[TestMethod]

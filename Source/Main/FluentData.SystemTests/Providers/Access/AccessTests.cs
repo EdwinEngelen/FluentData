@@ -15,7 +15,7 @@ namespace FluentData.Providers.Access
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("Access", DbProviderTypes.Access);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Access"), DbProviderTypes.Access);
 		}
 
 		[TestMethod]

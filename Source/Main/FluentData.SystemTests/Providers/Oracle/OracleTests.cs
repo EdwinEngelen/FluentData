@@ -9,7 +9,7 @@ namespace FluentData.Providers.Oracle
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("Oracle", DbProviderTypes.Oracle);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Oracle"), DbProviderTypes.Oracle);
 		}
 
 		[TestMethod]

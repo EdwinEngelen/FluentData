@@ -9,7 +9,7 @@ namespace FluentData.Providers.SqlAzure
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlAzure", DbProviderTypes.SqlAzure);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlAzure"), DbProviderTypes.SqlAzure);
 		}
 
 		[TestMethod]

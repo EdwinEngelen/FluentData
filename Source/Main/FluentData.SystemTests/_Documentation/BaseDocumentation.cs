@@ -1,10 +1,12 @@
-﻿namespace FluentData._Documentation
+﻿using FluentData._Helpers;
+
+namespace FluentData._Documentation
 {
 	public class BaseDocumentation
 	{
 		public IDbContext Context()
 		{
-			return new DbContext().ConnectionStringName("SqlServer", DbProviderTypes.SqlServer);
+			return TestHelper.Context();
 		}
 	}
 }

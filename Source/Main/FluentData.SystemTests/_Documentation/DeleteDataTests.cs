@@ -8,11 +8,11 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Delete_data_sql()
 		{
-var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
-				.Parameters("The Warren Buffet Way", 1)
-				.ExecuteReturnLastId();
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
+							.Parameters("The Warren Buffet Way", 1)
+							.ExecuteReturnLastId();
 
-int rowsAffected = Context().Sql("delete from Product where ProductId = @0")
+			int rowsAffected = Context().Sql("delete from Product where ProductId = @0")
 						.Parameters(productId)
 						.Execute();
 
