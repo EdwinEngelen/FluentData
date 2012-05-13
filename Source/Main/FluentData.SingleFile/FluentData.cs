@@ -133,7 +133,7 @@ namespace FluentData
 			parameter.Size = size;
 
 			_data.Parameters.Add(parameter);
-			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction);
+			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction, parameter.Size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
