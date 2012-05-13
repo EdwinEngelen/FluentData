@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.UnitTests", "FluentData.UnitTests\FluentData.UnitTests.csproj", "{807A231E-0F2F-46ED-877D-2733737DF0B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SystemTests", "FluentData.SystemTests\FluentData.SystemTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.IntegrationTests", "FluentData.SystemTests\FluentData.IntegrationTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SingleFile", "FluentData.SingleFile\FluentData.SingleFile.csproj", "{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}"
 EndProject
@@ -28,12 +28,12 @@ Global
 		SccProjectUniqueName2 = FluentData.UnitTests\\FluentData.UnitTests.csproj
 		SccProjectName2 = FluentData.UnitTests
 		SccLocalPath2 = FluentData.UnitTests
-		SccProjectUniqueName3 = FluentData.SystemTests\\FluentData.SystemTests.csproj
-		SccProjectName3 = FluentData.SystemTests
-		SccLocalPath3 = FluentData.SystemTests
-		SccProjectUniqueName4 = FluentData.SingleFile\\FluentData.SingleFile.csproj
-		SccProjectName4 = FluentData.SingleFile
-		SccLocalPath4 = FluentData.SingleFile
+		SccProjectUniqueName3 = FluentData.SingleFile\\FluentData.SingleFile.csproj
+		SccProjectName3 = FluentData.SingleFile
+		SccLocalPath3 = FluentData.SingleFile
+		SccProjectUniqueName4 = FluentData.SystemTests\\FluentData.IntegrationTests.csproj
+		SccProjectName4 = FluentData.SystemTests
+		SccLocalPath4 = FluentData.SystemTests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = FluentData.vsmdi
