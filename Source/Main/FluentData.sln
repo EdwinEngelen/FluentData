@@ -12,9 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.UnitTests", "FluentData.UnitTests\FluentData.UnitTests.csproj", "{807A231E-0F2F-46ED-877D-2733737DF0B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.IntegrationTests", "FluentData.SystemTests\FluentData.IntegrationTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SingleFile", "FluentData.SingleFile\FluentData.SingleFile.csproj", "{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.IntegrationTests", "FluentData.IntegrationTests\FluentData.IntegrationTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -31,9 +31,9 @@ Global
 		SccProjectUniqueName3 = FluentData.SingleFile\\FluentData.SingleFile.csproj
 		SccProjectName3 = FluentData.SingleFile
 		SccLocalPath3 = FluentData.SingleFile
-		SccProjectUniqueName4 = FluentData.SystemTests\\FluentData.IntegrationTests.csproj
-		SccProjectName4 = FluentData.SystemTests
-		SccLocalPath4 = FluentData.SystemTests
+		SccProjectUniqueName4 = FluentData.IntegrationTests\\FluentData.IntegrationTests.csproj
+		SccProjectName4 = FluentData.IntegrationTests
+		SccLocalPath4 = FluentData.IntegrationTests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = FluentData.vsmdi
@@ -51,14 +51,14 @@ Global
 		{807A231E-0F2F-46ED-877D-2733737DF0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{807A231E-0F2F-46ED-877D-2733737DF0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{807A231E-0F2F-46ED-877D-2733737DF0B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
