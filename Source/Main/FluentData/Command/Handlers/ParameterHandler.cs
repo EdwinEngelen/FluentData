@@ -12,14 +12,19 @@ namespace FluentData
 					&& parameter.DataTypes == DataTypes.Object)
 				{
 					if (parameter.Value == null)
-						parameter.Value = DBNull.Value;
+					{
+						parameter.DataTypes = DataTypes.String;
+					}
 					else
 					{
 						parameter.DataTypes = data.ContextData.Provider.GetDbTypeForClrType(parameter.Value.GetType());
 						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDataException(string.Format("The parameter {0} is off a type that is not supported.", parameter.ParameterName));
+							throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
 					}
 				}
+
+				if (parameter.Value == null)
+					parameter.Value = DBNull.Value;
 
 				var dbParameter = data.InnerCommand.CreateParameter();
 				dbParameter.DbType = (System.Data.DbType) parameter.DataTypes;

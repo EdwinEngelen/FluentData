@@ -1,5 +1,5 @@
 ﻿
-// FluentData version 2.2.1.0.
+// FluentData version 2.2.1.1.
 // Copyright ©  2012 - Lars-Erik Kindblad (http://www.kindblad.com).
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
@@ -29,10 +29,10 @@ namespace FluentData
 
 		internal void ColumnValueAction(string columnName, object value, bool propertyNameIsParameterName)
 		{
-			ColumnAction(columnName, false, value, propertyNameIsParameterName);
+			ColumnAction(columnName, value, typeof(object), propertyNameIsParameterName);
 		}
 
-		private void ColumnAction(string columnName, bool isSql, object value, bool propertyNameIsParameterName)
+		private void ColumnAction(string columnName, object value, Type type, bool propertyNameIsParameterName)
 		{
 			var parameterName = "";
 			if (propertyNameIsParameterName)
@@ -48,28 +48,27 @@ namespace FluentData
 
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
-			if (!isSql)
-				ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
+			var parameterType = DataTypes.Object;
+			if (type != (typeof(object)))
+			{
+				parameterType = _data.Provider.GetDbTypeForClrType(type);
+			}
+
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false);
 		}
 
 		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
 		{
-			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
+			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
 
-			var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, propertyName);
-			if (propertyName.Contains("."))
-			{
-				propertyName = propertyName.Substring(propertyName.LastIndexOf(".") + 1);
-			}
-
-			ColumnAction(propertyName, false, propertyValue, propertyNameIsParameterName);
+			ColumnAction(parser.Name, parser.Value, parser.Type, propertyNameIsParameterName);
 		}
 
 		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)
 		{
 			var propertyValue = (item as IDictionary<string, object>) [propertyName];
 
-			ColumnAction(propertyName, false, propertyValue, true);
+			ColumnAction(propertyName, propertyValue, typeof(object), true);
 		}
 
 		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
@@ -80,22 +79,24 @@ namespace FluentData
 			{
 				foreach (var ignorePropertyExpression in ignorePropertyExpressions)
 				{
-					var ignorePropertyName = ReflectionHelper.GetPropertyNameFromExpression(ignorePropertyExpression);
+					var ignorePropertyName = new PropertyExpressionParser<T>(_data.Item, ignorePropertyExpression).Name;
 					ignorePropertyNames.Add(ignorePropertyName);
 				}
 			}
 
 			foreach (var property in properties)
 			{
-				var propertyType = ReflectionHelper.GetPropertyType(property);
 
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase));
+				if (ignoreProperty != null)
+					continue;
 
-				if (ignoreProperty == null
-					&& ReflectionHelper.IsBasicClrType(propertyType))
+				var propertyType = ReflectionHelper.GetPropertyType(property);
+
+				if (ReflectionHelper.IsBasicClrType(propertyType))
 				{
 					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property);
-					ColumnAction(property.Name, false, propertyValue, propertyNameIsParameterName);
+					ColumnAction(property.Name, propertyValue, propertyType, propertyNameIsParameterName);
 				}
 			}
 		}
@@ -117,17 +118,17 @@ namespace FluentData
 				if (ignoreProperty == null
 					&& ReflectionHelper.IsBasicClrType(property.Value.GetType()))
 				{
-					ColumnAction(property.Key, false, property.Value, propertyNameIsParameterName);
+					ColumnAction(property.Key, property.Value, typeof(object), propertyNameIsParameterName);
 				}
 			}
 		}
 
-		internal void ParameterAction(string name, object value, DataTypes dataTypes, ParameterDirection direction, bool isId, int size = 0)
+		internal void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
 		{
 			var parameter = new Parameter();
 			parameter.ParameterName = name;
 			parameter.Value = value;
-			parameter.DataTypes = dataTypes;
+			parameter.DataTypes = dataType;
 			parameter.Direction = direction;
 			parameter.IsId = isId;
 			parameter.Size = size;
@@ -159,9 +160,8 @@ namespace FluentData
 
 		internal void WhereAction<T>(Expression<Func<T, object>> expression)
 		{
-			var propertyName = ReflectionHelper.GetPropertyNameFromExpression(expression);
-			var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, propertyName);
-			WhereAction(propertyName, propertyValue);
+			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
+			WhereAction(parser.Name, parser.Value);
 		}
 	}
 
@@ -1520,14 +1520,19 @@ namespace FluentData
 					&& parameter.DataTypes == DataTypes.Object)
 				{
 					if (parameter.Value == null)
-						parameter.Value = DBNull.Value;
+					{
+						parameter.DataTypes = DataTypes.String;
+					}
 					else
 					{
 						parameter.DataTypes = data.ContextData.Provider.GetDbTypeForClrType(parameter.Value.GetType());
 						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDataException(string.Format("The parameter {0} is off a type that is not supported.", parameter.ParameterName));
+							throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
 					}
 				}
+
+				if (parameter.Value == null)
+					parameter.Value = DBNull.Value;
 
 				var dbParameter = data.InnerCommand.CreateParameter();
 				dbParameter.DbType = (System.Data.DbType) parameter.DataTypes;
@@ -3066,6 +3071,46 @@ namespace FluentData
 		Rollbacked = 2
 	}
 
+	public class PropertyExpressionParser<T>
+	{
+		private readonly object _item;
+		private PropertyInfo _property;
+
+		public PropertyExpressionParser(object item, Expression<Func<T, object>> propertyExpression)
+		{
+			_item = item;
+			_property = GetProperty(propertyExpression);
+		}
+
+		private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> exp)
+		{
+			PropertyInfo result;
+			if (exp.Body.NodeType == ExpressionType.Convert)
+				result = ((MemberExpression) ((UnaryExpression) exp.Body).Operand).Member as PropertyInfo;
+			else result = ((MemberExpression) exp.Body).Member as PropertyInfo;
+
+			if (result != null)
+				return typeof(T).GetProperty(result.Name);
+
+			throw new ArgumentException(string.Format("Expression '{0}' does not refer to a property.", exp.ToString()));
+		}
+		
+		public object Value
+		{
+			get { return ReflectionHelper.GetPropertyValue(_item, _property); }
+		}
+
+		public string Name
+		{
+			get { return _property.Name; }
+		}
+
+		public Type Type
+		{
+			get { return ReflectionHelper.GetPropertyType(_property); }
+		}
+	}
+
 	public class FluentDataException : Exception
 	{
 		public FluentDataException(string message)
@@ -3080,27 +3125,6 @@ namespace FluentData
 
 	internal static class ReflectionHelper
 	{
-		public static object GetPropertyValueFromExpression<T>(object item, Expression<Func<T, object>> expression)
-		{
-			var propertyPath = expression.Body.ToString().Replace(expression.Parameters[0] + ".", string.Empty);
-
-			foreach (var part in propertyPath.Split('.'))
-			{
-				if (item == null)
-					return null;
-
-				var type = item.GetType();
-
-				var property = type.GetProperty(part);
-				if (property == null)
-					return null;
-
-				item = GetPropertyValue(item, property);
-			}
-
-			return item;
-		}
-
 		public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> expression)
 		{
 			string propertyPath = null;

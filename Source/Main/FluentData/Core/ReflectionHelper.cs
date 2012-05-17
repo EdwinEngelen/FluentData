@@ -9,27 +9,6 @@ namespace FluentData
 {
 	internal static class ReflectionHelper
 	{
-		public static object GetPropertyValueFromExpression<T>(object item, Expression<Func<T, object>> expression)
-		{
-			var propertyPath = expression.Body.ToString().Replace(expression.Parameters[0] + ".", string.Empty);
-
-			foreach (var part in propertyPath.Split('.'))
-			{
-				if (item == null)
-					return null;
-
-				var type = item.GetType();
-
-				var property = type.GetProperty(part);
-				if (property == null)
-					return null;
-
-				item = GetPropertyValue(item, property);
-			}
-
-			return item;
-		}
-
 		public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> expression)
 		{
 			string propertyPath = null;

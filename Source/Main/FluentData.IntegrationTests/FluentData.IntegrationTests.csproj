@@ -75,6 +75,7 @@
     <Compile Include="Features\Builders\StoredProcedure\ParameterTests.cs" />
     <Compile Include="Features\Builders\Update\AutoMapTests.cs" />
     <Compile Include="Features\Builders\Insert\AutoMapTests.cs" />
+    <Compile Include="Features\Builders\DataTypesTests.cs" />
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
     <Compile Include="Features\Queries\QueryNoAutoMapTests.cs" />
     <Compile Include="Features\Queries\QueryComplexTests.cs">
@@ -118,6 +119,7 @@
     <Compile Include="_Documentation\UpdateDataTests.cs" />
     <Compile Include="_Helpers\Categories.cs" />
     <Compile Include="_Helpers\Category.cs" />
+    <Compile Include="_Helpers\DataTypeValue.cs" />
     <Compile Include="_Helpers\Order.cs" />
     <Compile Include="_Helpers\OrderReport.cs" />
     <Compile Include="_Helpers\Product.cs" />

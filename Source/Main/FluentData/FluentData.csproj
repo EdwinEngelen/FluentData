@@ -134,6 +134,7 @@
     <Compile Include="Context\PartialClasses\Sql.cs" />
     <Compile Include="Context\PartialClasses\Transactions.cs" />
     <Compile Include="Context\TransactionStates.cs" />
+    <Compile Include="Core\PropertyExpressionParser.cs" />
     <Compile Include="Core\FluentDataException.cs" />
     <Compile Include="Core\ReflectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
