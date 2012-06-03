@@ -12,7 +12,8 @@ namespace FluentData
 			{
 				IDbConnection connection = null;
 
-				if (ContextData.UseTransaction)
+				if (ContextData.UseTransaction
+					|| ContextData.UseSharedConnection)
 				{
 					if (ContextData.Connection == null)
 						ContextData.Connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);

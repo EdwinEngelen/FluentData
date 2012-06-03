@@ -5,6 +5,7 @@ namespace FluentData
 	public class DbContextData
 	{
 		public bool UseTransaction { get; set; }
+		public bool UseSharedConnection { get; set; }
 		public System.Data.IDbConnection Connection { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,6 +10,8 @@ namespace FluentData
 {
 	internal static class ReflectionHelper
 	{
+		private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _cachedProperties = new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
+
 		public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> expression)
 		{
 			string propertyPath = null;
@@ -73,10 +76,24 @@ namespace FluentData
 
 			return dictionary[name];
 		}
-		
-		public static List<PropertyInfo> GetProperties(object item)
+
+		public static Dictionary<string, PropertyInfo> GetProperties(Type type)
 		{
-			return item.GetType().GetProperties().ToList();
+			var properties = _cachedProperties.GetOrAdd(type, BuildPropertyDictionary);
+
+			return properties;
+		}
+
+		private static Dictionary<string, PropertyInfo> BuildPropertyDictionary(Type type)
+		{
+			var result = new Dictionary<string, PropertyInfo>();
+
+			var properties = type.GetProperties();
+			foreach (var property in properties)
+			{
+				result.Add(property.Name.ToLower(), property);
+			}
+			return result;
 		}
 
 		public static bool IsList(object item)
@@ -99,8 +116,6 @@ namespace FluentData
 		/// <summary>
 		/// Includes a work around for getting the actual type of a Nullable type.
 		/// </summary>
-		/// <param name="property"></param>
-		/// <returns></returns>
 		public static Type GetPropertyType(PropertyInfo property)
 		{
 			if (IsNullable(property))
@@ -118,24 +133,11 @@ namespace FluentData
 
 		public static bool IsBasicClrType(Type type)
 		{
-			if (type.IsEnum)
-				return true;
-
-			var types = new HashSet<Type>();
-			types.Add(typeof(bool));
-			types.Add(typeof(byte));
-			types.Add(typeof(long));
-			types.Add(typeof(char));
-			types.Add(typeof(string));
-			types.Add(typeof(DateTime));
-			types.Add(typeof(decimal));
-			types.Add(typeof(double));
-			types.Add(typeof(float));
-			types.Add(typeof(Guid));
-			types.Add(typeof(short));
-			types.Add(typeof(int));
-
-			if (types.Contains(type))
+			if (type.IsEnum
+				|| type.IsPrimitive
+				|| type.IsValueType
+				|| type == typeof(string)
+				|| type == typeof(DateTime))
 				return true;
 
 			return false;

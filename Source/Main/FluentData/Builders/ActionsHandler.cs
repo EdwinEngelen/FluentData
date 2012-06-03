@@ -62,7 +62,7 @@ namespace FluentData
 
 		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
-			var properties = ReflectionHelper.GetProperties(_data.Item);
+			var properties = ReflectionHelper.GetProperties(_data.Item.GetType());
 			var ignorePropertyNames = new HashSet<string>();
 			if (ignorePropertyExpressions != null)
 			{
@@ -76,16 +76,16 @@ namespace FluentData
 			foreach (var property in properties)
 			{
 
-				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase));
+				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
 
-				var propertyType = ReflectionHelper.GetPropertyType(property);
+				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
 				if (ReflectionHelper.IsBasicClrType(propertyType))
 				{
-					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property);
-					ColumnAction(property.Name, propertyValue, propertyType, propertyNameIsParameterName);
+					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
+					ColumnAction(property.Value.Name, propertyValue, propertyType, propertyNameIsParameterName);
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace FluentData
 {
@@ -52,32 +53,40 @@ namespace FluentData
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
-				if (_data.ContextData.OnConnectionOpening != null)
-					_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
-
 				if (_data.ContextData.UseTransaction)
 				{
 					if (_data.ContextData.Transaction == null)
 					{
-						_data.InnerCommand.Connection.Open();
+						OpenConnection();
 						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
 					}
 					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
 				}
 				else
-					_data.InnerCommand.Connection.Open();
-
-				if (_data.ContextData.OnConnectionOpened != null)
-					_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
+				{
+					if (_data.InnerCommand.Connection.State != ConnectionState.Open)
+						OpenConnection();
+				}
 
 				if (_data.ContextData.OnExecuting != null)
 					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
-
+				
 				if (useReader)
 					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
 
 				_queryAlreadyExecuted = true;
 			}
+		}
+
+		private void OpenConnection()
+		{
+			if (_data.ContextData.OnConnectionOpening != null)
+				_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
+
+			_data.InnerCommand.Connection.Open();
+
+			if (_data.ContextData.OnConnectionOpened != null)
+				_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
 		}
 
 		private void HandleQueryFinally()
@@ -87,7 +96,7 @@ namespace FluentData
 				if (_data.Reader != null)
 					_data.Reader.Close();
 
-					_command.ClosePrivateConnection();
+				_command.ClosePrivateConnection();
 			}
 		}
 

@@ -8,6 +8,7 @@ namespace FluentData
 	{
 		IDbContext IgnoreIfAutoMapFails { get; }
 		IDbContext UseTransaction(bool useTransaction);
+		IDbContext UseSharedConnection(bool useSharedConnection);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);

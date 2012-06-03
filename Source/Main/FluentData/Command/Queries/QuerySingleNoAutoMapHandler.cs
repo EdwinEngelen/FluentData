@@ -17,8 +17,7 @@ namespace FluentData
 					item = customMapperReader(data.Reader);
 				else if (customMapperDynamic != null)
 				{
-					var dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
+					var dynamicObject = new DynamicTypAutoMapper(data).AutoMap();
 					item = customMapperDynamic(dynamicObject);
 				}
 			}

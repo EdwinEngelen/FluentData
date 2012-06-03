@@ -1,4 +1,6 @@
-﻿using System.Dynamic;
+﻿using System;
+using System.Dynamic;
+using System.Linq.Expressions;
 using FluentData;
 
 namespace FluentData

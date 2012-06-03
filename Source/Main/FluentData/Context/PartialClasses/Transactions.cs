@@ -8,6 +8,12 @@
 			return this;
 		}
 
+		public IDbContext UseSharedConnection(bool useSharedConnection)
+		{
+			ContextData.UseSharedConnection = useSharedConnection;
+			return this;
+		}
+
 		public IDbContext IsolationLevel(IsolationLevel isolationLevel)
 		{
 			ContextData.IsolationLevel = isolationLevel;

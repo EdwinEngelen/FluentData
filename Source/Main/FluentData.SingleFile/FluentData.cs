@@ -11,6 +11,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Reflection;
 using System.Text;
@@ -73,7 +74,7 @@ namespace FluentData
 
 		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
-			var properties = ReflectionHelper.GetProperties(_data.Item);
+			var properties = ReflectionHelper.GetProperties(_data.Item.GetType());
 			var ignorePropertyNames = new HashSet<string>();
 			if (ignorePropertyExpressions != null)
 			{
@@ -87,16 +88,16 @@ namespace FluentData
 			foreach (var property in properties)
 			{
 
-				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Name, StringComparison.CurrentCultureIgnoreCase));
+				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
 
-				var propertyType = ReflectionHelper.GetPropertyType(property);
+				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
 				if (ReflectionHelper.IsBasicClrType(propertyType))
 				{
-					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property);
-					ColumnAction(property.Name, propertyValue, propertyType, propertyNameIsParameterName);
+					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
+					ColumnAction(property.Value.Name, propertyValue, propertyType, propertyNameIsParameterName);
 				}
 			}
 		}
@@ -1120,7 +1121,8 @@ namespace FluentData
 
 		internal void ClosePrivateConnection()
 		{
-			if (!_data.ContextData.UseTransaction)
+			if (!_data.ContextData.UseTransaction
+				&& !_data.ContextData.UseSharedConnection)
 			{
 				_data.InnerCommand.Connection.Close();
 
@@ -1211,89 +1213,70 @@ namespace FluentData
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 
-	internal class AutoMapper<T> : BaseMapper<AutoMapper<T>>
+	internal class AutoMapper<T>
 	{
 		private readonly DbCommandData _dbCommandData;
-		private readonly Dictionary<Type, List<PropertyInfo>> _cachedProperties;
 
 		internal AutoMapper(DbCommandData dbCommandData)
 		{
 			_dbCommandData = dbCommandData;
-			_cachedProperties = new Dictionary<Type, List<PropertyInfo>>();
-			Reader(dbCommandData.Reader);
 		}
 
 		public void AutoMap(object item)
 		{
-			var properties = GetProperties(item);
-			foreach (var field in Fields)
-			{
-				var value = base._reader.GetValue(field.Index);
-				bool wasMapped;
+			var properties = ReflectionHelper.GetProperties(item.GetType());
+			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
 
-				if (IsComplex(field, properties))
-					wasMapped = HandleComplexField(0, item, field, value);
+			foreach (var field in fields)
+			{
+				var value = _dbCommandData.Reader.GetValue(field.Index);
+				var wasMapped = false;
+
+				PropertyInfo property = null;
+					
+				if (properties.TryGetValue(field.LowerName, out property))
+				{
+					SetPropertyValue(field, property, item, value);
+					wasMapped = true;
+				}
 				else
-					wasMapped = HandleSimpleField(item, field, value);
+				{
+					if (field.LowerName.IndexOf('_') != -1)
+						wasMapped = HandleComplexField(item, field, value);
+				}
 
 				if (!wasMapped && !_dbCommandData.ContextData.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
 
-		private bool IsComplex(DataReaderField field, List<PropertyInfo> properties)
+		private bool HandleComplexField(object item, DataReaderField field, object value)
 		{
-			foreach (var property in properties)
+			string propertyName = null;
+
+			for (var level = 0; level <= field.NestedLevels; level++)
 			{
-				if (property.Name.Equals(field.Name, StringComparison.CurrentCultureIgnoreCase))
-					return false;
-			}
-
-			if (field.Name.Contains("_"))
-				return true;
-
-			return false;
-		}
-
-		private bool HandleSimpleField(object item, DataReaderField field, object value)
-		{
-			var properties = GetProperties(item);
-
-			foreach (var property in properties)
-			{
-				if (property.Name.Equals(field.Name, StringComparison.CurrentCultureIgnoreCase))
-				{
-					SetPropertyValue(field, property, item, value);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private bool HandleComplexField(int level, object item, DataReaderField field, object value)
-		{
-			var propertyName = field.GetNestedName(level);
-
-			var properties = GetProperties(item);
-
-			var property = properties.SingleOrDefault(x => x.Name.Equals(propertyName, StringComparison.CurrentCultureIgnoreCase));
-
-			if (property != null)
-			{
-				if (level == field.NestedLevels)
-				{
-					SetPropertyValue(field, property, item, value);
-					return true;
-				}
+				if (string.IsNullOrEmpty(propertyName))
+					propertyName = field.GetNestedName(level);
 				else
+					propertyName += "_" + field.GetNestedName(level);
+
+				PropertyInfo property = null;
+				var properties = ReflectionHelper.GetProperties(item.GetType());
+				if (properties.TryGetValue(propertyName, out property))
 				{
-					object instance = GetOrCreateInstance(item, property);
-
-					if (instance == null)
-						return false;
-
-					return HandleComplexField(level + 1, instance, field, value);
+					if (level == field.NestedLevels)
+					{
+						SetPropertyValue(field, property, item, value);
+						return true;
+					}
+					else
+					{
+						item = GetOrCreateInstance(item, property);
+						if (item == null)
+							return false;
+						propertyName = null;	
+					}
 				}
 			}
 
@@ -1312,19 +1295,6 @@ namespace FluentData
 			}
 
 			return instance;
-		}
-
-		private List<PropertyInfo> GetProperties(object item)
-		{
-			var type = item.GetType();
-
-			if (_cachedProperties.ContainsKey(type))
-				return _cachedProperties[type];
-
-			var properties = ReflectionHelper.GetProperties(item);
-			_cachedProperties.Add(type, properties);
-
-			return properties;
 		}
 
 		private void SetPropertyValue(DataReaderField field, PropertyInfo property, object item, object value)
@@ -1369,69 +1339,27 @@ namespace FluentData
 		}	
 	}
 
-	internal abstract class BaseMapper<T>
-		where T : BaseMapper<T>
-	{
-		protected IDataReader _reader;
-		protected List<DataReaderField> Fields;
-
-		protected T Reader(IDataReader reader)
-		{
-			_reader = reader;
-			Fields = GetDataReaderFields();
-			return (T) this;
-		}
-
-		private List<DataReaderField> GetDataReaderFields()
-		{
-			var columns = new List<DataReaderField>();
-
-			for (int i = 0; i < _reader.FieldCount; i++)
-			{
-				var column = new DataReaderField();
-				column.Name = _reader.GetName(i);
-				column.Type = _reader.GetFieldType(i);
-				column.Index = i;
-
-				if (columns.SingleOrDefault(x => x.Name == column.Name) == null)
-					columns.Add(column);
-			}
-
-			return columns;
-		}
-
-		protected object GetDataReaderValue(int index, bool isNullable)
-		{
-			var value = _reader[index];
-			var type = value.GetType();
-
-			if (value == DBNull.Value)
-			{
-				if (isNullable)
-					return null;
-				
-				if (type == typeof(DateTime))
-					return DateTime.MinValue;
-			}
-
-			return value;
-		}
-	}
-
 	internal class DataReaderField
 	{
-		public int Index { get; set; }
-		public string Name { get; set; }
-		public Type Type { get; set; }
-		private List<string> _nestedPropertyNames;
+		public int Index { get; private set; }
+		public string LowerName { get; private set; }
+		public string Name { get; private set; }
+		public Type Type { get; private set; }
+		private readonly string[] _nestedPropertyNames;
+		private readonly int _nestedLevels;
+
+		public DataReaderField(int index, string name, Type type)
+		{
+			Index = index;
+			Name = name;
+			LowerName = name.ToLower();
+			Type = type;
+			_nestedPropertyNames = LowerName.Split('_');
+			_nestedLevels = _nestedPropertyNames.Count() - 1;
+		}
 
 		public string GetNestedName(int level)
 		{
-			if (_nestedPropertyNames == null)
-			{
-				_nestedPropertyNames = Name.Split('_').ToList();
-			}
-
 			return _nestedPropertyNames[level];
 		}
 
@@ -1439,27 +1367,31 @@ namespace FluentData
 		{
 			get
 			{
-				return _nestedPropertyNames.Count - 1;
+				return _nestedLevels;
 			}
 		}
 	}
 
-	internal class DynamicTypAutoMapper : BaseMapper<DynamicTypAutoMapper>
+	internal class DynamicTypAutoMapper
 	{
+		private readonly DbCommandData _dbCommandData;
+
 		public DynamicTypAutoMapper(DbCommandData dbCommandData)
 		{
-			base.Reader(dbCommandData.Reader);
+			_dbCommandData = dbCommandData;
 		}
 
 		public ExpandoObject AutoMap()
 		{
 			var item = new ExpandoObject();
 
+			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
+
 			var itemDictionary = (IDictionary<string, object>) item;
 
-			foreach (var column in Fields)
+			foreach (var column in fields)
 			{
-				var value = GetDataReaderValue(column.Index, true);
+				var value = DataReaderHelper.GetDataReaderValue(_dbCommandData.Reader, column.Index, true);
 
 				itemDictionary.Add(column.Name, value); 
 			}
@@ -1951,8 +1883,7 @@ namespace FluentData
 					item = customMapperReader(data.Reader);
 				else if (customMapperDynamic != null)
 				{
-					var dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
+					var dynamicObject = new DynamicTypAutoMapper(data).AutoMap();
 					item = customMapperDynamic(dynamicObject);
 				}
 			}
@@ -2135,32 +2066,40 @@ namespace FluentData
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
-				if (_data.ContextData.OnConnectionOpening != null)
-					_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
-
 				if (_data.ContextData.UseTransaction)
 				{
 					if (_data.ContextData.Transaction == null)
 					{
-						_data.InnerCommand.Connection.Open();
+						OpenConnection();
 						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
 					}
 					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
 				}
 				else
-					_data.InnerCommand.Connection.Open();
-
-				if (_data.ContextData.OnConnectionOpened != null)
-					_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
+				{
+					if (_data.InnerCommand.Connection.State != ConnectionState.Open)
+						OpenConnection();
+				}
 
 				if (_data.ContextData.OnExecuting != null)
 					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
-
+				
 				if (useReader)
 					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
 
 				_queryAlreadyExecuted = true;
 			}
+		}
+
+		private void OpenConnection()
+		{
+			if (_data.ContextData.OnConnectionOpening != null)
+				_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
+
+			_data.InnerCommand.Connection.Open();
+
+			if (_data.ContextData.OnConnectionOpened != null)
+				_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
 		}
 
 		private void HandleQueryFinally()
@@ -2170,7 +2109,7 @@ namespace FluentData
 				if (_data.Reader != null)
 					_data.Reader.Close();
 
-					_command.ClosePrivateConnection();
+				_command.ClosePrivateConnection();
 			}
 		}
 
@@ -2655,6 +2594,7 @@ namespace FluentData
 	public class DbContextData
 	{
 		public bool UseTransaction { get; set; }
+		public bool UseSharedConnection { get; set; }
 		public System.Data.IDbConnection Connection { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }
@@ -2694,6 +2634,7 @@ namespace FluentData
 	{
 		IDbContext IgnoreIfAutoMapFails { get; }
 		IDbContext UseTransaction(bool useTransaction);
+		IDbContext UseSharedConnection(bool useSharedConnection);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
@@ -2906,10 +2847,6 @@ namespace FluentData
 
 	public partial class DbContext : IDbContext
 	{
-		/// <summary>
-		/// Set a custom object locator to override the way the entity and list instances are created.
-		/// </summary>
-		/// <param name="entityFactory"></param>
 		public IDbContext EntityFactory(IEntityFactory entityFactory)
 		{
 			ContextData.EntityFactory = entityFactory;
@@ -2964,7 +2901,8 @@ namespace FluentData
 			{
 				IDbConnection connection = null;
 
-				if (ContextData.UseTransaction)
+				if (ContextData.UseTransaction
+					|| ContextData.UseSharedConnection)
 				{
 					if (ContextData.Connection == null)
 						ContextData.Connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
@@ -3023,6 +2961,12 @@ namespace FluentData
 			return this;
 		}
 
+		public IDbContext UseSharedConnection(bool useSharedConnection)
+		{
+			ContextData.UseSharedConnection = useSharedConnection;
+			return this;
+		}
+
 		public IDbContext IsolationLevel(IsolationLevel isolationLevel)
 		{
 			ContextData.IsolationLevel = isolationLevel;
@@ -3069,6 +3013,41 @@ namespace FluentData
 		None = 0,
 		Committed = 1,
 		Rollbacked = 2
+	}
+
+	internal class DataReaderHelper
+	{
+		internal static List<DataReaderField> GetDataReaderFields(IDataReader reader)
+		{
+			var columns = new List<DataReaderField>();
+
+			for (var i = 0; i < reader.FieldCount; i++)
+			{
+				var column = new DataReaderField(i, reader.GetName(i), reader.GetFieldType(i));
+
+				if (columns.SingleOrDefault(x => x.LowerName == column.LowerName) == null)
+					columns.Add(column);
+			}
+
+			return columns;
+		}
+
+		internal static object GetDataReaderValue(IDataReader reader, int index, bool isNullable)
+		{
+			var value = reader[index];
+			var type = value.GetType();
+
+			if (value == DBNull.Value)
+			{
+				if (isNullable)
+					return null;
+
+				if (type == typeof(DateTime))
+					return DateTime.MinValue;
+			}
+
+			return value;
+		}
 	}
 
 	public class PropertyExpressionParser<T>
@@ -3125,6 +3104,8 @@ namespace FluentData
 
 	internal static class ReflectionHelper
 	{
+		private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> _cachedProperties = new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
+
 		public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> expression)
 		{
 			string propertyPath = null;
@@ -3189,10 +3170,24 @@ namespace FluentData
 
 			return dictionary[name];
 		}
-		
-		public static List<PropertyInfo> GetProperties(object item)
+
+		public static Dictionary<string, PropertyInfo> GetProperties(Type type)
 		{
-			return item.GetType().GetProperties().ToList();
+			var properties = _cachedProperties.GetOrAdd(type, BuildPropertyDictionary);
+
+			return properties;
+		}
+
+		private static Dictionary<string, PropertyInfo> BuildPropertyDictionary(Type type)
+		{
+			var result = new Dictionary<string, PropertyInfo>();
+
+			var properties = type.GetProperties();
+			foreach (var property in properties)
+			{
+				result.Add(property.Name.ToLower(), property);
+			}
+			return result;
 		}
 
 		public static bool IsList(object item)
@@ -3215,8 +3210,6 @@ namespace FluentData
 		/// <summary>
 		/// Includes a work around for getting the actual type of a Nullable type.
 		/// </summary>
-		/// <param name="property"></param>
-		/// <returns></returns>
 		public static Type GetPropertyType(PropertyInfo property)
 		{
 			if (IsNullable(property))
@@ -3234,24 +3227,11 @@ namespace FluentData
 
 		public static bool IsBasicClrType(Type type)
 		{
-			if (type.IsEnum)
-				return true;
-
-			var types = new HashSet<Type>();
-			types.Add(typeof(bool));
-			types.Add(typeof(byte));
-			types.Add(typeof(long));
-			types.Add(typeof(char));
-			types.Add(typeof(string));
-			types.Add(typeof(DateTime));
-			types.Add(typeof(decimal));
-			types.Add(typeof(double));
-			types.Add(typeof(float));
-			types.Add(typeof(Guid));
-			types.Add(typeof(short));
-			types.Add(typeof(int));
-
-			if (types.Contains(type))
+			if (type.IsEnum
+				|| type.IsPrimitive
+				|| type.IsValueType
+				|| type == typeof(string)
+				|| type == typeof(DateTime))
 				return true;
 
 			return false;

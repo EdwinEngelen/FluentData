@@ -84,7 +84,6 @@
     <Compile Include="Command\DbCommandTypes.cs" />
     <Compile Include="Command\IDbCommand.cs" />
     <Compile Include="Command\Mappers\AutoMapper.cs" />
-    <Compile Include="Command\Mappers\BaseMapper.cs" />
     <Compile Include="Command\Mappers\DataReaderField.cs" />
     <Compile Include="Command\Mappers\DynamicTypeAutoMapper.cs" />
     <Compile Include="Command\Parameter.cs" />
@@ -134,6 +133,7 @@
     <Compile Include="Context\PartialClasses\Sql.cs" />
     <Compile Include="Context\PartialClasses\Transactions.cs" />
     <Compile Include="Context\TransactionStates.cs" />
+    <Compile Include="Core\DataReaderHelper.cs" />
     <Compile Include="Core\PropertyExpressionParser.cs" />
     <Compile Include="Core\FluentDataException.cs" />
     <Compile Include="Core\ReflectionHelper.cs" />

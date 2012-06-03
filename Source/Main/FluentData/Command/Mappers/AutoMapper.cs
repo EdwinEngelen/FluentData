@@ -1,93 +1,72 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace FluentData
 {
-	internal class AutoMapper<T> : BaseMapper<AutoMapper<T>>
+	internal class AutoMapper<T>
 	{
 		private readonly DbCommandData _dbCommandData;
-		private readonly Dictionary<Type, List<PropertyInfo>> _cachedProperties;
 
 		internal AutoMapper(DbCommandData dbCommandData)
 		{
 			_dbCommandData = dbCommandData;
-			_cachedProperties = new Dictionary<Type, List<PropertyInfo>>();
-			Reader(dbCommandData.Reader);
 		}
 
 		public void AutoMap(object item)
 		{
-			var properties = GetProperties(item);
-			foreach (var field in Fields)
-			{
-				var value = base._reader.GetValue(field.Index);
-				bool wasMapped;
+			var properties = ReflectionHelper.GetProperties(item.GetType());
+			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
 
-				if (IsComplex(field, properties))
-					wasMapped = HandleComplexField(0, item, field, value);
+			foreach (var field in fields)
+			{
+				var value = _dbCommandData.Reader.GetValue(field.Index);
+				var wasMapped = false;
+
+				PropertyInfo property = null;
+					
+				if (properties.TryGetValue(field.LowerName, out property))
+				{
+					SetPropertyValue(field, property, item, value);
+					wasMapped = true;
+				}
 				else
-					wasMapped = HandleSimpleField(item, field, value);
+				{
+					if (field.LowerName.IndexOf('_') != -1)
+						wasMapped = HandleComplexField(item, field, value);
+				}
 
 				if (!wasMapped && !_dbCommandData.ContextData.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
 
-		private bool IsComplex(DataReaderField field, List<PropertyInfo> properties)
+		private bool HandleComplexField(object item, DataReaderField field, object value)
 		{
-			foreach (var property in properties)
+			string propertyName = null;
+
+			for (var level = 0; level <= field.NestedLevels; level++)
 			{
-				if (property.Name.Equals(field.Name, StringComparison.CurrentCultureIgnoreCase))
-					return false;
-			}
-
-			if (field.Name.Contains("_"))
-				return true;
-
-			return false;
-		}
-
-		private bool HandleSimpleField(object item, DataReaderField field, object value)
-		{
-			var properties = GetProperties(item);
-
-			foreach (var property in properties)
-			{
-				if (property.Name.Equals(field.Name, StringComparison.CurrentCultureIgnoreCase))
-				{
-					SetPropertyValue(field, property, item, value);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private bool HandleComplexField(int level, object item, DataReaderField field, object value)
-		{
-			var propertyName = field.GetNestedName(level);
-
-			var properties = GetProperties(item);
-
-			var property = properties.SingleOrDefault(x => x.Name.Equals(propertyName, StringComparison.CurrentCultureIgnoreCase));
-
-			if (property != null)
-			{
-				if (level == field.NestedLevels)
-				{
-					SetPropertyValue(field, property, item, value);
-					return true;
-				}
+				if (string.IsNullOrEmpty(propertyName))
+					propertyName = field.GetNestedName(level);
 				else
+					propertyName += "_" + field.GetNestedName(level);
+
+				PropertyInfo property = null;
+				var properties = ReflectionHelper.GetProperties(item.GetType());
+				if (properties.TryGetValue(propertyName, out property))
 				{
-					object instance = GetOrCreateInstance(item, property);
-
-					if (instance == null)
-						return false;
-
-					return HandleComplexField(level + 1, instance, field, value);
+					if (level == field.NestedLevels)
+					{
+						SetPropertyValue(field, property, item, value);
+						return true;
+					}
+					else
+					{
+						item = GetOrCreateInstance(item, property);
+						if (item == null)
+							return false;
+						propertyName = null;	
+					}
 				}
 			}
 
@@ -106,19 +85,6 @@ namespace FluentData
 			}
 
 			return instance;
-		}
-
-		private List<PropertyInfo> GetProperties(object item)
-		{
-			var type = item.GetType();
-
-			if (_cachedProperties.ContainsKey(type))
-				return _cachedProperties[type];
-
-			var properties = ReflectionHelper.GetProperties(item);
-			_cachedProperties.Add(type, properties);
-
-			return properties;
 		}
 
 		private void SetPropertyValue(DataReaderField field, PropertyInfo property, object item, object value)

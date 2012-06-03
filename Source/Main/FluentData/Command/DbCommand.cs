@@ -40,7 +40,8 @@ namespace FluentData
 
 		internal void ClosePrivateConnection()
 		{
-			if (!_data.ContextData.UseTransaction)
+			if (!_data.ContextData.UseTransaction
+				&& !_data.ContextData.UseSharedConnection)
 			{
 				_data.InnerCommand.Connection.Close();
 
