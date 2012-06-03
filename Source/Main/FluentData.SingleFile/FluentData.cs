@@ -1,5 +1,5 @@
 ﻿
-// FluentData version 2.2.1.1.
+// FluentData version 2.2.2.0.
 // Copyright ©  2012 - Lars-Erik Kindblad (http://www.kindblad.com).
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
