@@ -2,6 +2,7 @@ namespace FluentData
 {
 	public interface IInsertBuilder
 	{
+		int Execute();
 		int ExecuteReturnLastId();
 		T ExecuteReturnLastId<T>();
 		int ExecuteReturnLastId(string identityColumnName);

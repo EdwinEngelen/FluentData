@@ -199,6 +199,18 @@ namespace FluentData
 			From = "";
 			Select = "";
 			WhereSql = "";
+			PagingCurrentPage = 1;
+			PagingItemsPerPage = 0;
+		}
+
+		internal int GetFromItems()
+		{
+			return (GetToItems() - PagingItemsPerPage + 1);
+		}
+
+		internal int GetToItems()
+		{
+			return (PagingCurrentPage*PagingItemsPerPage);
 		}
 	}
 
@@ -452,6 +464,7 @@ namespace FluentData
 
 	public interface IInsertBuilder
 	{
+		int Execute();
 		int ExecuteReturnLastId();
 		T ExecuteReturnLastId<T>();
 		int ExecuteReturnLastId(string identityColumnName);
@@ -485,6 +498,7 @@ namespace FluentData
 
 	public interface ISelectBuilder<TEntity>
 	{
+		ISelectBuilder<TEntity> Select(string sql);
 		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
@@ -525,6 +539,10 @@ namespace FluentData
 		{
 			get
 			{
+				if (Data.PagingItemsPerPage > 0
+					&& string.IsNullOrEmpty(Data.OrderBy))
+					throw new FluentDataException("Order by must defined when using Paging.");
+
 				Data.Command.Sql(Data.Provider.GetSqlForSelectBuilder(Data));
 				return Data.Command;
 			}
@@ -536,9 +554,15 @@ namespace FluentData
 			Actions = new ActionsHandler(Data);
 		}
 
+		public ISelectBuilder<TEntity> Select(string sql)
+		{
+			Data.Select += sql;
+			return this;
+		}
+
 		public ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
-			var alias = sql + " as " + ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_");
+			var alias = Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
 			if (Data.Select.Length > 0)
 				Data.Select += ",";
 
@@ -602,12 +626,12 @@ namespace FluentData
 
 		public TList Query<TList>(Action<dynamic, TEntity> customMapper) where TList : IList<TEntity>
 		{
-			throw new NotImplementedException();
+			return Command.Query<TEntity, TList>(customMapper);
 		}
 
 		public TList Query<TList>(Action<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
 		{
-			throw new NotImplementedException();
+			return Command.Query<TEntity, TList>(customMapper);
 		}
 
 		public List<TEntity> Query()
@@ -617,42 +641,42 @@ namespace FluentData
 
 		public List<TEntity> Query(Action<dynamic, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.Query(customMapper);
 		}
 
 		public List<TEntity> Query(Action<IDataReader, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.Query(customMapper);
 		}
 
 		public TList QueryComplex<TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>
 		{
-			throw new NotImplementedException();
+			return Command.QueryComplex<TEntity, TList>(customMapper);
 		}
 
 		public List<TEntity> QueryComplex(Action<IDataReader, IList<TEntity>> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QueryComplex(customMapper);
 		}
 
 		public TList QueryNoAutoMap<TList>(Func<dynamic, TEntity> customMapper) where TList : IList<TEntity>
 		{
-			throw new NotImplementedException();
+			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
 		}
 
 		public TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
 		{
-			throw new NotImplementedException();
+			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
 		}
 
 		public List<TEntity> QueryNoAutoMap(Func<dynamic, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QueryNoAutoMap(customMapper);
 		}
 
 		public List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QueryNoAutoMap(customMapper);
 		}
 
 		public TEntity QuerySingle()
@@ -662,27 +686,28 @@ namespace FluentData
 
 		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QuerySingle(customMapper);
 		}
 
 		public TEntity QuerySingle(Action<dynamic, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QuerySingle(customMapper);
 		}
 
 		public TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QuerySingleNoAutoMap(customMapper);
 		}
 
 		public TEntity QuerySingleNoAutoMap(Func<dynamic, TEntity> customMapper)
 		{
-			throw new NotImplementedException();
+			return Command.QuerySingleNoAutoMap(customMapper);
 		}
 
 		public TValue QueryValue<TValue>()
 		{
-			throw new NotImplementedException();
+			return Command.QueryValue<TValue>();
+
 		}
 	}
 
@@ -2869,6 +2894,7 @@ namespace FluentData
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
+		ISelectBuilder<TEntity> Select<TEntity>(string sql);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
@@ -2940,6 +2966,11 @@ namespace FluentData
 
 	public partial class DbContext : IDbContext
 	{
+		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
+		{
+			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql);
+		}
+
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
 			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql, mapToProperty);
@@ -3517,6 +3548,11 @@ namespace FluentData
 			return "@" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
 			throw new NotImplementedException();
@@ -3819,6 +3855,11 @@ namespace FluentData
 			return "@" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
 			throw new NotImplementedException();
@@ -3931,6 +3972,7 @@ namespace FluentData
 		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
 		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
+		string GetSelectBuilderAlias(string name, string alias);
 		string GetSqlForSelectBuilder(BuilderData data);
 		string GetSqlForInsertBuilder(BuilderData data);
 		string GetSqlForUpdateBuilder(BuilderData data);
@@ -3985,6 +4027,11 @@ namespace FluentData
 		public string GetParameterName(string parameterName)
 		{
 			return ":" + parameterName;
+		}
+
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " " + alias;
 		}
 
 		public string GetSqlForSelectBuilder(BuilderData data)
@@ -4093,6 +4140,11 @@ namespace FluentData
 		public string GetParameterName(string parameterName)
 		{
 			return "@" + parameterName;
+		}
+
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
 		}
 
 		public string GetSqlForSelectBuilder(BuilderData data)
@@ -4211,6 +4263,11 @@ namespace FluentData
 			return "@" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
 			var sql = "";
@@ -4248,8 +4305,8 @@ namespace FluentData
 											data.Select,
 											data.OrderBy,
 											sql,
-											1,
-											1);
+											data.GetFromItems(),
+											data.GetToItems());
 			}
 
 			return sql;
