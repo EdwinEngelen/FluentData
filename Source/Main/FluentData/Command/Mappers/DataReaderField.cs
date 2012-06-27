@@ -35,5 +35,13 @@ namespace FluentData
 				return _nestedLevels;
 			}
 		}
+
+		public bool IsSystem
+		{
+			get
+			{
+				return Name.IndexOf("fluentdata_") > -1;
+			}
+		}
 	}
 }

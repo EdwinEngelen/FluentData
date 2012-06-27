@@ -51,6 +51,16 @@ namespace FluentData.Providers.Oracle
 			return ":" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			throw new NotImplementedException();
+		}
+
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
 			return new InsertBuilderSqlGenerator().GenerateSql(":", data);

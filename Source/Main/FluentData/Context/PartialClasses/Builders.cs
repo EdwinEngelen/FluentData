@@ -1,12 +1,21 @@
 ﻿using System;
 using System.Dynamic;
 using System.Linq.Expressions;
-using FluentData;
 
 namespace FluentData
 {
 	public partial class DbContext : IDbContext
 	{
+		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
+		{
+			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql);
+		}
+
+		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
+		{
+			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql, mapToProperty);
+		}
+
 		public IInsertBuilder Insert(string tableName)
 		{
 			return new InsertBuilder(ContextData.Provider, CreateCommand, tableName);

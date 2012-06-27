@@ -52,6 +52,16 @@ namespace FluentData.Providers.SqlServerCompact
 			return "@" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			throw new NotImplementedException();
+		}
+
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
 			return new InsertBuilderSqlGenerator().GenerateSql("@", data);

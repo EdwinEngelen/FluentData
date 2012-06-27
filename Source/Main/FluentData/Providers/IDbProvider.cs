@@ -14,6 +14,8 @@ namespace FluentData
 		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
 		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
+		string GetSelectBuilderAlias(string name, string alias);
+		string GetSqlForSelectBuilder(BuilderData data);
 		string GetSqlForInsertBuilder(BuilderData data);
 		string GetSqlForUpdateBuilder(BuilderData data);
 		string GetSqlForDeleteBuilder(BuilderData data);

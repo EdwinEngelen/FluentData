@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Text;
-using FluentData;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -50,6 +49,16 @@ namespace FluentData.Providers.Access
 		public string GetParameterName(string parameterName)
 		{
 			return "@" + parameterName;
+		}
+
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			throw new NotImplementedException();
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)

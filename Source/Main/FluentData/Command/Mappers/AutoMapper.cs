@@ -19,6 +19,9 @@ namespace FluentData
 
 			foreach (var field in fields)
 			{
+				if (field.IsSystem)
+					continue;
+
 				var value = _dbCommandData.Reader.GetValue(field.Index);
 				var wasMapped = false;
 

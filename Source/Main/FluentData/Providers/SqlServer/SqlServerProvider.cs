@@ -52,6 +52,55 @@ namespace FluentData.Providers.SqlServer
 			return "@" + parameterName;
 		}
 
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			var sql = "";
+			if (data.PagingItemsPerPage == 0)
+			{
+				sql = "select " + data.Select;
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+				if (data.OrderBy.Length > 0)
+					sql += " order by " + data.OrderBy;
+			}
+			else if (data.PagingItemsPerPage > 0)
+			{
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+
+				sql = string.Format(@"with PagedPersons as
+										(
+											select top 100 percent {0}, row_number() over (order by {1}) as fluentdata_RowNumber
+											{2}
+										)
+										select *
+										from PagedPersons
+										where fluentdata_RowNumber between {3} and {4}",
+											data.Select,
+											data.OrderBy,
+											sql,
+											data.GetFromItems(),
+											data.GetToItems());
+			}
+
+			return sql;
+		}
+
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
 			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
