@@ -86,11 +86,6 @@ namespace FluentData.Providers.Access
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
 			var lastId = default(T);

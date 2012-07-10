@@ -161,6 +161,12 @@ namespace FluentData.Providers.SqlAzure
 		}
 
 		[TestMethod]
+		public void SelectBuilder_Paging()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		[TestMethod]
 		public void MultipleResultset()
 		{
 			using (var command = Context().MultiResultSql())

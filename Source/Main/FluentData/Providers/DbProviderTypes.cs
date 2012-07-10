@@ -8,6 +8,8 @@
 		SqlAzure = 3,
 		Oracle = 4,
 		MySql = 5,
-		Access = 6
+		Access = 6,
+		Sqlite = 7,
+		PostgreSql = 8
 	}
 }

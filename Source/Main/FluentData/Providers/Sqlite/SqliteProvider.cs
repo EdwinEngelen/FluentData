@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Data;
+using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.SqlServerCompact
+namespace FluentData.Providers.Sqlite
 {
-	internal class SqlServerCompactProvider : IDbProvider
+	internal class Sqlite : IDbProvider
 	{
 		public string ProviderName
-		{
+		{ 
 			get
 			{
-				return "System.Data.SqlServerCe.4.0";
-			}
+				return "System.Data.SQLite";
+			} 
 		}
-
 		public bool SupportsOutputParameters
 		{
-			get { return false; }
-		}
-
-		public bool SupportsMultipleQueries
-		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public bool SupportsMultipleResultset
 		{
-			get { return false; }
+			get { return true; }
+		}
+
+		public bool SupportsMultipleQueries
+		{
+			get { return true; }
 		}
 
 		public bool SupportsStoredProcedures
@@ -68,13 +68,12 @@ namespace FluentData.Providers.SqlServerCompact
 				sql += " having " + data.Having;
 			if (data.OrderBy.Length > 0)
 				sql += " order by " + data.OrderBy;
-			if (data.PagingItemsPerPage > 0)
+			if (data.PagingItemsPerPage > 0
+				&& data.PagingCurrentPage > 0)
 			{
-				sql += " offset " + (data.GetFromItems() - 1) + " rows";
-				if (data.PagingItemsPerPage > 0)
-					sql += " fetch next " + data.PagingItemsPerPage + " rows only";
+				sql += string.Format(" limit {0}, {1}", data.GetFromItems() - 1, data.GetToItems());
 			}
-
+			
 			return sql;
 		}
 
@@ -105,11 +104,21 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			var lastId = default(T);
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
+
+			data.Sql.Append("select last_insert_rowid();");
+
+			T lastId = default(T);
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
 			});
 
 			return lastId;
@@ -117,25 +126,6 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
-			
-		}
-
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
-		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
-
-			T lastId = default(T);
-
-			if (recordsAffected > 0)
-			{
-				data.InnerCommand.CommandText = "select cast(@@identity as int)";
-
-				var value = data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
-			}
-
-			return lastId;
 		}
 	}
 }

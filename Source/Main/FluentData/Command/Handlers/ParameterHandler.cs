@@ -6,35 +6,37 @@ namespace FluentData
 	{
 		internal void FixParameterType(DbCommandData data)
 		{
-			foreach (var parameter in data.Parameters)
-			{
-				if (parameter.Direction == ParameterDirection.Input
-					&& parameter.DataTypes == DataTypes.Object)
-				{
-					if (parameter.Value == null)
-					{
-						parameter.DataTypes = DataTypes.String;
-					}
-					else
-					{
-						parameter.DataTypes = data.ContextData.Provider.GetDbTypeForClrType(parameter.Value.GetType());
-						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
-					}
-				}
+		//    foreach (var parameter in data.Parameters)
+		//    {
+		//        if (parameter.Direction == ParameterDirection.Input
+		//            && parameter.DataType == DataTypes.Object)
+		//        {
+		//            if (parameter.Value == null)
+		//            {
+		//                parameter.DataType = DataTypes.String;
+		//            }
+		//            else
+		//            {
+		//                var type = parameter.Value.GetType();
 
-				if (parameter.Value == null)
-					parameter.Value = DBNull.Value;
+		//                parameter.DataType = data.ContextData.Provider.GetDbTypeForClrType(type);
+		//                if (parameter.DataType == DataTypes.Object)
+		//                    throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
+		//            }
+		//        }
 
-				var dbParameter = data.InnerCommand.CreateParameter();
-				dbParameter.DbType = (System.Data.DbType) parameter.DataTypes;
-				dbParameter.ParameterName = data.ContextData.Provider.GetParameterName(parameter.ParameterName);
-				dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
-				dbParameter.Value = parameter.Value;
-				if (parameter.Size > 0)
-					dbParameter.Size = parameter.Size;
-				data.InnerCommand.Parameters.Add(dbParameter);
-			}
+		//        if (parameter.Value == null)
+		//            parameter.Value = DBNull.Value;
+
+		//        var dbParameter = data.InnerCommand.CreateParameter();
+		//        dbParameter.DbType = (System.Data.DbType) parameter.DataType;
+		//        dbParameter.ParameterName = data.ContextData.Provider.GetParameterName(parameter.ParameterName);
+		//        dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
+		//        dbParameter.Value = parameter.Value;
+		//        if (parameter.Size > 0)
+		//            dbParameter.Size = parameter.Size;
+		//        data.InnerCommand.Parameters.Add(dbParameter);
+		//    }
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace FluentData.Providers
 		void Delete_data_sql();
 		void Delete_data_builder();
 		void In_query();
+		void SelectBuilder_Paging();
 		void Insert_data_builder_automapping();
 		void Insert_data_builder_no_automapping();
 		void Insert_data_sql();

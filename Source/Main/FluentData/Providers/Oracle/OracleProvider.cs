@@ -58,7 +58,46 @@ namespace FluentData.Providers.Oracle
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			var sql = "";
+			if (data.PagingItemsPerPage == 0)
+			{
+				sql = "select " + data.Select;
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+				if (data.OrderBy.Length > 0)
+					sql += " order by " + data.OrderBy;
+			}
+			else if (data.PagingItemsPerPage > 0)
+			{
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+
+				sql = string.Format(@"select * from
+										(
+											select {0}, 
+												row_number() over (order by {1}) FLUENTDATA_ROWNUMBER
+											{2}
+										)
+										where fluentdata_RowNumber between {3} and {4}
+										order by fluentdata_RowNumber",
+											data.Select,
+											data.OrderBy,
+											sql,
+											data.GetFromItems(),
+											data.GetToItems());
+			}
+
+			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -86,15 +125,10 @@ namespace FluentData.Providers.Oracle
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			data.Command.ParameterOut("FluentDataLastInsertedId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
-			data.Sql.Append(string.Format(" returning {0} into :FluentDataLastInsertedId", identityColumnName));
+			data.Command.ParameterOut("FluentDataLastId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
+			data.Command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
 			var lastId = default(T);
 
@@ -102,8 +136,7 @@ namespace FluentData.Providers.Oracle
 			{
 				data.InnerCommand.ExecuteNonQuery();
 
-				var parameter = (IDbDataParameter) data.InnerCommand.Parameters[":FluentDataLastInsertedId"];
-				lastId = (T) parameter.Value;
+				lastId = data.Command.ParameterValue<T>("FluentDataLastId");
 			});
 
 			return lastId;

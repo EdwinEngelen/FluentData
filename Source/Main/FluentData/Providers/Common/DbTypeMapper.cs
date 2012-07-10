@@ -29,6 +29,7 @@ namespace FluentData.Providers.Common
 						_types.Add(typeof(Guid), DataTypes.Guid);
 						_types.Add(typeof(Boolean), DataTypes.Boolean);
 						_types.Add(typeof(char), DataTypes.String);
+						_types.Add(typeof(DBNull), DataTypes.String);
 					}
 				}
 			}
@@ -36,7 +37,8 @@ namespace FluentData.Providers.Common
 			if (!_types.ContainsKey(clrType))
 				return DataTypes.Object;
 
-			return _types[clrType];
+			var dbType = _types[clrType];
+			return dbType;
 		}
 	}
 }

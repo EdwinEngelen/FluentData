@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -100,7 +101,9 @@
     <Compile Include="Providers\MySql\MySqlTests.cs" />
     <Compile Include="Providers\IDbProviderTests.cs" />
     <Compile Include="Providers\Oracle\OracleTests.cs" />
+    <Compile Include="Providers\PostgreSql\PostgreSqlTests.cs" />
     <Compile Include="Providers\SqlAzure\SqlAzureTests.cs" />
+    <Compile Include="Providers\Sqlite\SqliteTests.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactTests.cs" />
     <Compile Include="Providers\SqlServer\SqlServerTests.cs" />
     <Compile Include="_Documentation\BaseDocumentation.cs" />
@@ -136,7 +139,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Providers\SqlServerCompact\Data\FluentData.sdf" />
+    <Content Include="_Data\FluentDataDB.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="_Data\FluentDataDB.sdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="_Data\FluentDataDB" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Providers\SqlServerCompact\Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

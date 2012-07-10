@@ -11,14 +11,13 @@ namespace FluentData
 		public StringBuilder Sql { get; set; }
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
-		public ParameterCollection Parameters { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
 		public DbCommandTypes CommandType { get; set; }
 
 		public DbCommandData()
 		{
-			Parameters = new ParameterCollection();
 			CommandType = DbCommandTypes.Text;
+			Sql = new StringBuilder();
 		}
 	}
 }

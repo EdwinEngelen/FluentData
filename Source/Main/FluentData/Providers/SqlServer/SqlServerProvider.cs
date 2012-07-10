@@ -85,7 +85,7 @@ namespace FluentData.Providers.SqlServer
 
 				sql = string.Format(@"with PagedPersons as
 										(
-											select top 100 percent {0}, row_number() over (order by {1}) as fluentdata_RowNumber
+											select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
 											{2}
 										)
 										select *
@@ -126,11 +126,6 @@ namespace FluentData.Providers.SqlServer
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
 			if (data.Sql[data.Sql.Length - 1] != ';')
@@ -138,11 +133,11 @@ namespace FluentData.Providers.SqlServer
 
 			data.Sql.Append("select SCOPE_IDENTITY()");
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				var value = data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;

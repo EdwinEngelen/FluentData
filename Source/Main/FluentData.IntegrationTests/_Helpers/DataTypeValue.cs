@@ -12,4 +12,12 @@ namespace FluentData._Helpers
 		public decimal? DecimalValue { get; set; }
 		public DateTime? DateTimeValue { get; set; }
 	}
+
+	public class DataTypeValueNotNullable
+	{
+		public int Id { get; set; }
+		public string StringValue { get; set; }
+		public decimal DecimalValue { get; set; }
+		public DateTime DateTimeValue { get; set; }
+	}
 }

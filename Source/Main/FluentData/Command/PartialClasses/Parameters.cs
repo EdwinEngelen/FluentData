@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Data;
+using System.Linq;
+using System;
+using System.Text;
 
 namespace FluentData
 {
@@ -6,21 +10,68 @@ namespace FluentData
 	{
 		public IDbCommand Parameters(params object[] parameters)
 		{
-			for (int i = 0; i < parameters.Count(); i++)
+			for (var i = 0; i < parameters.Count(); i++)
 				Parameter(i.ToString(), parameters[i]);
 			return this;
 		}
 
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
 		{
-			var parameter = new Parameter();
-			parameter.DataTypes = parameterType;
-			parameter.ParameterName = name;
-			parameter.Direction = direction;
-			parameter.Value = value;
-			parameter.Size = size;
-			_data.Parameters.Add(parameter);
+			if (ReflectionHelper.IsList(value))
+				AddListParameterToInnerCommand(name, value);
+			else
+				AddParameterToInnerCommand(name, value, parameterType, direction, size);
+
 			return this;
+		}
+
+		private void AddListParameterToInnerCommand(string name, object value)
+		{
+			var list = (IEnumerable) value;
+
+			var newInStatement = new StringBuilder();
+
+			var k = -1;
+			foreach (var item in list)
+			{
+				k++;
+				if (k == 0)
+					newInStatement.Append(" in(");
+				else
+					newInStatement.Append(",");
+				
+				var parameter = AddParameterToInnerCommand("p" + name + "p" + k.ToString(), item);
+
+				newInStatement.Append(parameter.ParameterName);
+			}
+			newInStatement.Append(")");
+
+			var oldInStatement = string.Format(" in({0})", _data.ContextData.Provider.GetParameterName(name));
+			_data.Sql.Replace(oldInStatement, newInStatement.ToString());
+		}
+
+		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
+		{
+			if (value == null)
+				value = DBNull.Value;
+
+			if (value.GetType().IsEnum)
+				value = (int) value;
+
+			var dbParameter = _data.InnerCommand.CreateParameter();
+			if (parameterType == DataTypes.Object)
+				dbParameter.DbType = (System.Data.DbType) _data.ContextData.Provider.GetDbTypeForClrType(value.GetType());
+			else
+				dbParameter.DbType = (System.Data.DbType) parameterType;
+
+			dbParameter.ParameterName = _data.ContextData.Provider.GetParameterName(name);
+			dbParameter.Direction = (System.Data.ParameterDirection) direction;
+			dbParameter.Value = value;
+			if (size > 0)
+				dbParameter.Size = size;
+			_data.InnerCommand.Parameters.Add(dbParameter);
+
+			return dbParameter;
 		}
 
 		public IDbCommand Parameter(string name, object value)
@@ -44,10 +95,14 @@ namespace FluentData
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 
 			var value = (_data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
+
 			if (value == null)
 				return default(TParameterType);
 
-			return (TParameterType) value;
+			if (value.GetType() == typeof(TParameterType))
+				return (TParameterType) value;
+
+			return (TParameterType) Convert.ChangeType(value, typeof(TParameterType));
 		}
 	}
 }

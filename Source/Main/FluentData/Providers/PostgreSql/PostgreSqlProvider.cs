@@ -1,38 +1,38 @@
 ﻿using System;
 using System.Data;
+using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.SqlServerCompact
+namespace FluentData.Providers.PostgreSql
 {
-	internal class SqlServerCompactProvider : IDbProvider
+	internal class PostgreSqlProvider : IDbProvider
 	{
 		public string ProviderName
-		{
+		{ 
 			get
 			{
-				return "System.Data.SqlServerCe.4.0";
-			}
+				return "Npgsql";
+			} 
 		}
-
 		public bool SupportsOutputParameters
 		{
-			get { return false; }
-		}
-
-		public bool SupportsMultipleQueries
-		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public bool SupportsMultipleResultset
 		{
-			get { return false; }
+			get { return true; }
+		}
+
+		public bool SupportsMultipleQueries
+		{
+			get { return true; }
 		}
 
 		public bool SupportsStoredProcedures
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
@@ -47,7 +47,7 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public string GetParameterName(string parameterName)
 		{
-			return "@" + parameterName;
+			return ":" + parameterName;
 		}
 
 		public string GetSelectBuilderAlias(string name, string alias)
@@ -70,32 +70,33 @@ namespace FluentData.Providers.SqlServerCompact
 				sql += " order by " + data.OrderBy;
 			if (data.PagingItemsPerPage > 0)
 			{
-				sql += " offset " + (data.GetFromItems() - 1) + " rows";
 				if (data.PagingItemsPerPage > 0)
-					sql += " fetch next " + data.PagingItemsPerPage + " rows only";
+					sql += " limit " + data.PagingItemsPerPage;
+				sql += " offset " + (data.GetFromItems() - 1);
 			}
 
+			
 			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(":", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(":", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(":", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			return data.ObjectName;
 		}
 
 		public DataTypes GetDbTypeForClrType(Type clrType)
@@ -105,11 +106,21 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			var lastId = default(T);
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
+
+			data.Sql.Append("select lastval();");
+
+			T lastId = default(T);
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
 			});
 
 			return lastId;
@@ -117,25 +128,6 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
-			
-		}
-
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
-		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
-
-			T lastId = default(T);
-
-			if (recordsAffected > 0)
-			{
-				data.InnerCommand.CommandText = "select cast(@@identity as int)";
-
-				var value = data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
-			}
-
-			return lastId;
 		}
 	}
 }

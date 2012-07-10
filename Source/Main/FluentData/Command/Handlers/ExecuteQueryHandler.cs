@@ -47,9 +47,7 @@ namespace FluentData
 			}
 			else
 			{
-				FixSql();
-				new ParameterHandler().FixParameterType(_data);
-
+				_data.InnerCommand.CommandText = _data.Sql.ToString();
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
@@ -113,12 +111,6 @@ namespace FluentData
 				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
 			
 			throw exception;
-		}
-
-		private void FixSql()
-		{
-			_data.ContextData.Provider.FixInStatement(_data.Sql, _data.Parameters);
-			_data.InnerCommand.CommandText = _data.Sql.ToString();
 		}
 	}
 }

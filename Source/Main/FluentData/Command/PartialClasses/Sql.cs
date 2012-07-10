@@ -8,21 +8,14 @@ namespace FluentData
 	{
 		public IDbCommand Sql(string sql)
 		{
-			if (_data.Sql == null)
-				_data.Sql = new StringBuilder();
 			_data.Sql.Append(sql);
 			return this;
 		}
 
 		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
 		{
-			if (_data.Sql == null)
-				_data.Sql = new StringBuilder();
-
 			if (mappingExpressions == null)
-			{
-				_data.Sql.Append(sql);
-			}
+				Sql(sql);
 			else
 			{
 				var propertyNames = ReflectionHelper.GetPropertyNamesFromExpressions(mappingExpressions);

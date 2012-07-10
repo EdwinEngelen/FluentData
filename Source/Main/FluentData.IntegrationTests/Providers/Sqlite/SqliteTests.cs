@@ -1,28 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers.Access
+namespace FluentData.Providers.Sqlite
 {
 	[TestClass]
-	public class AccessTests : IDbProviderTests
+	public class SqliteTests : IDbProviderTests
 	{
-		[TestInitialize]
-		public void Initialize()
+		public SqliteTests()
 		{
+			Context().Sql(@"drop table if exists Category;
+							drop table if exists Product;
+
+							CREATE TABLE Category(
+								CategoryId INTEGER PRIMARY KEY,
+								Name VARCHAR(50));
+
+							CREATE TABLE Product(
+								ProductId INTEGER PRIMARY KEY AUTOINCREMENT,
+								Name VARCHAR(50),
+								CategoryId INTEGER);
+
+							insert into Category(CategoryId, Name)
+							select 1, 'Books'
+							union select 2, 'Movies';
+
+							insert into Product(ProductId, Name, CategoryId)
+							select 1, 'The Warren Buffet Way', 1
+							union select 2, 'Bill Gates Bio', 1
+							union select 3, 'James Bond - Goldeneye', 2
+							union select 4, 'The Bourne Identity', 2
+							").Execute();
 		}
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Access"), DbProviderTypes.Access);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Sqlite"), DbProviderTypes.Sqlite);
 		}
 
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Product")
-									.Query();
+			var products = Context().Sql("select * from Product").Query();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -30,8 +49,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void Query_single_dynamic()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
-									.QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle();
 
 			Assert.IsNotNull(product);
 		}
@@ -39,8 +57,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void Query_many_strongly_typed()
 		{
-			var products = Context().Sql("select * from Product")
-									.Query<Product>();
+			var products = Context().Sql("select * from Product").Query<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -48,8 +65,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void Query_single_strongly_typed()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
-									.QuerySingle<Product>();
+			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle<Product>();
 
 			Assert.IsNotNull(product);
 		}
@@ -71,6 +87,23 @@ namespace FluentData.Providers.Access
 		}
 
 		[TestMethod]
+		public void Query_auto_mapping_alias2()
+		{
+			var product = Context().Sql<Product>(@"select p.*,
+														c.CategoryId as {0},
+														c.Name as {1}
+													from Product p
+													inner join Category c on p.CategoryId = c.CategoryId
+													where ProductId = 1",
+														x => x.Category.CategoryId,
+														x => x.Category.Name).QuerySingle<Product>();
+
+			Assert.IsNotNull(product);
+			Assert.IsNotNull(product.Category);
+			Assert.IsNotNull(product.Category.Name);
+		}
+
+		[TestMethod]
 		public void Query_custom_mapping_dynamic()
 		{
 			var products = Context().Sql(@"select * from Product")
@@ -82,7 +115,7 @@ namespace FluentData.Providers.Access
 		public Product Custom_mapper_using_dynamic(dynamic row)
 		{
 			var product = new Product();
-			product.ProductId = row.ProductId;
+			product.ProductId = (int) row.ProductId;
 			product.Name = row.Name;
 			return product;
 		}
@@ -126,9 +159,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void Unnamed_parameters_one()
 		{
-			var product = Context().Sql("select * from Product where ProductId = @0")
-									.Parameters(1)
-									.QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle();
 
 			Assert.IsNotNull(product);
 		}
@@ -169,25 +200,36 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void SelectBuilder_Paging()
 		{
-			//throw new NotImplementedException();
+			var context = Context();
+
+			var category = context
+				.Select<Category>("CategoryId", x => x.CategoryId)
+				.Select("Name", x => x.Name)
+				.From("Category")
+				.OrderBy("Name asc")
+				.Paging(1, 1).QuerySingle();
+			Assert.AreEqual("Books", category.Name);
+
+			category = context
+				.Select<Category>("CategoryId", x => x.CategoryId)
+				.Select("Name", x => x.Name)
+				.From("Category")
+				.OrderBy("Name asc")
+				.Paging(2, 1).QuerySingle();
+			Assert.AreEqual("Movies", category.Name);
 		}
 
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			try
+			using (var command = Context().MultiResultSql())
 			{
-				var command = Context().MultiResultSql();
-				Assert.Fail();
-			}
-			catch (FluentDataException ex)
-			{
-				if (!ex.Message.Contains("The selected database does not support"))
-					Assert.Fail();
-			}
-			catch
-			{
-				Assert.Fail();
+				var categories = command.Sql(@"select * from Category;
+												select * from Product;").Query();
+				var products = command.Query();
+
+				Assert.IsTrue(categories.Count > 0);
+				Assert.IsTrue(products.Count > 0);
 			}
 		}
 
@@ -252,12 +294,12 @@ namespace FluentData.Providers.Access
 		{
 			var product = Context().Sql("select * from Product where ProductId = 1")
 								.QuerySingle<Product>();
-
+			
 			product.Name = "The Warren Buffet Way";
 
 			var rowsAffected = Context().Update<Product>("Product", product)
-										.AutoMap(x => x.ProductId)
 										.Where(x => x.ProductId)
+										.AutoMap(x => x.ProductId)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -266,7 +308,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void Delete_data_sql()
 		{
-			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1)")
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
 							.Parameters("The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
@@ -314,24 +356,20 @@ namespace FluentData.Providers.Access
 		}
 
 		[TestMethod]
+		public void Stored_procedure()
+		{
+		}
+
+		[TestMethod]
 		public void Stored_procedure_builder()
 		{
-			try
-			{
-				var rowsAffected = Context().StoredProcedure("").Execute();
-			}
-			catch (FluentDataException ex)
-			{
-				if (!ex.Message.Contains("The selected database does not support"))
-					Assert.Fail();
-			}
 		}
 
 		[TestMethod]
 		public void StoredProcedure_builder_automapping()
 		{
 		}
-		
+
 		[TestMethod]
 		public void StoredProcedure_builder_using_expression()
 		{

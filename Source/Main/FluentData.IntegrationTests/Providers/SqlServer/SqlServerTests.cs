@@ -172,6 +172,11 @@ namespace FluentData.Providers.SqlServer
 		}
 
 		[TestMethod]
+		public void SelectBuilder_Paging()
+		{
+		}
+
+		[TestMethod]
 		public void MultipleResultset()
 		{
 			using (var command = Context().MultiResultSql())

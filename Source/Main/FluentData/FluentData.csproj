@@ -144,14 +144,15 @@
     <Compile Include="Providers\Common\ConnectionFactory.cs" />
     <Compile Include="Providers\Common\DbTypeMapper.cs" />
     <Compile Include="Providers\Common\Builders\DeleteBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\Common\FixSqlInStatement.cs" />
     <Compile Include="Providers\Common\Builders\InsertBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\Builders\UpdateBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\PostgreSql\PostgreSqlProvider.cs" />
     <Compile Include="Providers\MySql\MySqlProvider.cs" />
     <Compile Include="Providers\DbProviderFactory.cs" />
     <Compile Include="Providers\DbProviderTypes.cs" />
     <Compile Include="Providers\IDbProvider.cs" />
     <Compile Include="Providers\Oracle\OracleProvider.cs" />
+    <Compile Include="Providers\Sqlite\SqliteProvider.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />
   </ItemGroup>

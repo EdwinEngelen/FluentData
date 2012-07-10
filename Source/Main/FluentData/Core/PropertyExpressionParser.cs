@@ -15,7 +15,7 @@ namespace FluentData
 			_property = GetProperty(propertyExpression);
 		}
 
-		private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> exp)
+		private static PropertyInfo GetProperty(Expression<Func<T, object>> exp)
 		{
 			PropertyInfo result;
 			if (exp.Body.NodeType == ExpressionType.Convert)

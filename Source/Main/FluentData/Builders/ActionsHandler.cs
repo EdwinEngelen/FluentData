@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace FluentData
 {
@@ -29,21 +28,9 @@ namespace FluentData
 			else
 				parameterName = "c" + _data.Columns.Count.ToString();
 
-			if (value != null)
-			{
-				if (value.GetType().IsEnum)
-					value = (int) value;
-			}
-
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
-			var parameterType = DataTypes.Object;
-			if (type != (typeof(object)))
-			{
-				parameterType = _data.Provider.GetDbTypeForClrType(type);
-			}
-
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false);
+			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
 		}
 
 		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
@@ -75,7 +62,6 @@ namespace FluentData
 
 			foreach (var property in properties)
 			{
-
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
@@ -112,18 +98,17 @@ namespace FluentData
 			}
 		}
 
-		internal void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
 		{
 			var parameter = new Parameter();
 			parameter.ParameterName = name;
 			parameter.Value = value;
-			parameter.DataTypes = dataType;
+			parameter.DataType = dataType;
 			parameter.Direction = direction;
 			parameter.IsId = isId;
 			parameter.Size = size;
 
-			_data.Parameters.Add(parameter);
-			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction, parameter.Size);
+			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataType, parameter.Direction, parameter.Size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)

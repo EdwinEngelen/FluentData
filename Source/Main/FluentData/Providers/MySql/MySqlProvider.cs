@@ -57,7 +57,24 @@ namespace FluentData.Providers.MySql
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			var sql = "";
+			sql = "select " + data.Select;
+			sql += " from " + data.From;
+			if (data.WhereSql.Length > 0)
+				sql += " where " + data.WhereSql;
+			if (data.GroupBy.Length > 0)
+				sql += " group by " + data.GroupBy;
+			if (data.Having.Length > 0)
+				sql += " having " + data.Having;
+			if (data.OrderBy.Length > 0)
+				sql += " order by " + data.OrderBy;
+			if (data.PagingItemsPerPage > 0
+				&& data.PagingCurrentPage > 0)
+			{
+				sql += string.Format(" limit {0}, {1}", data.GetFromItems() - 1, data.GetToItems());
+			}
+			
+			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -83,11 +100,6 @@ namespace FluentData.Providers.MySql
 		public DataTypes GetDbTypeForClrType(Type clrType)
 		{
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
-		}
-
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
 		}
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)

@@ -13,7 +13,7 @@ namespace FluentData.UnitTests.Core
 			var category = new Category();
 			category.CategoryId = Categories.Movies;
 			var value = ReflectionHelper.GetPropertyValue(category, "CategoryId");
-			Assert.AreEqual(2, value);
+			Assert.AreEqual(Categories.Movies, value);
 		}
 
 		[TestMethod]

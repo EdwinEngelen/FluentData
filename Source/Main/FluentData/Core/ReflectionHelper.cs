@@ -45,9 +45,6 @@ namespace FluentData
 		{
 			var value = property.GetValue(item, null);
 
-			if (property.PropertyType.IsEnum)
-				return (int) value;
-
 			return value;
 		}
 

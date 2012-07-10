@@ -21,7 +21,6 @@ namespace FluentData
 		string GetSqlForDeleteBuilder(BuilderData data);
 		string GetSqlForStoredProcedureBuilder(BuilderData data);
 		DataTypes GetDbTypeForClrType(Type clrType);
-		void FixInStatement(StringBuilder sql, ParameterCollection parameters);
 		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
 		void OnCommandExecuting(DbCommandData data);
 	}

@@ -37,6 +37,35 @@ namespace FluentData.Features.Builders
 		}
 
 		[TestMethod]
+		public void Update_values_not_nullable()
+		{
+			using (var context = TestHelper.Context().UseTransaction(true))
+			{
+				var value = new DataTypeValueNotNullable();
+				value.DecimalValue = 5;
+				value.StringValue = "test";
+				value.DateTimeValue = DateTime.Now;
+
+				value.Id = context.Insert("DataTypeValue")
+							.Column("DecimalValue", value.DecimalValue)
+							.Column("StringValue", value.StringValue)
+							.Column("DateTimeValue", value.DateTimeValue)
+							.ExecuteReturnLastId();
+
+				Assert.IsTrue(value.Id > 0);
+
+				context.Update("DataTypeValue")
+						.Column("DecimalValue", value.DecimalValue)
+						.Column("StringValue", value.StringValue)
+						.Column("DateTimeValue", value.DateTimeValue)
+						.Where("Id", value.Id)
+						.Execute();
+
+				Assert.IsTrue(value.Id > 0);
+			}
+		}
+
+		[TestMethod]
 		public void Update_values_expression()
 		{
 			using (var context = TestHelper.Context().UseTransaction(true))

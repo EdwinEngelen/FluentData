@@ -1,8 +1,10 @@
 ﻿using FluentData.Providers.Access;
 using FluentData.Providers.MySql;
 using FluentData.Providers.Oracle;
+using FluentData.Providers.PostgreSql;
 using FluentData.Providers.SqlServer;
 using FluentData.Providers.SqlServerCompact;
+using FluentData.Providers.Sqlite;
 
 namespace FluentData
 {
@@ -28,6 +30,12 @@ namespace FluentData
 					break;
 				case DbProviderTypes.Access:
 					provider = new AccessProvider();
+					break;
+				case DbProviderTypes.Sqlite:
+					provider = new Sqlite();
+					break;
+				case DbProviderTypes.PostgreSql:
+					provider = new PostgreSqlProvider();
 					break;
 			}
 

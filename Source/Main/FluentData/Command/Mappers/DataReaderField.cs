@@ -40,7 +40,7 @@ namespace FluentData
 		{
 			get
 			{
-				return Name.IndexOf("fluentdata_") > -1;
+				return Name.IndexOf("FLUENTDATA_") > -1;
 			}
 		}
 	}
