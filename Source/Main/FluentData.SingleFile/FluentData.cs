@@ -41,21 +41,9 @@ namespace FluentData
 			else
 				parameterName = "c" + _data.Columns.Count.ToString();
 
-			if (value != null)
-			{
-				if (value.GetType().IsEnum)
-					value = (int) value;
-			}
-
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
-			var parameterType = DataTypes.Object;
-			if (type != (typeof(object)))
-			{
-				parameterType = _data.Provider.GetDbTypeForClrType(type);
-			}
-
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false);
+			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
 		}
 
 		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
@@ -87,7 +75,6 @@ namespace FluentData
 
 			foreach (var property in properties)
 			{
-
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
@@ -124,18 +111,17 @@ namespace FluentData
 			}
 		}
 
-		internal void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
 		{
 			var parameter = new Parameter();
 			parameter.ParameterName = name;
 			parameter.Value = value;
-			parameter.DataTypes = dataType;
+			parameter.DataType = dataType;
 			parameter.Direction = direction;
 			parameter.IsId = isId;
 			parameter.Size = size;
 
-			_data.Parameters.Add(parameter);
-			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataTypes, parameter.Direction, parameter.Size);
+			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataType, parameter.Direction, parameter.Size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
@@ -171,7 +157,6 @@ namespace FluentData
 		public int PagingCurrentPage { get; set; }
 		public int PagingItemsPerPage { get; set; }
 		public List<TableColumn> Columns { get; set; }
-		public List<Parameter> Parameters { get; set; }
 		public object Item { get; set; }
 		public string ObjectName { get; set; }
 		public DbCommandData CommandData { get; set; }
@@ -190,7 +175,6 @@ namespace FluentData
 			Provider = provider;
 			ObjectName = objectName;
 			Command = command;
-			Parameters = new List<Parameter>();
 			Columns = new List<TableColumn>();
 			Where = new List<TableColumn>();
 			Having = "";
@@ -1391,14 +1375,13 @@ namespace FluentData
 		public StringBuilder Sql { get; set; }
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
-		public ParameterCollection Parameters { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
 		public DbCommandTypes CommandType { get; set; }
 
 		public DbCommandData()
 		{
-			Parameters = new ParameterCollection();
 			CommandType = DbCommandTypes.Text;
+			Sql = new StringBuilder();
 		}
 	}
 
@@ -1620,7 +1603,7 @@ namespace FluentData
 		{
 			get
 			{
-				return Name.IndexOf("fluentdata_") > -1;
+				return Name.IndexOf("FLUENTDATA_") > -1;
 			}
 		}
 	}
@@ -1656,7 +1639,7 @@ namespace FluentData
 	public class Parameter
 	{
 		public string ParameterName { get; set; }
-		public DataTypes DataTypes { get; set; }
+		public DataTypes DataType { get; set; }
 		public object Value { get; set; }
 		public ParameterDirection Direction { get; set; }
 		public bool IsId { get; set; }
@@ -1699,35 +1682,37 @@ namespace FluentData
 	{
 		internal void FixParameterType(DbCommandData data)
 		{
-			foreach (var parameter in data.Parameters)
-			{
-				if (parameter.Direction == ParameterDirection.Input
-					&& parameter.DataTypes == DataTypes.Object)
-				{
-					if (parameter.Value == null)
-					{
-						parameter.DataTypes = DataTypes.String;
-					}
-					else
-					{
-						parameter.DataTypes = data.ContextData.Provider.GetDbTypeForClrType(parameter.Value.GetType());
-						if (parameter.DataTypes == DataTypes.Object)
-							throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
-					}
-				}
+		//    foreach (var parameter in data.Parameters)
+		//    {
+		//        if (parameter.Direction == ParameterDirection.Input
+		//            && parameter.DataType == DataTypes.Object)
+		//        {
+		//            if (parameter.Value == null)
+		//            {
+		//                parameter.DataType = DataTypes.String;
+		//            }
+		//            else
+		//            {
+		//                var type = parameter.Value.GetType();
 
-				if (parameter.Value == null)
-					parameter.Value = DBNull.Value;
+		//                parameter.DataType = data.ContextData.Provider.GetDbTypeForClrType(type);
+		//                if (parameter.DataType == DataTypes.Object)
+		//                    throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
+		//            }
+		//        }
 
-				var dbParameter = data.InnerCommand.CreateParameter();
-				dbParameter.DbType = (System.Data.DbType) parameter.DataTypes;
-				dbParameter.ParameterName = data.ContextData.Provider.GetParameterName(parameter.ParameterName);
-				dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
-				dbParameter.Value = parameter.Value;
-				if (parameter.Size > 0)
-					dbParameter.Size = parameter.Size;
-				data.InnerCommand.Parameters.Add(dbParameter);
-			}
+		//        if (parameter.Value == null)
+		//            parameter.Value = DBNull.Value;
+
+		//        var dbParameter = data.InnerCommand.CreateParameter();
+		//        dbParameter.DbType = (System.Data.DbType) parameter.DataType;
+		//        dbParameter.ParameterName = data.ContextData.Provider.GetParameterName(parameter.ParameterName);
+		//        dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
+		//        dbParameter.Value = parameter.Value;
+		//        if (parameter.Size > 0)
+		//            dbParameter.Size = parameter.Size;
+		//        data.InnerCommand.Parameters.Add(dbParameter);
+		//    }
 		}
 	}
 
@@ -1807,7 +1792,7 @@ namespace FluentData
 			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");
 
-			T lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, null);
+			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, null);
 
 			return lastId;
 		}
@@ -1822,7 +1807,7 @@ namespace FluentData
 			if (_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");
 
-			T lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
+			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
 
 			return lastId;
 		}
@@ -1834,21 +1819,14 @@ namespace FluentData
 	{
 		public IDbCommand Sql(string sql)
 		{
-			if (_data.Sql == null)
-				_data.Sql = new StringBuilder();
 			_data.Sql.Append(sql);
 			return this;
 		}
 
 		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
 		{
-			if (_data.Sql == null)
-				_data.Sql = new StringBuilder();
-
 			if (mappingExpressions == null)
-			{
-				_data.Sql.Append(sql);
-			}
+				Sql(sql);
 			else
 			{
 				var propertyNames = ReflectionHelper.GetPropertyNamesFromExpressions(mappingExpressions);
@@ -1882,21 +1860,68 @@ namespace FluentData
 	{
 		public IDbCommand Parameters(params object[] parameters)
 		{
-			for (int i = 0; i < parameters.Count(); i++)
+			for (var i = 0; i < parameters.Count(); i++)
 				Parameter(i.ToString(), parameters[i]);
 			return this;
 		}
 
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
 		{
-			var parameter = new Parameter();
-			parameter.DataTypes = parameterType;
-			parameter.ParameterName = name;
-			parameter.Direction = direction;
-			parameter.Value = value;
-			parameter.Size = size;
-			_data.Parameters.Add(parameter);
+			if (ReflectionHelper.IsList(value))
+				AddListParameterToInnerCommand(name, value);
+			else
+				AddParameterToInnerCommand(name, value, parameterType, direction, size);
+
 			return this;
+		}
+
+		private void AddListParameterToInnerCommand(string name, object value)
+		{
+			var list = (IEnumerable) value;
+
+			var newInStatement = new StringBuilder();
+
+			var k = -1;
+			foreach (var item in list)
+			{
+				k++;
+				if (k == 0)
+					newInStatement.Append(" in(");
+				else
+					newInStatement.Append(",");
+				
+				var parameter = AddParameterToInnerCommand("p" + name + "p" + k.ToString(), item);
+
+				newInStatement.Append(parameter.ParameterName);
+			}
+			newInStatement.Append(")");
+
+			var oldInStatement = string.Format(" in({0})", _data.ContextData.Provider.GetParameterName(name));
+			_data.Sql.Replace(oldInStatement, newInStatement.ToString());
+		}
+
+		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
+		{
+			if (value == null)
+				value = DBNull.Value;
+
+			if (value.GetType().IsEnum)
+				value = (int) value;
+
+			var dbParameter = _data.InnerCommand.CreateParameter();
+			if (parameterType == DataTypes.Object)
+				dbParameter.DbType = (System.Data.DbType) _data.ContextData.Provider.GetDbTypeForClrType(value.GetType());
+			else
+				dbParameter.DbType = (System.Data.DbType) parameterType;
+
+			dbParameter.ParameterName = _data.ContextData.Provider.GetParameterName(name);
+			dbParameter.Direction = (System.Data.ParameterDirection) direction;
+			dbParameter.Value = value;
+			if (size > 0)
+				dbParameter.Size = size;
+			_data.InnerCommand.Parameters.Add(dbParameter);
+
+			return dbParameter;
 		}
 
 		public IDbCommand Parameter(string name, object value)
@@ -1920,10 +1945,14 @@ namespace FluentData
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 
 			var value = (_data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
+
 			if (value == null)
 				return default(TParameterType);
 
-			return (TParameterType) value;
+			if (value.GetType() == typeof(TParameterType))
+				return (TParameterType) value;
+
+			return (TParameterType) Convert.ChangeType(value, typeof(TParameterType));
 		}
 	}
 
@@ -2313,9 +2342,7 @@ namespace FluentData
 			}
 			else
 			{
-				FixSql();
-				new ParameterHandler().FixParameterType(_data);
-
+				_data.InnerCommand.CommandText = _data.Sql.ToString();
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
@@ -2379,12 +2406,6 @@ namespace FluentData
 				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
 			
 			throw exception;
-		}
-
-		private void FixSql()
-		{
-			_data.ContextData.Provider.FixInStatement(_data.Sql, _data.Parameters);
-			_data.InnerCommand.CommandText = _data.Sql.ToString();
 		}
 	}
 
@@ -3326,7 +3347,7 @@ namespace FluentData
 			_property = GetProperty(propertyExpression);
 		}
 
-		private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> exp)
+		private static PropertyInfo GetProperty(Expression<Func<T, object>> exp)
 		{
 			PropertyInfo result;
 			if (exp.Body.NodeType == ExpressionType.Convert)
@@ -3403,9 +3424,6 @@ namespace FluentData
 		public static object GetPropertyValue(object item, PropertyInfo property)
 		{
 			var value = property.GetValue(item, null);
-
-			if (property.PropertyType.IsEnum)
-				return (int) value;
 
 			return value;
 		}
@@ -3583,11 +3601,6 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
 			var lastId = default(T);
@@ -3661,6 +3674,7 @@ namespace FluentData
 						_types.Add(typeof(Guid), DataTypes.Guid);
 						_types.Add(typeof(Boolean), DataTypes.Boolean);
 						_types.Add(typeof(char), DataTypes.String);
+						_types.Add(typeof(DBNull), DataTypes.String);
 					}
 				}
 			}
@@ -3668,7 +3682,8 @@ namespace FluentData
 			if (!_types.ContainsKey(clrType))
 				return DataTypes.Object;
 
-			return _types[clrType];
+			var dbType = _types[clrType];
+			return dbType;
 		}
 	}
 
@@ -3690,62 +3705,6 @@ namespace FluentData
 
 			var sql = string.Format("delete from {0} where {1}", data.ObjectName, whereSql);
 			return sql;
-		}
-	}
-
-	internal class FixSqlInStatement
-	{
-		public void FixPotentialInSql(IDbProvider provider, StringBuilder sql, ParameterCollection parameters)
-		{
-			int i = -1;
-			while (true)
-			{
-				i++;
-				if (i == parameters.Count)
-					break;
-
-				var parameter = parameters[i];
-
-				if (parameter.Direction == ParameterDirection.Output
-					|| parameter.DataTypes != DataTypes.Object)
-					continue;
-
-				if (ReflectionHelper.IsList(parameter.Value))
-				{
-					var oldListParameterName = parameter.ParameterName;
-					var list = (IEnumerable) parameter.Value;
-					
-					var newInStatement = new StringBuilder();
-
-					int k = -1;
-					foreach (var item in list)
-					{
-						k++;
-						if (k == 0)
-						{
-							parameter.ParameterName = "p" + parameter.ParameterName + "p0";
-							newInStatement.Append(" in(" + provider.GetParameterName(parameter.ParameterName));
-							parameter.Value = item;
-						}
-						else
-						{
-							var newParameter = new Parameter();
-							newParameter.ParameterName = "p" + oldListParameterName + "p" + k.ToString();
-							newParameter.Value = item;
-							newParameter.DataTypes = DataTypes.Object;
-							newParameter.Direction = parameter.Direction;
-
-							parameters.Insert(k, newParameter);
-
-							newInStatement.Append("," + newParameter.GetParameterName(provider));
-						}
-					}
-					newInStatement.Append(")");
-
-					var oldInStatement = string.Format(" in({0})", provider.GetParameterName(oldListParameterName));
-					sql.Replace(oldInStatement, newInStatement.ToString());
-				}
-			}
 		}
 	}
 
@@ -3811,6 +3770,131 @@ namespace FluentData
 		}
 	}
 
+	internal class PostgreSqlProvider : IDbProvider
+	{
+		public string ProviderName
+		{ 
+			get
+			{
+				return "Npgsql";
+			} 
+		}
+		public bool SupportsOutputParameters
+		{
+			get { return true; }
+		}
+
+		public bool SupportsMultipleResultset
+		{
+			get { return true; }
+		}
+
+		public bool SupportsMultipleQueries
+		{
+			get { return true; }
+		}
+
+		public bool SupportsStoredProcedures
+		{
+			get { return true; }
+		}
+
+		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		{
+			get { return true; }
+		}
+
+		public IDbConnection CreateConnection(string connectionString)
+		{
+			return ConnectionFactory.CreateConnection(ProviderName, connectionString);
+		}
+
+		public string GetParameterName(string parameterName)
+		{
+			return ":" + parameterName;
+		}
+
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			var sql = "";
+			sql = "select " + data.Select;
+			sql += " from " + data.From;
+			if (data.WhereSql.Length > 0)
+				sql += " where " + data.WhereSql;
+			if (data.GroupBy.Length > 0)
+				sql += " group by " + data.GroupBy;
+			if (data.Having.Length > 0)
+				sql += " having " + data.Having;
+			if (data.OrderBy.Length > 0)
+				sql += " order by " + data.OrderBy;
+			if (data.PagingItemsPerPage > 0)
+			{
+				if (data.PagingItemsPerPage > 0)
+					sql += " limit " + data.PagingItemsPerPage;
+				sql += " offset " + (data.GetFromItems() - 1);
+			}
+
+			
+			return sql;
+		}
+
+		public string GetSqlForInsertBuilder(BuilderData data)
+		{
+			return new InsertBuilderSqlGenerator().GenerateSql(":", data);
+		}
+
+		public string GetSqlForUpdateBuilder(BuilderData data)
+		{
+			return new UpdateBuilderSqlGenerator().GenerateSql(":", data);
+		}
+
+		public string GetSqlForDeleteBuilder(BuilderData data)
+		{
+			return new DeleteBuilderSqlGenerator().GenerateSql(":", data);
+		}
+
+		public string GetSqlForStoredProcedureBuilder(BuilderData data)
+		{
+			return data.ObjectName;
+		}
+
+		public DataTypes GetDbTypeForClrType(Type clrType)
+		{
+			return new DbTypeMapper().GetDbTypeForClrType(clrType);
+		}
+
+		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		{
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
+
+			data.Sql.Append("select lastval();");
+
+			T lastId = default(T);
+
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			{
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
+			});
+
+			return lastId;
+		}
+
+		public void OnCommandExecuting(DbCommandData data)
+		{
+		}
+	}
+
 	internal class MySqlProvider : IDbProvider
 	{
 		public string ProviderName
@@ -3862,7 +3946,24 @@ namespace FluentData
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			var sql = "";
+			sql = "select " + data.Select;
+			sql += " from " + data.From;
+			if (data.WhereSql.Length > 0)
+				sql += " where " + data.WhereSql;
+			if (data.GroupBy.Length > 0)
+				sql += " group by " + data.GroupBy;
+			if (data.Having.Length > 0)
+				sql += " having " + data.Having;
+			if (data.OrderBy.Length > 0)
+				sql += " order by " + data.OrderBy;
+			if (data.PagingItemsPerPage > 0
+				&& data.PagingCurrentPage > 0)
+			{
+				sql += string.Format(" limit {0}, {1}", data.GetFromItems() - 1, data.GetToItems());
+			}
+			
+			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -3888,11 +3989,6 @@ namespace FluentData
 		public DataTypes GetDbTypeForClrType(Type clrType)
 		{
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
-		}
-
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
 		}
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
@@ -3945,6 +4041,12 @@ namespace FluentData
 				case DbProviderTypes.Access:
 					provider = new AccessProvider();
 					break;
+				case DbProviderTypes.Sqlite:
+					provider = new Sqlite();
+					break;
+				case DbProviderTypes.PostgreSql:
+					provider = new PostgreSqlProvider();
+					break;
 			}
 
 			return provider;
@@ -3959,7 +4061,9 @@ namespace FluentData
 		SqlAzure = 3,
 		Oracle = 4,
 		MySql = 5,
-		Access = 6
+		Access = 6,
+		Sqlite = 7,
+		PostgreSql = 8
 	}
 
 	public interface IDbProvider
@@ -3979,7 +4083,6 @@ namespace FluentData
 		string GetSqlForDeleteBuilder(BuilderData data);
 		string GetSqlForStoredProcedureBuilder(BuilderData data);
 		DataTypes GetDbTypeForClrType(Type clrType);
-		void FixInStatement(StringBuilder sql, ParameterCollection parameters);
 		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
 		void OnCommandExecuting(DbCommandData data);
 	}
@@ -4036,7 +4139,46 @@ namespace FluentData
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			var sql = "";
+			if (data.PagingItemsPerPage == 0)
+			{
+				sql = "select " + data.Select;
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+				if (data.OrderBy.Length > 0)
+					sql += " order by " + data.OrderBy;
+			}
+			else if (data.PagingItemsPerPage > 0)
+			{
+				sql += " from " + data.From;
+				if (data.WhereSql.Length > 0)
+					sql += " where " + data.WhereSql;
+				if (data.GroupBy.Length > 0)
+					sql += " group by " + data.GroupBy;
+				if (data.Having.Length > 0)
+					sql += " having " + data.Having;
+
+				sql = string.Format(@"select * from
+										(
+											select {0}, 
+												row_number() over (order by {1}) FLUENTDATA_ROWNUMBER
+											{2}
+										)
+										where fluentdata_RowNumber between {3} and {4}
+										order by fluentdata_RowNumber",
+											data.Select,
+											data.OrderBy,
+											sql,
+											data.GetFromItems(),
+											data.GetToItems());
+			}
+
+			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -4064,15 +4206,10 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
-			data.Command.ParameterOut("FluentDataLastInsertedId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
-			data.Sql.Append(string.Format(" returning {0} into :FluentDataLastInsertedId", identityColumnName));
+			data.Command.ParameterOut("FluentDataLastId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
+			data.Command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
 			var lastId = default(T);
 
@@ -4080,8 +4217,7 @@ namespace FluentData
 			{
 				data.InnerCommand.ExecuteNonQuery();
 
-				var parameter = (IDbDataParameter) data.InnerCommand.Parameters[":FluentDataLastInsertedId"];
-				lastId = (T) parameter.Value;
+				lastId = data.Command.ParameterValue<T>("FluentDataLastId");
 			});
 
 			return lastId;
@@ -4094,6 +4230,129 @@ namespace FluentData
 				dynamic innerCommand = data.InnerCommand;
 				innerCommand.BindByName = true;
 			}
+		}
+	}
+
+	internal class Sqlite : IDbProvider
+	{
+		public string ProviderName
+		{ 
+			get
+			{
+				return "System.Data.SQLite";
+			} 
+		}
+		public bool SupportsOutputParameters
+		{
+			get { return true; }
+		}
+
+		public bool SupportsMultipleResultset
+		{
+			get { return true; }
+		}
+
+		public bool SupportsMultipleQueries
+		{
+			get { return true; }
+		}
+
+		public bool SupportsStoredProcedures
+		{
+			get { return false; }
+		}
+
+		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		{
+			get { return true; }
+		}
+
+		public IDbConnection CreateConnection(string connectionString)
+		{
+			return ConnectionFactory.CreateConnection(ProviderName, connectionString);
+		}
+
+		public string GetParameterName(string parameterName)
+		{
+			return "@" + parameterName;
+		}
+
+		public string GetSelectBuilderAlias(string name, string alias)
+		{
+			return name + " as " + alias;
+		}
+
+		public string GetSqlForSelectBuilder(BuilderData data)
+		{
+			var sql = "";
+			sql = "select " + data.Select;
+			sql += " from " + data.From;
+			if (data.WhereSql.Length > 0)
+				sql += " where " + data.WhereSql;
+			if (data.GroupBy.Length > 0)
+				sql += " group by " + data.GroupBy;
+			if (data.Having.Length > 0)
+				sql += " having " + data.Having;
+			if (data.OrderBy.Length > 0)
+				sql += " order by " + data.OrderBy;
+			if (data.PagingItemsPerPage > 0
+				&& data.PagingCurrentPage > 0)
+			{
+				sql += string.Format(" limit {0}, {1}", data.GetFromItems() - 1, data.GetToItems());
+			}
+			
+			return sql;
+		}
+
+		public string GetSqlForInsertBuilder(BuilderData data)
+		{
+			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+		}
+
+		public string GetSqlForUpdateBuilder(BuilderData data)
+		{
+			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+		}
+
+		public string GetSqlForDeleteBuilder(BuilderData data)
+		{
+			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+		}
+
+		public string GetSqlForStoredProcedureBuilder(BuilderData data)
+		{
+			throw new NotImplementedException();
+		}
+
+		public DataTypes GetDbTypeForClrType(Type clrType)
+		{
+			return new DbTypeMapper().GetDbTypeForClrType(clrType);
+		}
+
+		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		{
+			if (data.Sql[data.Sql.Length - 1] != ';')
+				data.Sql.Append(';');
+
+			data.Sql.Append("select last_insert_rowid();");
+
+			T lastId = default(T);
+
+			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			{
+				object value = data.InnerCommand.ExecuteScalar();
+
+				if (value.GetType() == typeof(T))
+					lastId = (T) value;
+
+				lastId = (T) Convert.ChangeType(value, typeof(T));
+			});
+
+			return lastId;
+		}
+
+		public void OnCommandExecuting(DbCommandData data)
+		{
 		}
 	}
 
@@ -4149,7 +4408,25 @@ namespace FluentData
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			throw new NotImplementedException();
+			var sql = "";
+			sql = "select " + data.Select;
+			sql += " from " + data.From;
+			if (data.WhereSql.Length > 0)
+				sql += " where " + data.WhereSql;
+			if (data.GroupBy.Length > 0)
+				sql += " group by " + data.GroupBy;
+			if (data.Having.Length > 0)
+				sql += " having " + data.Having;
+			if (data.OrderBy.Length > 0)
+				sql += " order by " + data.OrderBy;
+			if (data.PagingItemsPerPage > 0)
+			{
+				sql += " offset " + (data.GetFromItems() - 1) + " rows";
+				if (data.PagingItemsPerPage > 0)
+					sql += " fetch next " + data.PagingItemsPerPage + " rows only";
+			}
+
+			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -4175,11 +4452,6 @@ namespace FluentData
 		public DataTypes GetDbTypeForClrType(Type clrType)
 		{
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
-		}
-
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
 		}
 
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
@@ -4296,7 +4568,7 @@ namespace FluentData
 
 				sql = string.Format(@"with PagedPersons as
 										(
-											select top 100 percent {0}, row_number() over (order by {1}) as fluentdata_RowNumber
+											select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
 											{2}
 										)
 										select *
@@ -4337,11 +4609,6 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public void FixInStatement(StringBuilder sql, ParameterCollection parameters)
-		{
-			new FixSqlInStatement().FixPotentialInSql(this, sql, parameters);
-		}
-
 		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
 		{
 			if (data.Sql[data.Sql.Length - 1] != ';')
@@ -4349,11 +4616,11 @@ namespace FluentData
 
 			data.Sql.Append("select SCOPE_IDENTITY()");
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				var value = data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
