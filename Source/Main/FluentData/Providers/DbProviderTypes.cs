@@ -10,6 +10,7 @@
 		MySql = 5,
 		Access = 6,
 		Sqlite = 7,
-		PostgreSql = 8
+		PostgreSql = 8,
+		DB2 = 9
 	}
 }

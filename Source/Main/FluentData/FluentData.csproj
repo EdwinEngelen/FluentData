@@ -146,6 +146,7 @@
     <Compile Include="Providers\Common\Builders\DeleteBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\Builders\InsertBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\Builders\UpdateBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\DB2\DB2Provider.cs" />
     <Compile Include="Providers\PostgreSql\PostgreSqlProvider.cs" />
     <Compile Include="Providers\MySql\MySqlProvider.cs" />
     <Compile Include="Providers\DbProviderFactory.cs" />

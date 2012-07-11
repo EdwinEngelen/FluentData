@@ -1,4 +1,5 @@
 ﻿using FluentData.Providers.Access;
+using FluentData.Providers.DB2Provider;
 using FluentData.Providers.MySql;
 using FluentData.Providers.Oracle;
 using FluentData.Providers.PostgreSql;
@@ -36,6 +37,9 @@ namespace FluentData
 					break;
 				case DbProviderTypes.PostgreSql:
 					provider = new PostgreSqlProvider();
+					break;
+				case DbProviderTypes.DB2:
+					provider = new DB2Provider();
 					break;
 			}
 
