@@ -30,6 +30,8 @@ namespace FluentData.Providers.Common
 						_types.Add(typeof(Boolean), DataTypes.Boolean);
 						_types.Add(typeof(char), DataTypes.String);
 						_types.Add(typeof(DBNull), DataTypes.String);
+						_types.Add(typeof(float), DataTypes.Single);
+						_types.Add(typeof(double), DataTypes.Double);
 					}
 				}
 			}

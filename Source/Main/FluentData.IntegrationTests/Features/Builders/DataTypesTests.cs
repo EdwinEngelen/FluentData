@@ -16,11 +16,13 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = 5;
 				value.StringValue = "test";
 				value.DateTimeValue = DateTime.Now;
+				value.FloatValue = 12.12F;
 
 				value.Id = context.Insert("DataTypeValue")
 							.Column("DecimalValue", value.DecimalValue)
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
+							.Column("FloatValue", value.FloatValue)
 							.ExecuteReturnLastId();
 
 				Assert.IsTrue(value.Id > 0);
@@ -29,6 +31,7 @@ namespace FluentData.Features.Builders
 						.Column("DecimalValue", value.DecimalValue)
 						.Column("StringValue", value.StringValue)
 						.Column("DateTimeValue", value.DateTimeValue)
+						.Column("FloatValue", value.FloatValue)
 						.Where("Id", value.Id)
 						.Execute();
 
@@ -45,11 +48,13 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = 5;
 				value.StringValue = "test";
 				value.DateTimeValue = DateTime.Now;
+				value.FloatValue = 12.12F;
 
 				value.Id = context.Insert("DataTypeValue")
 							.Column("DecimalValue", value.DecimalValue)
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
+							.Column("FloatValue", value.FloatValue)
 							.ExecuteReturnLastId();
 
 				Assert.IsTrue(value.Id > 0);
@@ -58,6 +63,7 @@ namespace FluentData.Features.Builders
 						.Column("DecimalValue", value.DecimalValue)
 						.Column("StringValue", value.StringValue)
 						.Column("DateTimeValue", value.DateTimeValue)
+						.Column("FloatValue", value.FloatValue)
 						.Where("Id", value.Id)
 						.Execute();
 
@@ -74,11 +80,13 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = 5;
 				value.StringValue = "test";
 				value.DateTimeValue = DateTime.Now;
+				value.FloatValue = 12.12F;
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.Column(x => x.DecimalValue)
 							.Column(x => x.StringValue)
 							.Column(x => x.DateTimeValue)
+							.Column("FloatValue", value.FloatValue)
 							.ExecuteReturnLastId();
 
 				Assert.IsTrue(value.Id > 0);
@@ -87,6 +95,7 @@ namespace FluentData.Features.Builders
 						.Column(x => x.DecimalValue)
 						.Column(x => x.StringValue)
 						.Column(x => x.DateTimeValue)
+						.Column("FloatValue", value.FloatValue)
 						.Where(x => x.Id)
 						.Execute();
 
@@ -103,6 +112,7 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = 5;
 				value.StringValue = "test";
 				value.DateTimeValue = DateTime.Now;
+				value.FloatValue = 12.12F;
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.AutoMap(x => x.Id)
@@ -128,11 +138,13 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = null;
 				value.StringValue = null;
 				value.DateTimeValue = null;
+				value.FloatValue = null;
 
 				value.Id = context.Insert("DataTypeValue")
 							.Column("DecimalValue", value.DecimalValue)
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
+							.Column("FloatValue", value.FloatValue)
 							.ExecuteReturnLastId();
 
 				Assert.IsTrue(value.Id > 0);
@@ -141,6 +153,7 @@ namespace FluentData.Features.Builders
 						.Column("DecimalValue", value.DecimalValue)
 						.Column("StringValue", value.StringValue)
 						.Column("DateTimeValue", value.DateTimeValue)
+						.Column("FloatValue", value.FloatValue)
 						.Where("Id", value.Id)
 						.Execute();
 			}
@@ -155,11 +168,13 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = null;
 				value.StringValue = null;
 				value.DateTimeValue = null;
+				value.FloatValue = null;				
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.Column(x => x.DecimalValue)
 							.Column(x => x.StringValue)
 							.Column(x => x.DateTimeValue)
+							.Column("FloatValue", value.FloatValue)
 							.ExecuteReturnLastId();
 
 				Assert.IsTrue(value.Id > 0);
@@ -168,6 +183,7 @@ namespace FluentData.Features.Builders
 						.Column(x => x.DecimalValue)
 						.Column(x => x.StringValue)
 						.Column(x => x.DateTimeValue)
+						.Column("FloatValue", value.FloatValue)
 						.Where("Id", value.Id)
 						.Execute();
 			}
@@ -182,6 +198,7 @@ namespace FluentData.Features.Builders
 				value.DecimalValue = null;
 				value.StringValue = null;
 				value.DateTimeValue = null;
+				value.FloatValue = null;
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.AutoMap(x => x.Id)
