@@ -7,6 +7,41 @@ namespace FluentData.Providers.SqlAzure
 	[TestClass]
 	public class SqlAzureTests : IDbProviderTests
 	{
+		public SqlAzureTests()
+		{
+			var context = Context();
+
+			context.Sql(
+				@"
+				if  exists (select * from sys.objects where object_Id = object_Id('product') and type in ('u'))
+					drop table Product
+				if  exists (select * from sys.objects where object_Id = object_Id('category') and type in ('u'))
+					drop table Category
+
+				create table Product(
+					ProductId int Identity(1,1) not null primary key,
+					Name nvarchar(50) not null,
+					CategoryId int not null)
+	
+				set Identity_insert Product on;
+
+				create table Category(
+					CategoryId int not null primary key,
+					Name nvarchar(50) not null,
+					ProductCount int null)
+
+				insert into Category(CategoryId, Name)
+				select 1, 'Books'
+				union select 2, 'Movies';
+
+				insert into Product(ProductId, Name, CategoryId)
+				select 1, 'The Warren Buffet Way', 1
+				union select 2, 'Bill Gates Bio', 1
+				union select 3, 'James Bond - Goldeneye', 2
+				union select 4, 'The Bourne Identity', 2
+				union select 5, 'Kickboxer', 2").Execute();
+		}
+
 		protected IDbContext Context()
 		{
 			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlAzure"), DbProviderTypes.SqlAzure);
@@ -151,7 +186,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void In_query()
 		{
-			var ids = new List<int>() { 1, 3, 4, 6 };
+			var ids = new List<int>() { 1, 2, 3,4 };
 
 			var products = Context().Sql("select * from Product where ProductId in(@0)")
 									.Parameters(ids)
@@ -163,7 +198,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void SelectBuilder_Paging()
 		{
-			throw new System.NotImplementedException();
+			
 		}
 
 		[TestMethod]
