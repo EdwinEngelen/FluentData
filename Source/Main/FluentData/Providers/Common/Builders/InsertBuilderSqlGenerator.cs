@@ -2,7 +2,7 @@
 {
 	internal class InsertBuilderSqlGenerator
 	{
-		public string GenerateSql(string parameterPrefix, BuilderData data)
+		public string GenerateSql(IDbProvider provider, string parameterPrefix, BuilderData data)
 		{
 			var insertSql = "";
 			var valuesSql = "";
@@ -14,7 +14,7 @@
 					valuesSql += ",";
 				}
 
-				insertSql += column.ColumnName;
+				insertSql += provider.EscapeColumnName(column.ColumnName);
 				valuesSql += parameterPrefix + column.ParameterName;
 			}
 

@@ -2,7 +2,7 @@
 {
 	internal class UpdateBuilderSqlGenerator
 	{
-		public string GenerateSql(string parameterPrefix, BuilderData data)
+		public string GenerateSql(IDbProvider provider, string parameterPrefix, BuilderData data)
 		{
 			var setSql = "";
 			foreach (var column in data.Columns)
@@ -11,7 +11,7 @@
 					setSql += ", ";
 
 				setSql += string.Format("{0} = {1}{2}",
-									column.ColumnName,
+									provider.EscapeColumnName(column.ColumnName),
 									parameterPrefix,
 									column.ParameterName);
 			}
@@ -23,7 +23,7 @@
 					whereSql += " and ";
 
 				whereSql += string.Format("{0} = {1}{2}",
-									column.ColumnName,
+									provider.EscapeColumnName(column.ColumnName),
 									parameterPrefix,
 									column.ParameterName);
 			}

@@ -3578,17 +3578,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -3616,6 +3616,11 @@ namespace FluentData
 		public void OnCommandExecuting(DbCommandData data)
 		{
 			
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "[" + name + "]";
 		}
 
 		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
@@ -3691,7 +3696,7 @@ namespace FluentData
 
 	internal class DeleteBuilderSqlGenerator
 	{
-		public string GenerateSql(string parameterPrefix, BuilderData data)
+		public string GenerateSql(IDbProvider provider, string parameterPrefix, BuilderData data)
 		{
 			var whereSql = "";
 			foreach (var column in data.Columns)
@@ -3700,7 +3705,7 @@ namespace FluentData
 					whereSql += " and ";
 
 				whereSql += string.Format("{0} = {1}{2}",
-												column.ColumnName,
+												provider.EscapeColumnName(column.ColumnName),
 												parameterPrefix,
 												column.ParameterName);
 			}
@@ -3712,7 +3717,7 @@ namespace FluentData
 
 	internal class InsertBuilderSqlGenerator
 	{
-		public string GenerateSql(string parameterPrefix, BuilderData data)
+		public string GenerateSql(IDbProvider provider, string parameterPrefix, BuilderData data)
 		{
 			var insertSql = "";
 			var valuesSql = "";
@@ -3724,7 +3729,7 @@ namespace FluentData
 					valuesSql += ",";
 				}
 
-				insertSql += column.ColumnName;
+				insertSql += provider.EscapeColumnName(column.ColumnName);
 				valuesSql += parameterPrefix + column.ParameterName;
 			}
 
@@ -3738,7 +3743,7 @@ namespace FluentData
 
 	internal class UpdateBuilderSqlGenerator
 	{
-		public string GenerateSql(string parameterPrefix, BuilderData data)
+		public string GenerateSql(IDbProvider provider, string parameterPrefix, BuilderData data)
 		{
 			var setSql = "";
 			foreach (var column in data.Columns)
@@ -3747,7 +3752,7 @@ namespace FluentData
 					setSql += ", ";
 
 				setSql += string.Format("{0} = {1}{2}",
-									column.ColumnName,
+									provider.EscapeColumnName(column.ColumnName),
 									parameterPrefix,
 									column.ParameterName);
 			}
@@ -3759,7 +3764,7 @@ namespace FluentData
 					whereSql += " and ";
 
 				whereSql += string.Format("{0} = {1}{2}",
-									column.ColumnName,
+									provider.EscapeColumnName(column.ColumnName),
 									parameterPrefix,
 									column.ParameterName);
 			}
@@ -3845,17 +3850,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -3892,6 +3897,11 @@ namespace FluentData
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return name;
 		}
 	}
 
@@ -3970,17 +3980,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql(":", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql(":", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql(":", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4017,6 +4027,11 @@ namespace FluentData
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return name;
 		}
 	}
 
@@ -4093,17 +4108,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4140,6 +4155,11 @@ namespace FluentData
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "`" + name + "`";
 		}
 	}
 
@@ -4214,6 +4234,7 @@ namespace FluentData
 		DataTypes GetDbTypeForClrType(Type clrType);
 		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
 		void OnCommandExecuting(DbCommandData data);
+		string EscapeColumnName(string name);
 	}
 
 	internal class OracleProvider : IDbProvider
@@ -4312,17 +4333,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql(":", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql(":", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql(":", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, ":", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4359,6 +4380,11 @@ namespace FluentData
 				dynamic innerCommand = data.InnerCommand;
 				innerCommand.BindByName = true;
 			}
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return name;
 		}
 	}
 
@@ -4435,17 +4461,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4482,6 +4508,11 @@ namespace FluentData
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "[" + name + "]";
 		}
 	}
 
@@ -4560,17 +4591,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4598,6 +4629,11 @@ namespace FluentData
 		public void OnCommandExecuting(DbCommandData data)
 		{
 			
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "[" + name + "]";
 		}
 
 		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
@@ -4715,17 +4751,17 @@ namespace FluentData
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -4762,6 +4798,11 @@ namespace FluentData
 
 		public void OnCommandExecuting(DbCommandData data)
 		{
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "[" + name + "]";
 		}
 	}
 

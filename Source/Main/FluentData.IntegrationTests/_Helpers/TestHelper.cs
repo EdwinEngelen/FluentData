@@ -53,7 +53,7 @@ namespace FluentData._Helpers
 							ProductId int not null)
 
 						create table [Order](
-							OrderId int Identity(1,1) not null primary key,
+							OrderId int not null primary key,
 							Created datetime not null)
 
 						create table DataTypeValue(
@@ -62,7 +62,6 @@ namespace FluentData._Helpers
 							DecimalValue numeric(18, 0) null,
 							DatetimeValue datetime null,
 							FloatValue real null)
-
 
 						create table Customer(
 							CustomerId int Identity(1,1) not null primary key,
@@ -82,7 +81,13 @@ namespace FluentData._Helpers
 						select 1, 'The Warren Buffet Way', 1
 						union select 2, 'Bill Gates Bio', 1
 						union select 3, 'James Bond - Goldeneye', 2
-						union select 4, 'The Bourne Identity', 2
+						union select 4, 'The Bourne Identity', 2;
+
+						insert into [Order](OrderId, Created)
+						values(1, getdate());
+
+						insert into [OrderLine](OrderLineId, OrderId, ProductId)
+						values(1, 1, 1);
 						").Execute();
 
 						context.Sql(@"

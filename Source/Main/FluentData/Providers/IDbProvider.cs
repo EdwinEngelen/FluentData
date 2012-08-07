@@ -23,5 +23,6 @@ namespace FluentData
 		DataTypes GetDbTypeForClrType(Type clrType);
 		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
 		void OnCommandExecuting(DbCommandData data);
+		string EscapeColumnName(string name);
 	}
 }

@@ -80,17 +80,17 @@ namespace FluentData.Providers.SqlServerCompact
 
 		public string GetSqlForInsertBuilder(BuilderData data)
 		{
-			return new InsertBuilderSqlGenerator().GenerateSql("@", data);
+			return new InsertBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForUpdateBuilder(BuilderData data)
 		{
-			return new UpdateBuilderSqlGenerator().GenerateSql("@", data);
+			return new UpdateBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForDeleteBuilder(BuilderData data)
 		{
-			return new DeleteBuilderSqlGenerator().GenerateSql("@", data);
+			return new DeleteBuilderSqlGenerator().GenerateSql(this, "@", data);
 		}
 
 		public string GetSqlForStoredProcedureBuilder(BuilderData data)
@@ -118,6 +118,11 @@ namespace FluentData.Providers.SqlServerCompact
 		public void OnCommandExecuting(DbCommandData data)
 		{
 			
+		}
+
+		public string EscapeColumnName(string name)
+		{
+			return "[" + name + "]";
 		}
 
 		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
