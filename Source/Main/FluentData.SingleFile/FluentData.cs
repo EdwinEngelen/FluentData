@@ -1,5 +1,5 @@
 ﻿
-// FluentData version 2.2.3.0.
+// FluentData version 2.3.0.0.
 // Copyright ©  2012 - Lars-Erik Kindblad (http://www.kindblad.com).
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
@@ -836,6 +836,11 @@ namespace FluentData
 		{
 			return Command.QueryValues<T>();
 		}
+
+		public DataTable QueryDataTable()
+		{
+			return Command.QueryDataTable();
+		}
 	}
 
 	public interface IBaseStoredProcedureBuilder
@@ -1375,6 +1380,7 @@ namespace FluentData
 		public StringBuilder Sql { get; set; }
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
+		public System.Data.IDataReader InnerReader { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
 		public DbCommandTypes CommandType { get; set; }
 
@@ -1433,6 +1439,7 @@ namespace FluentData
 		TEntity QuerySingleNoAutoMap<TEntity>(Func<dynamic, TEntity> customMapper);
 		T QueryValue<T>();
 		List<T> QueryValues<T>();
+		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
@@ -1713,6 +1720,18 @@ namespace FluentData
 		//            dbParameter.Size = parameter.Size;
 		//        data.InnerCommand.Parameters.Add(dbParameter);
 		//    }
+		}
+	}
+
+	internal partial class DbCommand
+	{
+		public DataTable QueryDataTable()
+		{
+			var dataTable = new DataTable();
+
+			_data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(_data.InnerReader, LoadOption.OverwriteChanges));
+
+			return dataTable;
 		}
 	}
 
@@ -2363,9 +2382,12 @@ namespace FluentData
 
 				if (_data.ContextData.OnExecuting != null)
 					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
-				
+
 				if (useReader)
-					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
+				{
+					_data.InnerReader = _data.InnerCommand.ExecuteReader();
+					_data.Reader = new DataReader(_data.InnerReader);
+				}
 
 				_queryAlreadyExecuted = true;
 			}
