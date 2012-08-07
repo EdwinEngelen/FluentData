@@ -68,9 +68,12 @@ namespace FluentData
 
 				if (_data.ContextData.OnExecuting != null)
 					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
-				
+
 				if (useReader)
-					_data.Reader = new DataReader(_data.InnerCommand.ExecuteReader());
+				{
+					_data.InnerReader = _data.InnerCommand.ExecuteReader();
+					_data.Reader = new DataReader(_data.InnerReader);
+				}
 
 				_queryAlreadyExecuted = true;
 			}

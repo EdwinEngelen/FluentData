@@ -92,6 +92,7 @@
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\Handlers\ParameterHandler.cs" />
+    <Compile Include="Command\PartialClasses\QueryDataTable.cs" />
     <Compile Include="Command\PartialClasses\QueryNoAutoMap.cs" />
     <Compile Include="Command\PartialClasses\QuerySingleNoAutoMap.cs" />
     <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />

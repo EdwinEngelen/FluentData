@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 
 namespace FluentData
@@ -37,6 +38,7 @@ namespace FluentData
 		TEntity QuerySingleNoAutoMap<TEntity>(Func<dynamic, TEntity> customMapper);
 		T QueryValue<T>();
 		List<T> QueryValues<T>();
+		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);

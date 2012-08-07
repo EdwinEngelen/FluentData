@@ -11,6 +11,7 @@ namespace FluentData
 		public StringBuilder Sql { get; set; }
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
+		public System.Data.IDataReader InnerReader { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
 		public DbCommandTypes CommandType { get; set; }
 

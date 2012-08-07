@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace FluentData
 {
@@ -143,6 +144,11 @@ namespace FluentData
 		public List<T> QueryValues<T>()
 		{
 			return Command.QueryValues<T>();
+		}
+
+		public DataTable QueryDataTable()
+		{
+			return Command.QueryDataTable();
 		}
 	}
 }
