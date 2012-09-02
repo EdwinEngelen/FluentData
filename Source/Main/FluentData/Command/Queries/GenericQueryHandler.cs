@@ -14,7 +14,7 @@ namespace FluentData
 		{
 			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			var autoMapper = new AutoMapper<TEntity>(data);
+			var autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
 
 			while (data.Reader.Read())
 			{
@@ -40,7 +40,7 @@ namespace FluentData
 		{
 			AutoMapper<TEntity> autoMapper = null;
 
-			autoMapper = new AutoMapper<TEntity>(data);
+			autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
 
 			var item = default(TEntity);
 

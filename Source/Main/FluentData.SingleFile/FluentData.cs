@@ -1448,18 +1448,19 @@ namespace FluentData
 	internal class AutoMapper<T>
 	{
 		private readonly DbCommandData _dbCommandData;
+		private readonly Dictionary<string, PropertyInfo> _properties;
+		private readonly List<DataReaderField> _fields;
 
-		internal AutoMapper(DbCommandData dbCommandData)
+		internal AutoMapper(DbCommandData dbCommandData, Type itemType)
 		{
 			_dbCommandData = dbCommandData;
+			_properties = ReflectionHelper.GetProperties(itemType);
+			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
 		}
 
 		public void AutoMap(object item)
 		{
-			var properties = ReflectionHelper.GetProperties(item.GetType());
-			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
-
-			foreach (var field in fields)
+			foreach (var field in _fields)
 			{
 				if (field.IsSystem)
 					continue;
@@ -1469,7 +1470,7 @@ namespace FluentData
 
 				PropertyInfo property = null;
 					
-				if (properties.TryGetValue(field.LowerName, out property))
+				if (_properties.TryGetValue(field.LowerName, out property))
 				{
 					SetPropertyValue(field, property, item, value);
 					wasMapped = true;
@@ -1618,21 +1619,21 @@ namespace FluentData
 	internal class DynamicTypAutoMapper
 	{
 		private readonly DbCommandData _dbCommandData;
+		private readonly List<DataReaderField> _fields;
 
 		public DynamicTypAutoMapper(DbCommandData dbCommandData)
 		{
 			_dbCommandData = dbCommandData;
+			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
 		}
 
 		public ExpandoObject AutoMap()
 		{
 			var item = new ExpandoObject();
 
-			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
-
 			var itemDictionary = (IDictionary<string, object>) item;
 
-			foreach (var column in fields)
+			foreach (var column in _fields)
 			{
 				var value = DataReaderHelper.GetDataReaderValue(_dbCommandData.Reader, column.Index, true);
 
@@ -2232,7 +2233,7 @@ namespace FluentData
 		{
 			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			var autoMapper = new AutoMapper<TEntity>(data);
+			var autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
 
 			while (data.Reader.Read())
 			{
@@ -2258,7 +2259,7 @@ namespace FluentData
 		{
 			AutoMapper<TEntity> autoMapper = null;
 
-			autoMapper = new AutoMapper<TEntity>(data);
+			autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
 
 			var item = default(TEntity);
 

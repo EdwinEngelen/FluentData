@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace FluentData
@@ -6,18 +7,19 @@ namespace FluentData
 	internal class AutoMapper<T>
 	{
 		private readonly DbCommandData _dbCommandData;
+		private readonly Dictionary<string, PropertyInfo> _properties;
+		private readonly List<DataReaderField> _fields;
 
-		internal AutoMapper(DbCommandData dbCommandData)
+		internal AutoMapper(DbCommandData dbCommandData, Type itemType)
 		{
 			_dbCommandData = dbCommandData;
+			_properties = ReflectionHelper.GetProperties(itemType);
+			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
 		}
 
 		public void AutoMap(object item)
 		{
-			var properties = ReflectionHelper.GetProperties(item.GetType());
-			var fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
-
-			foreach (var field in fields)
+			foreach (var field in _fields)
 			{
 				if (field.IsSystem)
 					continue;
@@ -27,7 +29,7 @@ namespace FluentData
 
 				PropertyInfo property = null;
 					
-				if (properties.TryGetValue(field.LowerName, out property))
+				if (_properties.TryGetValue(field.LowerName, out property))
 				{
 					SetPropertyValue(field, property, item, value);
 					wasMapped = true;
