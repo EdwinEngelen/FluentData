@@ -16,8 +16,6 @@ namespace FluentData
 
 			var autoMapper = new AutoMapper<TEntity>(data);
 
-			DynamicTypAutoMapper dynamicAutoMapper = null;
-
 			while (data.Reader.Read())
 			{
 				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
@@ -28,12 +26,7 @@ namespace FluentData
 					customMapperReader(data.Reader, item);
 
 				if (customMapperDynamic != null)
-				{
-					if (dynamicAutoMapper == null)
-						dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
-					customMapperDynamic(dynamicObject, item);
-				}
+					customMapperDynamic(new DynamicDataReader(data.Reader), item);
 
 				items.Add(item);
 			}
@@ -61,11 +54,7 @@ namespace FluentData
 					customMapper(data.Reader, item);
 
 				if (customMapperDynamic != null)
-				{
-					var dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
-					customMapperDynamic(dynamicObject, item);
-				}
+					customMapperDynamic(new DynamicDataReader(data.Reader), item);
 			}
 
 			return item;

@@ -2144,24 +2144,14 @@ namespace FluentData
 		{
 			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			DynamicTypAutoMapper dynamicAutoMapper = null;
-
 			while (data.Reader.Read())
 			{
 				var item = default(TEntity);
 
 				if (customMapperReader != null)
-				{
 					item = customMapperReader(data.Reader);
-				}
 				else if (customMapperDynamic != null)
-				{
-					if (dynamicAutoMapper == null)
-						dynamicAutoMapper = new DynamicTypAutoMapper(data);
-
-					var dynamicObject = dynamicAutoMapper.AutoMap();
-					item = customMapperDynamic(dynamicObject);
-				}
+					item = customMapperDynamic(new DynamicDataReader(data.Reader));
 
 				items.Add(item);
 			}
@@ -2183,10 +2173,7 @@ namespace FluentData
 				if (customMapperReader != null)
 					item = customMapperReader(data.Reader);
 				else if (customMapperDynamic != null)
-				{
-					var dynamicObject = new DynamicTypAutoMapper(data).AutoMap();
-					item = customMapperDynamic(dynamicObject);
-				}
+					item = customMapperDynamic(new DynamicDataReader(data.Reader));
 			}
 
 			return item;
@@ -2247,8 +2234,6 @@ namespace FluentData
 
 			var autoMapper = new AutoMapper<TEntity>(data);
 
-			DynamicTypAutoMapper dynamicAutoMapper = null;
-
 			while (data.Reader.Read())
 			{
 				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
@@ -2259,12 +2244,7 @@ namespace FluentData
 					customMapperReader(data.Reader, item);
 
 				if (customMapperDynamic != null)
-				{
-					if (dynamicAutoMapper == null)
-						dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
-					customMapperDynamic(dynamicObject, item);
-				}
+					customMapperDynamic(new DynamicDataReader(data.Reader), item);
 
 				items.Add(item);
 			}
@@ -2292,11 +2272,7 @@ namespace FluentData
 					customMapper(data.Reader, item);
 
 				if (customMapperDynamic != null)
-				{
-					var dynamicAutoMapper = new DynamicTypAutoMapper(data);
-					var dynamicObject = dynamicAutoMapper.AutoMap();
-					customMapperDynamic(dynamicObject, item);
-				}
+					customMapperDynamic(new DynamicDataReader(data.Reader), item);
 			}
 
 			return item;
@@ -2743,6 +2719,25 @@ namespace FluentData
 		public object this[int i]
 		{
 			get { return GetValue(i); }
+		}
+	}
+
+	internal class DynamicDataReader : DynamicObject
+	{
+		private readonly IDataReader _dataReader;
+
+		internal DynamicDataReader(IDataReader dataReader)
+		{
+			_dataReader = dataReader;
+		}
+
+		public override bool TryGetMember(GetMemberBinder binder, out object result)
+		{
+			result = _dataReader[binder.Name];
+			if(result == DBNull.Value)
+				result = null;
+
+			return true;
 		}
 	}
 

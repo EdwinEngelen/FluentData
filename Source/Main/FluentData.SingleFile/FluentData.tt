@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" hostspecific="false" debug="true" #>
-<#@ assembly name="D:\CodePlex\FluentData\Source\Main\FluentData\bin\Debug\FluentData.dll" #>
+<#@ assembly name="C:\CodePlex\FluentData\Source\Main\FluentData\bin\Debug\FluentData.dll" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="Microsoft.CSharp" #>
 <#@ assembly name="System.Xml" #>
@@ -15,7 +15,7 @@
 <#@ output extension=".cs" #>
 
 <#
-string sourcePath = @"D:\CodePlex\FluentData\Source\Main\FluentData\";
+string sourcePath = @"C:\CodePlex\FluentData\Source\Main\FluentData\";
 
 WriteLine(string.Format("// {0} version {1}.", assemblyInfoProperty(sourcePath, "AssemblyTitle"), assemblyInfoProperty(sourcePath, "AssemblyVersion")));
 WriteLine("// Copyright ©  2012 - Lars-Erik Kindblad (http://www.kindblad.com).");

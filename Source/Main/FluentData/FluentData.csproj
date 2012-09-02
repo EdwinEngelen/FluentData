@@ -114,6 +114,7 @@
     <Compile Include="Command\Queries\QueryValueHandler.cs" />
     <Compile Include="Command\Queries\QueryValuesHandler.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
+    <Compile Include="Command\Reader\DynamicDataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />
     <Compile Include="Context\OnConnectionClosedEventArgs.cs" />
     <Compile Include="Context\OnConnectionOpenedEventArgs.cs" />
