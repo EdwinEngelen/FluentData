@@ -10,6 +10,8 @@ namespace FluentData
 		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
+		ISelectBuilder<TEntity> AndWhere(string sql);
+		ISelectBuilder<TEntity> OrWhere(string sql);
 		ISelectBuilder<TEntity> GroupBy(string sql);
 		ISelectBuilder<TEntity> OrderBy(string sql);
 		ISelectBuilder<TEntity> Having(string sql);

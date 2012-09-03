@@ -470,6 +470,8 @@ namespace FluentData
 		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
+		ISelectBuilder<TEntity> AndWhere(string sql);
+		ISelectBuilder<TEntity> OrWhere(string sql);
 		ISelectBuilder<TEntity> GroupBy(string sql);
 		ISelectBuilder<TEntity> OrderBy(string sql);
 		ISelectBuilder<TEntity> Having(string sql);
@@ -534,6 +536,22 @@ namespace FluentData
 		public ISelectBuilder<TEntity> Where(string sql)
 		{
 			Data.WhereSql += sql;
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> AndWhere(string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+				Where(" and ");
+			Where(sql);
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> OrWhere(string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+				Where(" or ");
+			Where(sql);
 			return this;
 		}
 

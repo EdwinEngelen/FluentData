@@ -56,6 +56,22 @@ namespace FluentData
 			return this;
 		}
 
+		public ISelectBuilder<TEntity> AndWhere(string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+				Where(" and ");
+			Where(sql);
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> OrWhere(string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+				Where(" or ");
+			Where(sql);
+			return this;
+		}
+
 		public ISelectBuilder<TEntity> OrderBy(string sql)
 		{
 			Data.OrderBy += sql;
