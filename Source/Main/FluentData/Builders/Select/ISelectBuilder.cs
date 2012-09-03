@@ -20,8 +20,7 @@ namespace FluentData
 
 		TList Query<TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> Query(Action<IDataReader, TEntity> customMapper = null);
-		TList QueryComplex<TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryComplex(Action<IDataReader, IList<TEntity>> customMapper);
+		void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
 		TValue QueryValue<TValue>();

@@ -10,7 +10,8 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test()
 		{
-			var categories = TestHelper.Context().Sql("select * from Category").QueryComplex<Category, List<Category>>(MapCategory);
+			var categories = new List<Category>();
+			TestHelper.Context().Sql("select * from Category").QueryComplex<Category>(categories, MapCategory);
 			Assert.IsTrue(categories.Count > 0);
 		}
 

@@ -139,5 +139,13 @@ namespace FluentData
 
 			return false;
 		}
+
+		public static bool IsCustomEntity<T>()
+		{
+			var type = typeof (T);
+			if(type.IsClass && Type.GetTypeCode(type) == TypeCode.Object)
+				return true;
+			return false;
+		}
 	}
 }

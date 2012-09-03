@@ -103,14 +103,9 @@ namespace FluentData
 			return Command.Query(customMapper);
 		}
 
-		public TList QueryComplex<TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>
+		public void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
 		{
-			return Command.QueryComplex<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> QueryComplex(Action<IDataReader, IList<TEntity>> customMapper)
-		{
-			return Command.QueryComplex(customMapper);
+			Command.QueryComplex<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null)

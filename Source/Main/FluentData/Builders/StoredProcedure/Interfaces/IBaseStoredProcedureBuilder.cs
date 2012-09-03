@@ -10,8 +10,7 @@ namespace FluentData
 		List<dynamic> Query();
 		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
 		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		TList QueryComplex<TEntity, TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryComplex<TEntity>(Action<IDataReader, IList<TEntity>> customMapper);
+		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);

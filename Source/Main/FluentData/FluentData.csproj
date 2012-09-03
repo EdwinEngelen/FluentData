@@ -106,7 +106,6 @@
     <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />
     <Compile Include="Command\Queries\GenericQueryHandler.cs" />
-    <Compile Include="Command\Queries\QueryComplexHandler.cs" />
     <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
     <Compile Include="Command\Queries\QueryValueHandler.cs" />
     <Compile Include="Command\Queries\QueryValuesHandler.cs" />
