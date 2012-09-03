@@ -10,15 +10,15 @@ namespace FluentData.Providers.DB2
 	{
 		public DB2ProviderTests()
 		{
-			var found = Context().Sql("select count(*) from sysibm.systables where name ='CATEGORY';").QueryValue<int>();
+			var found = Context().Sql("select count(*) from sysibm.systables where name ='CATEGORY';").QuerySingle<int>();
 			if (found > 0)
 			    Context().Sql("drop table ADMIN.CATEGORY;").Execute();
 
-			found = Context().Sql("select count(*) from sysibm.systables where name ='PRODUCT';").QueryValue<int>();
+			found = Context().Sql("select count(*) from sysibm.systables where name ='PRODUCT';").QuerySingle<int>();
 			if (found > 0)
 			    Context().Sql("drop table ADMIN.PRODUCT;").Execute();
 
-			found = Context().Sql("select count(*) from sysibm.sysroutines where routinename ='PRODUCTUPDATE';").QueryValue<int>();
+			found = Context().Sql("select count(*) from sysibm.sysroutines where routinename ='PRODUCTUPDATE';").QuerySingle<int>();
 			if (found > 0)
 				Context().Sql("drop procedure ADMIN.PRODUCTUPDATE;").Execute();
 
@@ -150,7 +150,7 @@ namespace FluentData.Providers.DB2
 		public void QueryValue()
 		{
 			int categoryId = Context().Sql("select CategoryId from Product where ProductId = 1")
-										.QueryValue<int>();
+										.QuerySingle<int>();
 
 			Assert.AreEqual(1, categoryId);
 		}
@@ -158,7 +158,7 @@ namespace FluentData.Providers.DB2
 		[TestMethod]
 		public void QueryValues()
 		{
-			var categories = Context().Sql("select CategoryId from Category order by CategoryId").QueryValues<int>();
+			var categories = Context().Sql("select CategoryId from Category order by CategoryId").Query<int>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual(1, categories[0]);

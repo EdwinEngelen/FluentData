@@ -483,7 +483,6 @@ namespace FluentData
 		void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
-		TValue QueryValue<TValue>();
 	}
 
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
@@ -599,12 +598,6 @@ namespace FluentData
 		{
 			return Command.QuerySingleComplex(customMapper);
 		}
-
-		public TValue QueryValue<TValue>()
-		{
-			return Command.QueryValue<TValue>();
-
-		}
 	}
 
 	internal abstract class BaseStoredProcedureBuilder
@@ -679,16 +672,6 @@ namespace FluentData
 			return Command.QuerySingleComplex(customMapper);
 		}
 
-		public T QueryValue<T>()
-		{
-			return Command.QueryValue<T>();
-		}
-
-		public List<T> QueryValues<T>()
-		{
-			return Command.QueryValues<T>();
-		}
-
 		public DataTable QueryDataTable()
 		{
 			return Command.QueryDataTable();
@@ -706,7 +689,6 @@ namespace FluentData
 		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
-		TValue QueryValue<TValue>();
 	}
 
 	public interface IStoredProcedureBuilder : IBaseStoredProcedureBuilder, IDisposable
@@ -1263,8 +1245,6 @@ namespace FluentData
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
-		T QueryValue<T>();
-		List<T> QueryValues<T>();
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
@@ -1786,35 +1766,6 @@ namespace FluentData
 		}
 	}
 
-	internal partial class DbCommand
-	{
-		public T QueryValue<T>()
-		{
-			T value = default(T);
-
-			_data.ExecuteQueryHandler.ExecuteQuery(true,
-				() =>
-				{
-					value = new QueryValueHandler<T>().Execute(_data);
-				});
-
-			return value;
-		}
-
-		public List<T> QueryValues<T>()
-		{
-			List<T> values = null;
-
-			_data.ExecuteQueryHandler.ExecuteQuery(true,
-				() =>
-				{
-					values = new QueryValuesHandler<T>().Execute(_data);
-				});
-
-			return values;
-		}
-	}
-
 	internal class QuerySingleComplexHandler<TEntity>
 	{
 		internal TEntity ExecuteSingleComplex(DbCommandData data,
@@ -1880,18 +1831,35 @@ namespace FluentData
 		{
 			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			var autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
-
-			while (data.Reader.Read())
+			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
-				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
+				var autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
 
-				if (customMapperReader == null)
-					autoMapper.AutoMap(item);
-				else
-					customMapperReader(data.Reader, item);
+				while (data.Reader.Read())
+				{
+					var item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
 
-				items.Add(item);
+					if (customMapperReader == null)
+						autoMapper.AutoMap(item);
+					else
+						customMapperReader(data.Reader, item);
+
+					items.Add(item);
+				}
+			}
+			else
+			{
+				while(data.Reader.Read())
+				{
+					TEntity value;
+
+					if(data.Reader.GetFieldType(0) == typeof(TEntity))
+						value = (TEntity)data.Reader.GetValue(0);
+					else
+						value = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
+
+					items.Add(value);
+				}
 			}
 
 			return items;
@@ -1900,20 +1868,33 @@ namespace FluentData
 		internal TEntity ExecuteSingle(DbCommandData data,
 										Action<IDataReader, TEntity> customMapper)
 		{
-			AutoMapper<TEntity> autoMapper = null;
-
-			autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
-
 			var item = default(TEntity);
 
-			if (data.Reader.Read())
+			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
-				item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
+				AutoMapper<TEntity> autoMapper = null;
 
-				if (customMapper == null)
-					autoMapper.AutoMap(item);
-				else
-					customMapper(data.Reader, item);
+				autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+
+				if (data.Reader.Read())
+				{
+					item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+
+					if (customMapper == null)
+						autoMapper.AutoMap(item);
+					else
+						customMapper(data.Reader, item);
+				}
+			}
+			else
+			{
+				if(data.Reader.Read())
+				{
+					if(data.Reader.GetFieldType(0) == typeof(TEntity))
+						item = (TEntity)data.Reader.GetValue(0);
+					else
+						item = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
+				}
 			}
 
 			return item;
@@ -2031,46 +2012,6 @@ namespace FluentData
 				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
 			
 			throw exception;
-		}
-	}
-
-	internal class QueryValueHandler<T>
-	{
-		public T Execute(DbCommandData data)
-		{
-			var value = default(T);
-
-			if (data.Reader.Read())
-			{
-				if (data.Reader.GetFieldType(0) == typeof(T))
-					value = (T) data.Reader.GetValue(0);
-				else
-					value = (T) Convert.ChangeType(data.Reader.GetValue(0), typeof(T));
-			}
-			
-			return value;
-		}
-	}
-
-	internal class QueryValuesHandler<T>
-	{
-		public List<T> Execute(DbCommandData data)
-		{
-			var items = new List<T>();
-
-			while (data.Reader.Read())
-			{
-				T value;
-
-				if (data.Reader.GetFieldType(0) == typeof(T))
-					value = (T) data.Reader.GetValue(0);
-				else
-					value = (T) Convert.ChangeType(data.Reader.GetValue(0), typeof(T));
-
-				items.Add(value);
-			}
-
-			return items;
 		}
 	}
 

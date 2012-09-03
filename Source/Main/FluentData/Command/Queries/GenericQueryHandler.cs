@@ -13,18 +13,35 @@ namespace FluentData
 		{
 			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
 
-			var autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
-
-			while (data.Reader.Read())
+			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
-				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
+				var autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
 
-				if (customMapperReader == null)
-					autoMapper.AutoMap(item);
-				else
-					customMapperReader(data.Reader, item);
+				while (data.Reader.Read())
+				{
+					var item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
 
-				items.Add(item);
+					if (customMapperReader == null)
+						autoMapper.AutoMap(item);
+					else
+						customMapperReader(data.Reader, item);
+
+					items.Add(item);
+				}
+			}
+			else
+			{
+				while(data.Reader.Read())
+				{
+					TEntity value;
+
+					if(data.Reader.GetFieldType(0) == typeof(TEntity))
+						value = (TEntity)data.Reader.GetValue(0);
+					else
+						value = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
+
+					items.Add(value);
+				}
 			}
 
 			return items;
@@ -33,20 +50,33 @@ namespace FluentData
 		internal TEntity ExecuteSingle(DbCommandData data,
 										Action<IDataReader, TEntity> customMapper)
 		{
-			AutoMapper<TEntity> autoMapper = null;
-
-			autoMapper = new AutoMapper<TEntity>(data, typeof(TEntity));
-
 			var item = default(TEntity);
 
-			if (data.Reader.Read())
+			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
-				item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
+				AutoMapper<TEntity> autoMapper = null;
 
-				if (customMapper == null)
-					autoMapper.AutoMap(item);
-				else
-					customMapper(data.Reader, item);
+				autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+
+				if (data.Reader.Read())
+				{
+					item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+
+					if (customMapper == null)
+						autoMapper.AutoMap(item);
+					else
+						customMapper(data.Reader, item);
+				}
+			}
+			else
+			{
+				if(data.Reader.Read())
+				{
+					if(data.Reader.GetFieldType(0) == typeof(TEntity))
+						item = (TEntity)data.Reader.GetValue(0);
+					else
+						item = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
+				}
 			}
 
 			return item;

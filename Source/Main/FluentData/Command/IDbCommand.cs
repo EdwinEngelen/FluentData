@@ -22,8 +22,6 @@ namespace FluentData
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
-		T QueryValue<T>();
-		List<T> QueryValues<T>();
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);

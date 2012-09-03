@@ -9,7 +9,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_int()
 		{
-			var categories = TestHelper.Context().Sql("select CategoryId from Category order by CategoryId").QueryValues<int>();
+			var categories = TestHelper.Context().Sql("select CategoryId from Category order by CategoryId").Query<int>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual(1, categories[0]);
@@ -19,7 +19,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_string()
 		{
-			var categories = TestHelper.Context().Sql("select Name from Category order by Name").QueryValues<string>();
+			var categories = TestHelper.Context().Sql("select Name from Category order by Name").Query<string>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual("Books", categories[0]);

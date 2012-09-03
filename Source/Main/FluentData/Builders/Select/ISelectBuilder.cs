@@ -23,6 +23,5 @@ namespace FluentData
 		void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
 		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
-		TValue QueryValue<TValue>();
 	}
 }

@@ -117,11 +117,5 @@ namespace FluentData
 		{
 			return Command.QuerySingleComplex(customMapper);
 		}
-
-		public TValue QueryValue<TValue>()
-		{
-			return Command.QueryValue<TValue>();
-
-		}
 	}
 }

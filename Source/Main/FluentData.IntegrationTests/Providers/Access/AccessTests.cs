@@ -104,7 +104,7 @@ namespace FluentData.Providers.Access
 		public void QueryValue()
 		{
 			int categoryId = Context().Sql("select CategoryId from Product where ProductId = 1")
-										.QueryValue<int>();
+										.QuerySingle<int>();
 
 			Assert.AreEqual(1, categoryId);
 		}
@@ -112,7 +112,7 @@ namespace FluentData.Providers.Access
 		[TestMethod]
 		public void QueryValues()
 		{
-			var categories = Context().Sql("select CategoryId from Category order by CategoryId").QueryValues<int>();
+			var categories = Context().Sql("select CategoryId from Category order by CategoryId").Query<int>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual(1, categories[0]);

@@ -9,7 +9,7 @@ namespace FluentData._Documentation
 		public void Test()
 		{
 			int numberOfProducts = Context().Sql(@"select count(*)
-													from Product").QueryValue<int>();
+													from Product").QuerySingle<int>();
 
 			Assert.IsTrue(numberOfProducts > 0);
 		}

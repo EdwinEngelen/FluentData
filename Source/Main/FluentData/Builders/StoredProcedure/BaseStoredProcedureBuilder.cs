@@ -76,16 +76,6 @@ namespace FluentData
 			return Command.QuerySingleComplex(customMapper);
 		}
 
-		public T QueryValue<T>()
-		{
-			return Command.QueryValue<T>();
-		}
-
-		public List<T> QueryValues<T>()
-		{
-			return Command.QueryValues<T>();
-		}
-
 		public DataTable QueryDataTable()
 		{
 			return Command.QueryDataTable();
