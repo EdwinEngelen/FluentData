@@ -315,22 +315,12 @@ namespace FluentData
 			return Command.Execute();
 		}
 
-		public int ExecuteReturnLastId()
-		{
-			return Command.ExecuteReturnLastId();
-		}
-
-		public T ExecuteReturnLastId<T>()
-		{
-			return Command.ExecuteReturnLastId<T>();
-		}
-
-		public int ExecuteReturnLastId(string identityColumnName)
+		public int ExecuteReturnLastId(string identityColumnName = null)
 		{
 			return Command.ExecuteReturnLastId(identityColumnName);
 		}
 
-		public T ExecuteReturnLastId<T>(string identityColumnName)
+		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			return Command.ExecuteReturnLastId<T>(identityColumnName);
 		}
@@ -449,20 +439,16 @@ namespace FluentData
 	public interface IInsertBuilder
 	{
 		int Execute();
-		int ExecuteReturnLastId();
-		T ExecuteReturnLastId<T>();
-		int ExecuteReturnLastId(string identityColumnName);
-		T ExecuteReturnLastId<T>(string identityColumnName);
+		int ExecuteReturnLastId(string identityColumnName = null);
+		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		IInsertBuilder Column(string columnName, object value);
 	}
 
 	public interface IInsertBuilder<T>
 	{
 		int Execute();
-		int ExecuteReturnLastId();
-		TReturn ExecuteReturnLastId<TReturn>();
-		int ExecuteReturnLastId(string identityColumnName);
-		TReturn ExecuteReturnLastId<TReturn>(string identityColumnName);
+		int ExecuteReturnLastId(string identityColumnName = null);
+		TReturn ExecuteReturnLastId<TReturn>(string identityColumnName = null);
 		IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IInsertBuilder<T> Column(string columnName, object value);
 		IInsertBuilder<T> Column(Expression<Func<T, object>> expression);
@@ -471,10 +457,8 @@ namespace FluentData
 	public interface IInsertBuilderDynamic
 	{
 		int Execute();
-		int ExecuteReturnLastId();
-		T ExecuteReturnLastId<T>();
-		int ExecuteReturnLastId(string identityColumnName);
-		T ExecuteReturnLastId<T>(string identityColumnName);
+		int ExecuteReturnLastId(string identityColumnName = null);
+		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		IInsertBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IInsertBuilderDynamic Column(string columnName, object value);
 		IInsertBuilderDynamic Column(string propertyName);
@@ -1306,10 +1290,8 @@ namespace FluentData
 		IDbCommand Parameters(params object[] parameters);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
-		int ExecuteReturnLastId();
-		T ExecuteReturnLastId<T>();
-		int ExecuteReturnLastId(string identityColumnName);
-		T ExecuteReturnLastId<T>(string identityColumnName);
+		int ExecuteReturnLastId(string identityColumnName = null);
+		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
@@ -1569,44 +1551,6 @@ namespace FluentData
 		ReturnValue = 6,
 	}
 
-	internal class ParameterHandler
-	{
-		internal void FixParameterType(DbCommandData data)
-		{
-		//    foreach (var parameter in data.Parameters)
-		//    {
-		//        if (parameter.Direction == ParameterDirection.Input
-		//            && parameter.DataType == DataTypes.Object)
-		//        {
-		//            if (parameter.Value == null)
-		//            {
-		//                parameter.DataType = DataTypes.String;
-		//            }
-		//            else
-		//            {
-		//                var type = parameter.Value.GetType();
-
-		//                parameter.DataType = data.ContextData.Provider.GetDbTypeForClrType(type);
-		//                if (parameter.DataType == DataTypes.Object)
-		//                    throw new FluentDataException(string.Format("The parameter {0} is of a type that is not supported.", parameter.ParameterName));
-		//            }
-		//        }
-
-		//        if (parameter.Value == null)
-		//            parameter.Value = DBNull.Value;
-
-		//        var dbParameter = data.InnerCommand.CreateParameter();
-		//        dbParameter.DbType = (System.Data.DbType) parameter.DataType;
-		//        dbParameter.ParameterName = data.ContextData.Provider.GetParameterName(parameter.ParameterName);
-		//        dbParameter.Direction = (System.Data.ParameterDirection) parameter.Direction;
-		//        dbParameter.Value = parameter.Value;
-		//        if (parameter.Size > 0)
-		//            dbParameter.Size = parameter.Size;
-		//        data.InnerCommand.Parameters.Add(dbParameter);
-		//    }
-		}
-	}
-
 	internal partial class DbCommand
 	{
 		public DataTable QueryDataTable()
@@ -1656,27 +1600,12 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public int ExecuteReturnLastId()
-		{
-			return ExecuteReturnLastId<int>();
-		}
-
-		public T ExecuteReturnLastId<T>()
-		{
-			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
-				throw new FluentDataException("The selected database does not support this method.");
-
-			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, null);
-
-			return lastId;
-		}
-
-		public int ExecuteReturnLastId(string identityColumnName)
+		public int ExecuteReturnLastId(string identityColumnName = null)
 		{
 			return ExecuteReturnLastId<int>(identityColumnName);
 		}
 
-		public T ExecuteReturnLastId<T>(string identityColumnName)
+		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			if (_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");

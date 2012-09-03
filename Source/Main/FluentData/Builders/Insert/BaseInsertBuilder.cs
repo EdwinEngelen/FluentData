@@ -25,22 +25,12 @@
 			return Command.Execute();
 		}
 
-		public int ExecuteReturnLastId()
-		{
-			return Command.ExecuteReturnLastId();
-		}
-
-		public T ExecuteReturnLastId<T>()
-		{
-			return Command.ExecuteReturnLastId<T>();
-		}
-
-		public int ExecuteReturnLastId(string identityColumnName)
+		public int ExecuteReturnLastId(string identityColumnName = null)
 		{
 			return Command.ExecuteReturnLastId(identityColumnName);
 		}
 
-		public T ExecuteReturnLastId<T>(string identityColumnName)
+		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			return Command.ExecuteReturnLastId<T>(identityColumnName);
 		}

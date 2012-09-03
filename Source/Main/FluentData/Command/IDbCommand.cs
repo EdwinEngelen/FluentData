@@ -13,10 +13,8 @@ namespace FluentData
 		IDbCommand Parameters(params object[] parameters);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
-		int ExecuteReturnLastId();
-		T ExecuteReturnLastId<T>();
-		int ExecuteReturnLastId(string identityColumnName);
-		T ExecuteReturnLastId<T>(string identityColumnName);
+		int ExecuteReturnLastId(string identityColumnName = null);
+		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);

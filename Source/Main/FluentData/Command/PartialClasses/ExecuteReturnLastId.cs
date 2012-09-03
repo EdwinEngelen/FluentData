@@ -2,27 +2,12 @@
 {
 	internal partial class DbCommand
 	{
-		public int ExecuteReturnLastId()
-		{
-			return ExecuteReturnLastId<int>();
-		}
-
-		public T ExecuteReturnLastId<T>()
-		{
-			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
-				throw new FluentDataException("The selected database does not support this method.");
-
-			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, null);
-
-			return lastId;
-		}
-
-		public int ExecuteReturnLastId(string identityColumnName)
+		public int ExecuteReturnLastId(string identityColumnName = null)
 		{
 			return ExecuteReturnLastId<int>(identityColumnName);
 		}
 
-		public T ExecuteReturnLastId<T>(string identityColumnName)
+		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			if (_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
 				throw new FluentDataException("The selected database does not support this method.");
