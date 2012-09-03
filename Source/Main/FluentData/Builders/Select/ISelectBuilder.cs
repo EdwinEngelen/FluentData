@@ -25,7 +25,7 @@ namespace FluentData
 		TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
 		List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper);
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
-		TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper);
+		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
 		TValue QueryValue<TValue>();
 	}
 }

@@ -19,9 +19,9 @@ namespace FluentData
 			{
 				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-				autoMapper.AutoMap(item);
-
-				if (customMapperReader != null)
+				if (customMapperReader == null)
+					autoMapper.AutoMap(item);
+				else
 					customMapperReader(data.Reader, item);
 
 				items.Add(item);
@@ -43,9 +43,9 @@ namespace FluentData
 			{
 				item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-				autoMapper.AutoMap(item);
-
-				if (customMapper != null)
+				if (customMapper == null)
+					autoMapper.AutoMap(item);
+				else
 					customMapper(data.Reader, item);
 			}
 

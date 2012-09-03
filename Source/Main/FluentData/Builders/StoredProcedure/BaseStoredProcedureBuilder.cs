@@ -86,9 +86,9 @@ namespace FluentData
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
 
-		public TEntity QuerySingleNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleNoAutoMap(customMapper);
+			return Command.QuerySingleComplex(customMapper);
 		}
 
 		public T QueryValue<T>()

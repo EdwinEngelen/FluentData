@@ -10,7 +10,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_map_using_data_reader()
 		{
-			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleNoAutoMap<Category>(MapCategoryReader);
+			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleComplex<Category>(MapCategoryReader);
 			Assert.IsNotNull(category);
 			Assert.IsTrue(category.Name.Length > 0);
 			Assert.IsTrue(category.CategoryId > 0);
@@ -27,7 +27,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_map_using_dynamic()
 		{
-			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleNoAutoMap<Category>(MapCategoryDynamic);
+			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleComplex<Category>(MapCategoryDynamic);
 			Assert.IsNotNull(category);
 			Assert.IsTrue(category.Name.Length > 0);
 			Assert.IsTrue(category.CategoryId > 0);

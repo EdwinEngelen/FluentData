@@ -8,7 +8,7 @@ namespace FluentData
 		public TList QueryComplex<TEntity, TList>(Action<IDataReader, IList<TEntity>> customMapper)
 			where TList : IList<TEntity>
 		{
-			TList items = default(TList);
+			var items = default(TList);
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{

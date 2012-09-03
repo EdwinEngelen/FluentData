@@ -128,9 +128,9 @@ namespace FluentData
 			return Command.QuerySingle(customMapper);
 		}
 
-		public TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleNoAutoMap(customMapper);
+			return Command.QuerySingleComplex(customMapper);
 		}
 
 		public TValue QueryValue<TValue>()
