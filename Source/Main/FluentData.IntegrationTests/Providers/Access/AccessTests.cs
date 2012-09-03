@@ -74,34 +74,30 @@ namespace FluentData.Providers.Access
 		public void Query_custom_mapping_dynamic()
 		{
 			var products = Context().Sql(@"select * from Product")
-									.QueryNoAutoMap<Product>(Custom_mapper_using_dynamic);
+									.Query<Product>(Custom_mapper_using_dynamic);
 
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public Product Custom_mapper_using_dynamic(IDataReader row)
+		public void Custom_mapper_using_dynamic(IDataReader row, Product product)
 		{
-			var product = new Product();
 			product.ProductId = row.Value.ProductId;
 			product.Name = row.Value.Name;
-			return product;
 		}
 
 		[TestMethod]
 		public void Query_custom_mapping_datareader()
 		{
 			var products = Context().Sql(@"select * from Product")
-									.QueryNoAutoMap<Product>(Custom_mapper_using_datareader);
+									.Query<Product>(Custom_mapper_using_datareader);
 
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public Product Custom_mapper_using_datareader(IDataReader row)
+		public void Custom_mapper_using_datareader(IDataReader row, Product product)
 		{
-			var product = new Product();
 			product.ProductId = row.GetInt32("ProductId");
 			product.Name = row.GetString("Name");
-			return product;
 		}
 
 		[TestMethod]

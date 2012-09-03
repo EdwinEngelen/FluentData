@@ -92,7 +92,6 @@
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\PartialClasses\QueryDataTable.cs" />
-    <Compile Include="Command\PartialClasses\QueryNoAutoMap.cs" />
     <Compile Include="Command\PartialClasses\QuerySingleComplex.cs" />
     <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Command\PartialClasses\QueryDynamic.cs" />
     <Compile Include="Command\PartialClasses\QuerySingle.cs" />
     <Compile Include="Command\PartialClasses\QueryValue.cs" />
-    <Compile Include="Command\Queries\QueryNoAutoMapHandler.cs" />
     <Compile Include="Command\Queries\QuerySingleComplexHandler.cs" />
     <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />

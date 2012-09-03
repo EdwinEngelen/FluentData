@@ -4,15 +4,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Queries
 {
 	[TestClass]
-	public class QuerySingleNoAutoMapTests
+	public class QuerySingleComplexTests
 	{
 		[TestMethod]
 		public void Test_map_using_data_reader()
 		{
-			var categories = TestHelper.Context().Sql("select * from Category").QueryNoAutoMap<Category>(MapCategoryReader);
-			Assert.IsTrue(categories.Count > 0);
-			Assert.IsTrue(categories[0].Name.Length > 0);
-			Assert.IsTrue(categories[0].CategoryId > 0);
+			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleComplex<Category>(MapCategoryReader);
+			Assert.IsNotNull(category);
+			Assert.IsTrue(category.Name.Length > 0);
+			Assert.IsTrue(category.CategoryId > 0);
 		}
 
 		private Category MapCategoryReader(IDataReader reader)
@@ -26,10 +26,10 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_map_using_dynamic()
 		{
-			var categories = TestHelper.Context().Sql("select * from Category").QueryNoAutoMap<Category>(MapCategoryDynamic);
-			Assert.IsTrue(categories.Count > 0);
-			Assert.IsTrue(categories[0].Name.Length > 0);
-			Assert.IsTrue(categories[0].CategoryId > 0);
+			var category = TestHelper.Context().Sql("select top 1 * from Category").QuerySingleComplex<Category>(MapCategoryDynamic);
+			Assert.IsNotNull(category);
+			Assert.IsTrue(category.Name.Length > 0);
+			Assert.IsTrue(category.CategoryId > 0);
 		}
 
 		private Category MapCategoryDynamic(IDataReader reader)

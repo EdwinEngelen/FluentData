@@ -81,11 +81,11 @@
     <Compile Include="Features\Connection\SharedConnectionTests.cs" />
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
     <Compile Include="Features\Queries\QueryDataTableTests.cs" />
-    <Compile Include="Features\Queries\QueryNoAutoMapTests.cs" />
+    <Compile Include="Features\Queries\QueryTests.cs" />
     <Compile Include="Features\Queries\QueryComplexTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Features\Queries\QuerySingleNoAutoMapTests.cs" />
+    <Compile Include="Features\Queries\QuerySingleComplexTests.cs" />
     <Compile Include="Features\Settings\CommandTimeoutTests.cs" />
     <Compile Include="Features\Events\OnConnectionClosedTests.cs" />
     <Compile Include="Features\Events\OnConnectionOpenedTests.cs" />

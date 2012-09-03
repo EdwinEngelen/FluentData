@@ -482,10 +482,8 @@ namespace FluentData
 		List<TEntity> Query(Action<IDataReader, TEntity> customMapper = null);
 		TList QueryComplex<TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
 		List<TEntity> QueryComplex(Action<IDataReader, IList<TEntity>> customMapper);
-		TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper);
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
-		TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper);
+		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
 		TValue QueryValue<TValue>();
 	}
 
@@ -598,24 +596,14 @@ namespace FluentData
 			return Command.QueryComplex(customMapper);
 		}
 
-		public TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper)
-		{
-			return Command.QueryNoAutoMap(customMapper);
-		}
-
 		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null)
 		{
 			return Command.QuerySingle(customMapper);
 		}
 
-		public TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleNoAutoMap(customMapper);
+			return Command.QuerySingleComplex(customMapper);
 		}
 
 		public TValue QueryValue<TValue>()
@@ -687,16 +675,6 @@ namespace FluentData
 			return Command.QueryComplex<TEntity>(customMapper);
 		}
 
-		public TList QueryNoAutoMap<TEntity, TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> QueryNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
-		{
-			return Command.QueryNoAutoMap<TEntity>(customMapper);
-		}
-
 		public dynamic QuerySingle()
 		{
 			return Command.QuerySingle();
@@ -707,9 +685,9 @@ namespace FluentData
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
 
-		public TEntity QuerySingleNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleNoAutoMap(customMapper);
+			return Command.QuerySingleComplex(customMapper);
 		}
 
 		public T QueryValue<T>()
@@ -737,11 +715,9 @@ namespace FluentData
 		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
 		TList QueryComplex<TEntity, TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
 		List<TEntity> QueryComplex<TEntity>(Action<IDataReader, IList<TEntity>> customMapper);
-		TList QueryNoAutoMap<TEntity, TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper);
 		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		TEntity QuerySingleNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper);
+		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
 		TValue QueryValue<TValue>();
 	}
 
@@ -1293,15 +1269,13 @@ namespace FluentData
 		int ExecuteReturnLastId(string identityColumnName = null);
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
-		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
+		dynamic QuerySingle();
 		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
+		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
 		TList QueryComplex<TEntity, TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
 		List<TEntity> QueryComplex<TEntity>(Action<IDataReader, IList<TEntity>> customMapper);
-		TList QueryNoAutoMap<TEntity, TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper);
-		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		TEntity QuerySingleNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper);
+		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
 		T QueryValue<T>();
 		List<T> QueryValues<T>();
 		DataTable QueryDataTable();
@@ -1565,33 +1539,13 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public TList QueryNoAutoMap<TEntity, TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			var items = default(TList);
-
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				items = new QueryNoAutoMapHandler<TEntity>().QueryNoAutoMap<TList>(_data, customMapper);
-			});
-
-			return items;
-		}
-
-		public List<TEntity> QueryNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
-		{
-			return QueryNoAutoMap<TEntity, List<TEntity>>(customMapper);
-		}
-	}
-
-	internal partial class DbCommand
-	{
-		public TEntity QuerySingleNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
 			var item = default(TEntity);
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleNoAutoMapHandler<TEntity>().ExecuteSingleNoAutoMap(_data, customMapper, null);
+				item = new QuerySingleComplexHandler<TEntity>().ExecuteSingleComplex(_data, customMapper);
 			});
 
 			return item;
@@ -1607,7 +1561,7 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn)
+			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
 				throw new FluentDataException("The selected database does not support this method.");
 
 			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
@@ -1791,7 +1745,7 @@ namespace FluentData
 		public TList QueryComplex<TEntity, TList>(Action<IDataReader, IList<TEntity>> customMapper)
 			where TList : IList<TEntity>
 		{
-			TList items = default(TList);
+			var items = default(TList);
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
@@ -1883,43 +1837,15 @@ namespace FluentData
 		}
 	}
 
-	internal class QueryNoAutoMapHandler<TEntity>
+	internal class QuerySingleComplexHandler<TEntity>
 	{
-		internal TList QueryNoAutoMap<TList>(DbCommandData data,
+		internal TEntity ExecuteSingleComplex(DbCommandData data,
 			Func<IDataReader, TEntity> customMapperReader)
-			where TList : IList<TEntity>
-		{
-			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
-
-			while (data.Reader.Read())
-			{
-				var item = default(TEntity);
-
-				if (customMapperReader != null)
-					item = customMapperReader(data.Reader);
-
-				items.Add(item);
-			}
-
-			return items;
-		}
-	}
-
-	internal class QuerySingleNoAutoMapHandler<TEntity>
-	{
-		internal TEntity ExecuteSingleNoAutoMap(DbCommandData data,
-			Func<IDataReader, TEntity> customMapperReader,
-			Func<dynamic, TEntity> customMapperDynamic)
 		{
 			var item = default(TEntity);
 
 			if (data.Reader.Read())
-			{
-				if (customMapperReader != null)
-					item = customMapperReader(data.Reader);
-				else if (customMapperDynamic != null)
-					item = customMapperDynamic(new DynamicDataReader(data.InnerReader));
-			}
+				item = customMapperReader(data.Reader);
 
 			return item;
 		}
@@ -1982,9 +1908,9 @@ namespace FluentData
 			{
 				var item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-				autoMapper.AutoMap(item);
-
-				if (customMapperReader != null)
+				if (customMapperReader == null)
+					autoMapper.AutoMap(item);
+				else
 					customMapperReader(data.Reader, item);
 
 				items.Add(item);
@@ -2006,9 +1932,9 @@ namespace FluentData
 			{
 				item = (TEntity) data.ContextData.EntityFactory.Create(typeof(TEntity));
 
-				autoMapper.AutoMap(item);
-
-				if (customMapper != null)
+				if (customMapper == null)
+					autoMapper.AutoMap(item);
+				else
 					customMapper(data.Reader, item);
 			}
 

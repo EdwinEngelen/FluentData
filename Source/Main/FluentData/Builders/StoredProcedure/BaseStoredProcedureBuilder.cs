@@ -66,16 +66,6 @@ namespace FluentData
 			return Command.QueryComplex<TEntity>(customMapper);
 		}
 
-		public TList QueryNoAutoMap<TEntity, TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> QueryNoAutoMap<TEntity>(Func<IDataReader, TEntity> customMapper)
-		{
-			return Command.QueryNoAutoMap<TEntity>(customMapper);
-		}
-
 		public dynamic QuerySingle()
 		{
 			return Command.QuerySingle();
