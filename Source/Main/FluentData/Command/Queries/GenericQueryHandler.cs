@@ -31,8 +31,7 @@ namespace FluentData
 		}
 
 		internal TEntity ExecuteSingle(DbCommandData data,
-										Action<IDataReader, TEntity> customMapper,
-										Action<dynamic, TEntity> customMapperDynamic)
+										Action<IDataReader, TEntity> customMapper)
 		{
 			AutoMapper<TEntity> autoMapper = null;
 
@@ -48,9 +47,6 @@ namespace FluentData
 
 				if (customMapper != null)
 					customMapper(data.Reader, item);
-
-				if (customMapperDynamic != null)
-					customMapperDynamic(new DynamicDataReader(data.InnerReader), item);
 			}
 
 			return item;

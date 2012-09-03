@@ -11,7 +11,7 @@ namespace FluentData
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryNoAutoMapHandler<TEntity>().QueryNoAutoMap<TList>(_data, customMapper, null);
+				items = new QueryNoAutoMapHandler<TEntity>().QueryNoAutoMap<TList>(_data, customMapper);
 			});
 
 			return items;

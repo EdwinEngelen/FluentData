@@ -11,12 +11,7 @@ namespace FluentData
 			return Query<TEntity, TList>(null);
 		}
 
-		public List<TEntity> Query<TEntity>()
-		{
-			return Query<TEntity, List<TEntity>>(null);
-		}
-
-		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper)
+		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null)
 			where TList : IList<TEntity>
 		{
 			var items = default(TList);

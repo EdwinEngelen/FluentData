@@ -15,7 +15,7 @@ namespace FluentData
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, customMapper, null);
+				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, customMapper);
 			});
 
 			return item;

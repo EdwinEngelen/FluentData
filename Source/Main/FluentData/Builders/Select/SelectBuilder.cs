@@ -93,32 +93,12 @@ namespace FluentData
 			return this;
 		}
 
-		public TList Query<TList>() where TList : IList<TEntity>
-		{
-			return Command.Query<TEntity, TList>();
-		}
-
-		public TList Query<TList>(Action<dynamic, TEntity> customMapper) where TList : IList<TEntity>
+		public TList Query<TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.Query<TEntity, TList>(customMapper);
 		}
 
-		public TList Query<TList>(Action<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			return Command.Query<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> Query()
-		{
-			return Command.Query<TEntity>();
-		}
-
-		public List<TEntity> Query(Action<dynamic, TEntity> customMapper)
-		{
-			return Command.Query(customMapper);
-		}
-
-		public List<TEntity> Query(Action<IDataReader, TEntity> customMapper)
+		public List<TEntity> Query(Action<IDataReader, TEntity> customMapper = null)
 		{
 			return Command.Query(customMapper);
 		}
@@ -133,19 +113,9 @@ namespace FluentData
 			return Command.QueryComplex(customMapper);
 		}
 
-		public TList QueryNoAutoMap<TList>(Func<dynamic, TEntity> customMapper) where TList : IList<TEntity>
-		{
-			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
-		}
-
 		public TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>
 		{
 			return Command.QueryNoAutoMap<TEntity, TList>(customMapper);
-		}
-
-		public List<TEntity> QueryNoAutoMap(Func<dynamic, TEntity> customMapper)
-		{
-			return Command.QueryNoAutoMap(customMapper);
 		}
 
 		public List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper)
@@ -153,27 +123,12 @@ namespace FluentData
 			return Command.QueryNoAutoMap(customMapper);
 		}
 
-		public TEntity QuerySingle()
-		{
-			return Command.QuerySingle<TEntity>();
-		}
-
-		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper)
-		{
-			return Command.QuerySingle(customMapper);
-		}
-
-		public TEntity QuerySingle(Action<dynamic, TEntity> customMapper)
+		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null)
 		{
 			return Command.QuerySingle(customMapper);
 		}
 
 		public TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper)
-		{
-			return Command.QuerySingleNoAutoMap(customMapper);
-		}
-
-		public TEntity QuerySingleNoAutoMap(Func<dynamic, TEntity> customMapper)
 		{
 			return Command.QuerySingleNoAutoMap(customMapper);
 		}
