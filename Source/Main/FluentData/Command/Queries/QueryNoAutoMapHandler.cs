@@ -19,7 +19,7 @@ namespace FluentData
 				if (customMapperReader != null)
 					item = customMapperReader(data.Reader);
 				else if (customMapperDynamic != null)
-					item = customMapperDynamic(new DynamicDataReader(data.Reader));
+					item = customMapperDynamic(new DynamicDataReader(data.InnerReader));
 
 				items.Add(item);
 			}

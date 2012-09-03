@@ -5,9 +5,9 @@ namespace FluentData
 {
 	internal class DynamicDataReader : DynamicObject
 	{
-		private readonly IDataReader _dataReader;
+		private readonly System.Data.IDataReader _dataReader;
 
-		internal DynamicDataReader(IDataReader dataReader)
+		internal DynamicDataReader(System.Data.IDataReader dataReader)
 		{
 			_dataReader = dataReader;
 		}

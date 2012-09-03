@@ -73,11 +73,11 @@ namespace FluentData.Providers.Oracle
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public Product Custom_mapper_using_dynamic(dynamic row)
+		public Product Custom_mapper_using_dynamic(IDataReader row)
 		{
 			var product = new Product();
-			product.ProductId = row.PRODUCTID;
-			product.Name = row.NAME;
+			product.ProductId = row.Value.PRODUCTID;
+			product.Name = row.Value.NAME;
 			return product;
 		}
 

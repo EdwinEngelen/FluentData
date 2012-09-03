@@ -4,6 +4,7 @@ namespace FluentData
 {
 	public interface IDataReader
 	{
+		dynamic Value { get;  }
 		void Close();
 		int Depth { get; }
 		void Dispose();

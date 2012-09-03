@@ -5,7 +5,7 @@ namespace FluentData.Providers
 	public interface IDbProviderTests
 	{
 		Product Custom_mapper_using_datareader(IDataReader row);
-		Product Custom_mapper_using_dynamic(dynamic row);
+		Product Custom_mapper_using_dynamic(IDataReader row);
 		void Delete_data_sql();
 		void Delete_data_builder();
 		void In_query();

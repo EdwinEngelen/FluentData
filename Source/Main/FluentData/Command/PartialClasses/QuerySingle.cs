@@ -20,17 +20,5 @@ namespace FluentData
 
 			return item;
 		}
-
-		public TEntity QuerySingle<TEntity>(Action<dynamic, TEntity> customMapper)
-		{
-			var item = default(TEntity);
-
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, null, customMapper);
-			});
-
-			return item;
-		}
 	}
 }

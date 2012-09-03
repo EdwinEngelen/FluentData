@@ -33,11 +33,11 @@ namespace FluentData.Features.Queries
 			Assert.IsTrue(category.CategoryId > 0);
 		}
 
-		private Category MapCategoryDynamic(dynamic reader)
+		private Category MapCategoryDynamic(IDataReader reader)
 		{
 			var category = new Category();
-			category.CategoryId = (Categories) reader.CategoryId;
-			category.Name = reader.Name;
+			category.CategoryId = (Categories) reader.Value.CategoryId;
+			category.Name = reader.Value.Name;
 			return category;
 		}
 	}

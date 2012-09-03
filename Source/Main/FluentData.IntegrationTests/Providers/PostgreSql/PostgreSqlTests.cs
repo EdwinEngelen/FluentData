@@ -120,11 +120,11 @@ namespace FluentData.Providers.PostgreSql
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public Product Custom_mapper_using_dynamic(dynamic row)
+		public Product Custom_mapper_using_dynamic(IDataReader row)
 		{
 			var product = new Product();
-			product.ProductId = row.productid;
-			product.Name = row.name;
+			product.ProductId = row.Value.productid;
+			product.Name = row.Value.name;
 			return product;
 		}
 

@@ -19,22 +19,16 @@ namespace FluentData
 		ISelectBuilder<TEntity> Parameters(params object[] parameters);
 
 		TList Query<TList>() where TList : IList<TEntity>;
-		TList Query<TList>(Action<dynamic, TEntity> customMapper) where TList : IList<TEntity>;
 		TList Query<TList>(Action<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
 		List<TEntity> Query();
-		List<TEntity> Query(Action<dynamic, TEntity> customMapper);
 		List<TEntity> Query(Action<IDataReader, TEntity> customMapper);
 		TList QueryComplex<TList>(Action<IDataReader, IList<TEntity>> customMapper) where TList : IList<TEntity>;
 		List<TEntity> QueryComplex(Action<IDataReader, IList<TEntity>> customMapper);
-		TList QueryNoAutoMap<TList>(Func<dynamic, TEntity> customMapper) where TList : IList<TEntity>;
 		TList QueryNoAutoMap<TList>(Func<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
-		List<TEntity> QueryNoAutoMap(Func<dynamic, TEntity> customMapper);
 		List<TEntity> QueryNoAutoMap(Func<IDataReader, TEntity> customMapper);
 		TEntity QuerySingle();
 		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper);
-		TEntity QuerySingle(Action<dynamic, TEntity> customMapper);
 		TEntity QuerySingleNoAutoMap(Func<IDataReader, TEntity> customMapper);
-		TEntity QuerySingleNoAutoMap(Func<dynamic, TEntity> customMapper);
 		TValue QueryValue<TValue>();
 	}
 }

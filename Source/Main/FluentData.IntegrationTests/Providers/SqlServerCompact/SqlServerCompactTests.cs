@@ -74,11 +74,11 @@ namespace FluentData.Providers.SqlServerCompact
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public Product Custom_mapper_using_dynamic(dynamic row)
+		public Product Custom_mapper_using_dynamic(IDataReader row)
 		{
 			var product = new Product();
-			product.ProductId = row.ProductId;
-			product.Name = row.Name;
+			product.ProductId = row.Value.ProductId;
+			product.Name = row.Value.Name;
 			return product;
 		}
 
