@@ -171,8 +171,7 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void Unnamed_parameters_many()
 		{
-			var products = Context().Sql("select * from Product where ProductId = :0 or ProductId = :1")
-									.Parameters(1, 2)
+			var products = Context().Sql("select * from Product where ProductId = :0 or ProductId = :1", 1, 2)
 									.Query();
 
 			Assert.AreEqual(2, products.Count);
@@ -194,8 +193,7 @@ namespace FluentData.Providers.PostgreSql
 		{
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
-			var products = Context().Sql("select * from Product where ProductId in(:0)")
-									.Parameters(ids)
+			var products = Context().Sql("select * from Product where ProductId in(:0)", ids)
 									.Query();
 
 			Assert.AreEqual(4, products.Count);
@@ -240,8 +238,7 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void Insert_data_sql()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);")
-							.Parameters("The Warren Buffet Way", 1)
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -275,8 +272,7 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void Update_data_sql()
 		{
-			var rowsAffected = Context().Sql("update Product set Name = :0 where ProductId = :1")
-								.Parameters("The Warren Buffet Way", 1)
+			var rowsAffected = Context().Sql("update Product set Name = :0 where ProductId = :1", "The Warren Buffet Way", 1)
 								.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -312,12 +308,10 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void Delete_data_sql()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);")
-							.Parameters("The Warren Buffet Way", 1)
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
-			var rowsAffected = Context().Sql("delete from Product where ProductId = :0")
-									.Parameters(productId)
+			var rowsAffected = Context().Sql("delete from Product where ProductId = :0", productId)
 									.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -326,8 +320,7 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void Delete_data_builder()
 		{
-			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(:0, :1)")
-								.Parameters("The Warren Buffet Way", 1)
+			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(:0, :1)", "The Warren Buffet Way", 1)
 								.ExecuteReturnLastId();
 
 			var rowsAffected = Context().Delete("Product")
@@ -342,12 +335,10 @@ namespace FluentData.Providers.PostgreSql
 		{
 			using (var context = Context().UseTransaction(true))
 			{
-				context.Sql("update Product set Name = :0 where ProductId = :1")
-							.Parameters("The Warren Buffet Way", 1)
+				context.Sql("update Product set Name = :0 where ProductId = :1", "The Warren Buffet Way", 1)
 							.Execute();
 
-				context.Sql("update Product set Name = :0 where ProductId = :1")
-							.Parameters("Bill Gates Bio", 2)
+				context.Sql("update Product set Name = :0 where ProductId = :1", "Bill Gates Bio", 2)
 							.Execute();
 
 				context.Commit();

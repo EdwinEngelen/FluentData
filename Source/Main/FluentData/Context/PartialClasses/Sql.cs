@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace FluentData
 {
@@ -32,8 +33,11 @@ namespace FluentData
 		public IDbCommand Sql(string sql, params object[] parameters)
 		{
 			var command = CreateCommand.Sql(sql);
-			if (parameters != null)
-				command.Parameters(parameters);
+			if(parameters != null)
+			{
+				for(var i = 0; i < parameters.Count(); i++)
+					command.Parameter(i.ToString(), parameters[i]);
+			}
 			return command;
 		}
 
@@ -52,8 +56,11 @@ namespace FluentData
 		public IDbCommand MultiResultSql(string sql, params object[] parameters)
 		{
 			var command = CreateCommand.UseMultipleResultset.Sql(sql);
-			if (parameters != null)
-				command.Parameters(parameters);
+			if(parameters != null)
+			{
+				for(var i = 0; i < parameters.Count(); i++)
+					command.Parameter(i.ToString(), parameters[i]);
+			}
 			return command;
 		}
 

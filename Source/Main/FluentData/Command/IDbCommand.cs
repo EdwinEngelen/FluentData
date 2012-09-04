@@ -10,7 +10,7 @@ namespace FluentData
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
 		IDbCommand Parameter(string name, object value);
 		IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0);
-		IDbCommand Parameters(params object[] parameters);
+		//IDbCommand Parameters(params object[] parameters);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		int ExecuteReturnLastId(string identityColumnName = null);

@@ -470,15 +470,14 @@ namespace FluentData
 		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
-		ISelectBuilder<TEntity> AndWhere(string sql);
-		ISelectBuilder<TEntity> OrWhere(string sql);
+		ISelectBuilder<TEntity> WhereAnd(string sql);
+		ISelectBuilder<TEntity> WhereOr(string sql);
 		ISelectBuilder<TEntity> GroupBy(string sql);
 		ISelectBuilder<TEntity> OrderBy(string sql);
 		ISelectBuilder<TEntity> Having(string sql);
 		ISelectBuilder<TEntity> Paging(int currentPage, int itemsPerPage);
 
 		ISelectBuilder<TEntity> Parameter(string name, object value);
-		ISelectBuilder<TEntity> Parameters(params object[] parameters);
 
 		TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null);
@@ -539,7 +538,7 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> AndWhere(string sql)
+		public ISelectBuilder<TEntity> WhereAnd(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Where(" and ");
@@ -547,7 +546,7 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> OrWhere(string sql)
+		public ISelectBuilder<TEntity> WhereOr(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Where(" or ");
@@ -583,12 +582,6 @@ namespace FluentData
 		public ISelectBuilder<TEntity> Parameter(string name, object value)
 		{
 			Data.Command.Parameter(name, value);
-			return this;
-		}
-
-		public ISelectBuilder<TEntity> Parameters(params object[] parameters)
-		{
-			Data.Command.Parameters(parameters);
 			return this;
 		}
 
@@ -1251,7 +1244,7 @@ namespace FluentData
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
 		IDbCommand Parameter(string name, object value);
 		IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0);
-		IDbCommand Parameters(params object[] parameters);
+		//IDbCommand Parameters(params object[] parameters);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		int ExecuteReturnLastId(string identityColumnName = null);
@@ -2821,8 +2814,11 @@ namespace FluentData
 		public IDbCommand Sql(string sql, params object[] parameters)
 		{
 			var command = CreateCommand.Sql(sql);
-			if (parameters != null)
-				command.Parameters(parameters);
+			if(parameters != null)
+			{
+				for(var i = 0; i < parameters.Count(); i++)
+					command.Parameter(i.ToString(), parameters[i]);
+			}
 			return command;
 		}
 
@@ -2841,8 +2837,11 @@ namespace FluentData
 		public IDbCommand MultiResultSql(string sql, params object[] parameters)
 		{
 			var command = CreateCommand.UseMultipleResultset.Sql(sql);
-			if (parameters != null)
-				command.Parameters(parameters);
+			if(parameters != null)
+			{
+				for(var i = 0; i < parameters.Count(); i++)
+					command.Parameter(i.ToString(), parameters[i]);
+			}
 			return command;
 		}
 

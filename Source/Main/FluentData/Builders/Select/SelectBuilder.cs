@@ -56,7 +56,7 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> AndWhere(string sql)
+		public ISelectBuilder<TEntity> WhereAnd(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Where(" and ");
@@ -64,7 +64,7 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> OrWhere(string sql)
+		public ISelectBuilder<TEntity> WhereOr(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Where(" or ");
@@ -100,12 +100,6 @@ namespace FluentData
 		public ISelectBuilder<TEntity> Parameter(string name, object value)
 		{
 			Data.Command.Parameter(name, value);
-			return this;
-		}
-
-		public ISelectBuilder<TEntity> Parameters(params object[] parameters)
-		{
-			Data.Command.Parameters(parameters);
 			return this;
 		}
 

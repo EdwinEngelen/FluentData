@@ -9,8 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_sql()
 		{
-			int rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1")
-								.Parameters("The Warren Buffet Way", 1)
+			int rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
 								.Execute();
 
 			Assert.AreEqual(1, rowsAffected);

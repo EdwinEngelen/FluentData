@@ -9,8 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Stored_procedure_sql()
 		{
-var rowsAffected = Context().Sql("execute ProductUpdate @ProductId = @0, @Name = @1")
-							.Parameters(1, "The Warren Buffet Way")
+			var rowsAffected = Context().Sql("execute ProductUpdate @ProductId = @0, @Name = @1", 1, "The Warren Buffet Way")
 							.Execute();
 
 			Assert.AreEqual(1, rowsAffected);

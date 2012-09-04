@@ -9,8 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Insert_data_sql()
 		{
-			int productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
-							.Parameters("The Warren Buffet Way", 1)
+			int productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);

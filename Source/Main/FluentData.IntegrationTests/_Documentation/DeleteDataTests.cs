@@ -8,12 +8,10 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Delete_data_sql()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
-							.Parameters("The Warren Buffet Way", 1)
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
-			int rowsAffected = Context().Sql("delete from Product where ProductId = @0")
-						.Parameters(productId)
+			int rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId)
 						.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -22,8 +20,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Delete_data_builder()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);")
-							.Parameters("The Warren Buffet Way", 1)
+			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId();
 
 			int rowsAffected = Context().Delete("Product")

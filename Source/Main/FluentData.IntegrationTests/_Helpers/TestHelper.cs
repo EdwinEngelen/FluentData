@@ -161,8 +161,7 @@ namespace FluentData._Helpers
 		public static Product GetProduct(IDbContext context, int productId)
 		{
 			var product = context
-							.Sql("select * from product where productid = @0")
-							.Parameters(productId)
+							.Sql("select * from product where productid = @0", productId)
 							.QuerySingle<Product>();
 
 			return product;
@@ -171,8 +170,7 @@ namespace FluentData._Helpers
 		public static ExpandoObject GetProductDynamic(IDbContext context, int productId)
 		{
 			var product = context
-							.Sql("select * from product where productid = @0")
-							.Parameters(productId)
+							.Sql("select * from product where productid = @0", productId)
 							.QuerySingle();
 
 			return product;

@@ -17,8 +17,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Indexed_parameters_alternative()
 		{
-			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1")
-										.Parameters(1, 2).Query();
+			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query();
 
 			Assert.AreEqual(2, products.Count);
 		}
