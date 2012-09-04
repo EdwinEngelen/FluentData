@@ -15,7 +15,7 @@ namespace FluentData.Features.Queries
 			Assert.IsTrue(categories[0].CategoryId > 0);
 		}
 
-		private void MapCategoryReader(IDataReader reader, Category category)
+		private void MapCategoryReader(Category category, IDataReader reader)
 		{
 			category.CategoryId = (Categories) reader.GetInt32("CategoryId");
 			category.Name = reader.GetString("Name");
@@ -30,7 +30,7 @@ namespace FluentData.Features.Queries
 			Assert.IsTrue(categories[0].CategoryId > 0);
 		}
 
-		private void MapCategoryDynamic(IDataReader reader, Category category)
+		private void MapCategoryDynamic(Category category, IDataReader reader)
 		{
 			category.CategoryId = (Categories) reader.Value.CategoryId;
 			category.Name = reader.Value.Name;

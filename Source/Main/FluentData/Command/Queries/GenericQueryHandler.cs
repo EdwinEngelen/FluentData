@@ -7,7 +7,7 @@ namespace FluentData
 	{
 		internal TList ExecuteListReader<TList>(
 									DbCommandData data,
-									Action<IDataReader, TEntity> customMapperReader
+									Action<TEntity, IDataReader> customMapperReader
 					)
 			where TList : IList<TEntity>
 		{
@@ -24,7 +24,7 @@ namespace FluentData
 					if (customMapperReader == null)
 						autoMapper.AutoMap(item);
 					else
-						customMapperReader(data.Reader, item);
+						customMapperReader(item, data.Reader);
 
 					items.Add(item);
 				}
@@ -48,7 +48,7 @@ namespace FluentData
 		}
 
 		internal TEntity ExecuteSingle(DbCommandData data,
-										Action<IDataReader, TEntity> customMapper)
+										Action<TEntity, IDataReader> customMapper)
 		{
 			var item = default(TEntity);
 
@@ -65,7 +65,7 @@ namespace FluentData
 					if (customMapper == null)
 						autoMapper.AutoMap(item);
 					else
-						customMapper(data.Reader, item);
+						customMapper(item, data.Reader);
 				}
 			}
 			else

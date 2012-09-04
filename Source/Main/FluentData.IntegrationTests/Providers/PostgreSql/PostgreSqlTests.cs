@@ -120,7 +120,7 @@ namespace FluentData.Providers.PostgreSql
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_dynamic(IDataReader row, Product product)
+		public void Custom_mapper_using_dynamic(Product product, IDataReader row)
 		{
 			product.ProductId = row.Value.ProductId;
 			product.Name = row.Value.Name;
@@ -135,7 +135,7 @@ namespace FluentData.Providers.PostgreSql
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_datareader(IDataReader row, Product product)
+		public void Custom_mapper_using_datareader(Product product, IDataReader row)
 		{
 			product.ProductId = row.GetInt32("ProductId");
 			product.Name = row.GetString("Name");

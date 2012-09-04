@@ -5,12 +5,12 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
+		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				while(_data.Reader.Read())
-					customMapper(_data.Reader, list);
+					customMapper(list, _data.Reader);
 			});
 		}
 	}

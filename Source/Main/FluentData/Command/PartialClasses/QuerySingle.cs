@@ -9,7 +9,7 @@ namespace FluentData
 			return QuerySingle<TEntity>(null);
 		}
 
-		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
 			var item = default(TEntity);
 

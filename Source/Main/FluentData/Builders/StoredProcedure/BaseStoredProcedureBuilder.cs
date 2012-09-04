@@ -46,17 +46,17 @@ namespace FluentData
 			return Command.Query();
 		}
 
-		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>
+		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.Query<TEntity, TList>(customMapper);
 		}
 
-		public List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null)
+		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.Query<TEntity>(customMapper);
 		}
 
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
+		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			Command.QueryComplex<TEntity>(list, customMapper);
 		}
@@ -66,7 +66,7 @@ namespace FluentData
 			return Command.QuerySingle();
 		}
 
-		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null)
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.QuerySingle<TEntity>(customMapper);
 		}

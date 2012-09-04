@@ -11,7 +11,7 @@ namespace FluentData
 			return Query<TEntity, TList>(null);
 		}
 
-		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null)
+		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
 			where TList : IList<TEntity>
 		{
 			var items = default(TList);
@@ -24,7 +24,7 @@ namespace FluentData
 			return items;
 		}
 
-		public List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper)
+		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
 			return Query<TEntity, List<TEntity>>(customMapper);
 		}

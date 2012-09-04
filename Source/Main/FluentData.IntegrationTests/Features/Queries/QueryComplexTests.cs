@@ -15,7 +15,7 @@ namespace FluentData.Features.Queries
 			Assert.IsTrue(categories.Count > 0);
 		}
 
-		private void MapCategory(IDataReader reader, IList<Category> categories)
+		private void MapCategory(IList<Category> categories, IDataReader reader)
 		{
 			var category = new Category();
 			category.CategoryId = (Categories) reader.GetInt32("CategoryId");

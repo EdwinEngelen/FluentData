@@ -17,10 +17,10 @@ namespace FluentData
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		dynamic QuerySingle();
-		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
-		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
+		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);

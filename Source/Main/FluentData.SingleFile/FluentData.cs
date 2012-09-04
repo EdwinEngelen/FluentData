@@ -480,10 +480,10 @@ namespace FluentData
 		ISelectBuilder<TEntity> Parameter(string name, object value);
 		ISelectBuilder<TEntity> Parameters(params object[] parameters);
 
-		TList Query<TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
-		List<TEntity> Query(Action<IDataReader, TEntity> customMapper = null);
-		void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
-		TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null);
+		TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null);
+		void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
 	}
 
@@ -592,22 +592,22 @@ namespace FluentData
 			return this;
 		}
 
-		public TList Query<TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>
+		public TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.Query<TEntity, TList>(customMapper);
 		}
 
-		public List<TEntity> Query(Action<IDataReader, TEntity> customMapper = null)
+		public List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.Query(customMapper);
 		}
 
-		public void QueryComplex(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
+		public void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			Command.QueryComplex<TEntity>(list, customMapper);
 		}
 
-		public TEntity QuerySingle(Action<IDataReader, TEntity> customMapper = null)
+		public TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.QuerySingle(customMapper);
 		}
@@ -660,17 +660,17 @@ namespace FluentData
 			return Command.Query();
 		}
 
-		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>
+		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.Query<TEntity, TList>(customMapper);
 		}
 
-		public List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null)
+		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.Query<TEntity>(customMapper);
 		}
 
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
+		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			Command.QueryComplex<TEntity>(list, customMapper);
 		}
@@ -680,7 +680,7 @@ namespace FluentData
 			return Command.QuerySingle();
 		}
 
-		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null)
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
@@ -701,11 +701,11 @@ namespace FluentData
 		TValue ParameterValue<TValue>(string name);
 		int Execute();
 		List<dynamic> Query();
-		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper) where TList : IList<TEntity>;
-		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
+		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper) where TList : IList<TEntity>;
+		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		dynamic QuerySingle();
-		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
+		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
 	}
 
@@ -1258,10 +1258,10 @@ namespace FluentData
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		dynamic QuerySingle();
-		List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper = null);
-		TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null) where TList : IList<TEntity>;
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper);
-		TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper = null);
+		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
@@ -1706,7 +1706,7 @@ namespace FluentData
 			return Query<TEntity, TList>(null);
 		}
 
-		public TList Query<TEntity, TList>(Action<IDataReader, TEntity> customMapper = null)
+		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
 			where TList : IList<TEntity>
 		{
 			var items = default(TList);
@@ -1719,7 +1719,7 @@ namespace FluentData
 			return items;
 		}
 
-		public List<TEntity> Query<TEntity>(Action<IDataReader, TEntity> customMapper)
+		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
 			return Query<TEntity, List<TEntity>>(customMapper);
 		}
@@ -1727,12 +1727,12 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IDataReader, IList<TEntity>> customMapper)
+		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
 				while(_data.Reader.Read())
-					customMapper(_data.Reader, list);
+					customMapper(list, _data.Reader);
 			});
 		}
 	}
@@ -1771,7 +1771,7 @@ namespace FluentData
 			return QuerySingle<TEntity>(null);
 		}
 
-		public TEntity QuerySingle<TEntity>(Action<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
 			var item = default(TEntity);
 
@@ -1843,7 +1843,7 @@ namespace FluentData
 	{
 		internal TList ExecuteListReader<TList>(
 									DbCommandData data,
-									Action<IDataReader, TEntity> customMapperReader
+									Action<TEntity, IDataReader> customMapperReader
 					)
 			where TList : IList<TEntity>
 		{
@@ -1860,7 +1860,7 @@ namespace FluentData
 					if (customMapperReader == null)
 						autoMapper.AutoMap(item);
 					else
-						customMapperReader(data.Reader, item);
+						customMapperReader(item, data.Reader);
 
 					items.Add(item);
 				}
@@ -1884,7 +1884,7 @@ namespace FluentData
 		}
 
 		internal TEntity ExecuteSingle(DbCommandData data,
-										Action<IDataReader, TEntity> customMapper)
+										Action<TEntity, IDataReader> customMapper)
 		{
 			var item = default(TEntity);
 
@@ -1901,7 +1901,7 @@ namespace FluentData
 					if (customMapper == null)
 						autoMapper.AutoMap(item);
 					else
-						customMapper(data.Reader, item);
+						customMapper(item, data.Reader);
 				}
 			}
 			else
