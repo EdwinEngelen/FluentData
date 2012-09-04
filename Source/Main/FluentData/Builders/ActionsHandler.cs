@@ -116,14 +116,6 @@ namespace FluentData
 			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
 		}
 
-		internal void ParametersAction(object[] parameters)
-		{
-			var count = parameters.Count();
-
-			for (int i = 0; i < count; i++)
-				ParameterAction(i.ToString(), parameters[i], DataTypes.Object, ParameterDirection.Input, false);
-		}
-
 		internal void WhereAction(string columnName, object value)
 		{
 			var parameterName = "id" + _data.Where.Count().ToString();

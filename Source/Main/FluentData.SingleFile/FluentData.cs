@@ -129,14 +129,6 @@ namespace FluentData
 			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
 		}
 
-		internal void ParametersAction(object[] parameters)
-		{
-			var count = parameters.Count();
-
-			for (int i = 0; i < count; i++)
-				ParameterAction(i.ToString(), parameters[i], DataTypes.Object, ParameterDirection.Input, false);
-		}
-
 		internal void WhereAction(string columnName, object value)
 		{
 			var parameterName = "id" + _data.Where.Count().ToString();
@@ -1593,13 +1585,6 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public IDbCommand Parameters(params object[] parameters)
-		{
-			for (var i = 0; i < parameters.Count(); i++)
-				Parameter(i.ToString(), parameters[i]);
-			return this;
-		}
-
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
 		{
 			if (ReflectionHelper.IsList(value))

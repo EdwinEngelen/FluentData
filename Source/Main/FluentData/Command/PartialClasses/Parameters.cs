@@ -8,13 +8,6 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public IDbCommand Parameters(params object[] parameters)
-		{
-			for (var i = 0; i < parameters.Count(); i++)
-				Parameter(i.ToString(), parameters[i]);
-			return this;
-		}
-
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
 		{
 			if (ReflectionHelper.IsList(value))
