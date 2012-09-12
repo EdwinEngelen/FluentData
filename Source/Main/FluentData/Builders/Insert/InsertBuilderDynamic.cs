@@ -13,7 +13,7 @@ namespace FluentData
 
 		public IInsertBuilderDynamic Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
@@ -25,19 +25,19 @@ namespace FluentData
 
 		public IInsertBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 

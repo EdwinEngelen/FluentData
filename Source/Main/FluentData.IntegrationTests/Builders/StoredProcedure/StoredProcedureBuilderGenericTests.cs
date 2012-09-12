@@ -39,7 +39,7 @@ namespace FluentData
 			{
 				var storedProcedure = context.StoredProcedure<Product>("ProductInsert", product)
 					.ParameterOut("ProductId", DataTypes.Int32)
-					.AutoMap(x => x.ProductId);
+					.AutoMap(x => x.ProductId, x => x.Category);
 
 				storedProcedure.Execute();
 				product.ProductId = storedProcedure.ParameterValue<int>("ProductId");

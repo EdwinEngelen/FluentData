@@ -11,7 +11,7 @@ namespace FluentData
 
 		public IStoredProcedureBuilder Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 

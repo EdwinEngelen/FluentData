@@ -15,39 +15,35 @@ namespace FluentData
 			_data = data;
 		}
 
-		internal void ColumnValueAction(string columnName, object value, bool propertyNameIsParameterName)
+		internal void ColumnValueAction(string columnName, object value)
 		{
-			ColumnAction(columnName, value, typeof(object), propertyNameIsParameterName);
+			ColumnAction(columnName, value, typeof(object));
 		}
 
-		private void ColumnAction(string columnName, object value, Type type, bool propertyNameIsParameterName)
+		private void ColumnAction(string columnName, object value, Type type)
 		{
-			var parameterName = "";
-			if (propertyNameIsParameterName)
-				parameterName = columnName;
-			else
-				parameterName = "c" + _data.Columns.Count.ToString();
+			var parameterName = columnName;
 
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
 		}
 
-		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
+		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
 
-			ColumnAction(parser.Name, parser.Value, parser.Type, propertyNameIsParameterName);
+			ColumnAction(parser.Name, parser.Value, parser.Type);
 		}
 
 		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)
 		{
 			var propertyValue = (item as IDictionary<string, object>) [propertyName];
 
-			ColumnAction(propertyName, propertyValue, typeof(object), true);
+			ColumnAction(propertyName, propertyValue, typeof(object));
 		}
 
-		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
+		internal void AutoMapColumnsAction<T>(params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
 			var properties = ReflectionHelper.GetProperties(_data.Item.GetType());
 			var ignorePropertyNames = new HashSet<string>();
@@ -68,15 +64,12 @@ namespace FluentData
 
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
-				if (ReflectionHelper.IsBasicClrType(propertyType))
-				{
-					var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
-					ColumnAction(property.Value.Name, propertyValue, propertyType, propertyNameIsParameterName);
-				}
+				var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
+				ColumnAction(property.Value.Name, propertyValue, propertyType);
 			}
 		}
 
-		internal void AutoMapDynamicTypeColumnsAction(bool propertyNameIsParameterName, params string[] ignorePropertyExpressions)
+		internal void AutoMapDynamicTypeColumnsAction(params string[] ignorePropertyExpressions)
 		{
 			var properties = (IDictionary<string, object>) _data.Item;
 			var ignorePropertyNames = new HashSet<string>();
@@ -90,25 +83,14 @@ namespace FluentData
 			{
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
 
-				if (ignoreProperty == null
-					&& ReflectionHelper.IsBasicClrType(property.Value.GetType()))
-				{
-					ColumnAction(property.Key, property.Value, typeof(object), propertyNameIsParameterName);
-				}
+				if (ignoreProperty == null)
+					ColumnAction(property.Key, property.Value, typeof(object));
 			}
 		}
 
 		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
 		{
-			var parameter = new Parameter();
-			parameter.ParameterName = name;
-			parameter.Value = value;
-			parameter.DataType = dataType;
-			parameter.Direction = direction;
-			parameter.IsId = isId;
-			parameter.Size = size;
-
-			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataType, parameter.Direction, parameter.Size);
+			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
@@ -118,7 +100,7 @@ namespace FluentData
 
 		internal void WhereAction(string columnName, object value)
 		{
-			var parameterName = "id" + _data.Where.Count().ToString();
+			var parameterName = columnName;
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));

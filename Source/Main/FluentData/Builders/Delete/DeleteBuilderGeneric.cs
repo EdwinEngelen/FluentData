@@ -12,13 +12,13 @@ namespace FluentData
 		}
 		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 
 		public IDeleteBuilder<T> Where(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}

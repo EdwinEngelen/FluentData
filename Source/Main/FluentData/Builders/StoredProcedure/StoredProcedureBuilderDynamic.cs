@@ -15,13 +15,13 @@ namespace FluentData
 
 		public IStoredProcedureBuilderDynamic Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 
 		public IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(true, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 

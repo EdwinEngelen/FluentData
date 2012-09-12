@@ -13,19 +13,19 @@ namespace FluentData
 
 		public IStoredProcedureBuilder<T> Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 
 		public IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(true, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, true);
+			Actions.ColumnValueAction(expression);
 
 			return this;
 		}

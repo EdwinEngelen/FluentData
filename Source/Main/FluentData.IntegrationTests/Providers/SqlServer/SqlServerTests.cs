@@ -229,7 +229,7 @@ namespace FluentData.Providers.SqlServer
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.AutoMap(x => x.ProductId)
+								.AutoMap(x => x.ProductId, x => x.Category)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -265,7 +265,7 @@ namespace FluentData.Providers.SqlServer
 
 			var rowsAffected = Context().Update<Product>("Product", product)
 										.Where(x => x.ProductId)
-										.AutoMap(x => x.ProductId)
+										.AutoMap(x => x.ProductId, x => x.Category)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -351,7 +351,7 @@ namespace FluentData.Providers.SqlServer
 		    product.Name = "The Warren Buffet Way";
 
 		    var rowsAffected = Context().StoredProcedure<Product>("ProductUpdate", product)
-											.AutoMap(x => x.CategoryId)
+											.AutoMap(x => x.CategoryId, x => x.Category)
 											.Execute();
 
 		    Assert.AreEqual(1, rowsAffected);

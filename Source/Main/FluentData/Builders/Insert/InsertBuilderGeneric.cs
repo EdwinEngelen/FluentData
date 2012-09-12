@@ -13,37 +13,37 @@ namespace FluentData
 
 		public IInsertBuilder<T> Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		public IInsertBuilder<T> Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 
 		public IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 	}

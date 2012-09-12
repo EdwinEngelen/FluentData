@@ -15,13 +15,13 @@
 
 		public IUpdateBuilder Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}
