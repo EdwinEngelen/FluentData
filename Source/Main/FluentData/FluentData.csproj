@@ -129,7 +129,6 @@
     <Compile Include="Context\PartialClasses\Events.cs" />
     <Compile Include="Context\PartialClasses\Sql.cs" />
     <Compile Include="Context\PartialClasses\Transactions.cs" />
-    <Compile Include="Context\TransactionStates.cs" />
     <Compile Include="Core\DataReaderHelper.cs" />
     <Compile Include="Core\PropertyExpressionParser.cs" />
     <Compile Include="Core\FluentDataException.cs" />

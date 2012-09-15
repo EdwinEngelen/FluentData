@@ -28,39 +28,35 @@ namespace FluentData
 			_data = data;
 		}
 
-		internal void ColumnValueAction(string columnName, object value, bool propertyNameIsParameterName)
+		internal void ColumnValueAction(string columnName, object value)
 		{
-			ColumnAction(columnName, value, typeof(object), propertyNameIsParameterName);
+			ColumnAction(columnName, value, typeof(object));
 		}
 
-		private void ColumnAction(string columnName, object value, Type type, bool propertyNameIsParameterName)
+		private void ColumnAction(string columnName, object value, Type type)
 		{
-			var parameterName = "";
-			if (propertyNameIsParameterName)
-				parameterName = columnName;
-			else
-				parameterName = "c" + _data.Columns.Count.ToString();
+			var parameterName = columnName;
 
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
 		}
 
-		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, bool propertyNameIsParameterName)
+		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
 
-			ColumnAction(parser.Name, parser.Value, parser.Type, propertyNameIsParameterName);
+			ColumnAction(parser.Name, parser.Value, parser.Type);
 		}
 
 		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)
 		{
 			var propertyValue = (item as IDictionary<string, object>) [propertyName];
 
-			ColumnAction(propertyName, propertyValue, typeof(object), true);
+			ColumnAction(propertyName, propertyValue, typeof(object));
 		}
 
-		internal void AutoMapColumnsAction<T>(bool propertyNameIsParameterName, params Expression<Func<T, object>>[] ignorePropertyExpressions)
+		internal void AutoMapColumnsAction<T>(params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
 			var properties = ReflectionHelper.GetProperties(_data.Item.GetType());
 			var ignorePropertyNames = new HashSet<string>();
@@ -80,12 +76,13 @@ namespace FluentData
 					continue;
 
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
+
 				var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
-				ColumnAction(property.Value.Name, propertyValue, propertyType, propertyNameIsParameterName);
+				ColumnAction(property.Value.Name, propertyValue, propertyType);
 			}
 		}
 
-		internal void AutoMapDynamicTypeColumnsAction(bool propertyNameIsParameterName, params string[] ignorePropertyExpressions)
+		internal void AutoMapDynamicTypeColumnsAction(params string[] ignorePropertyExpressions)
 		{
 			var properties = (IDictionary<string, object>) _data.Item;
 			var ignorePropertyNames = new HashSet<string>();
@@ -99,25 +96,14 @@ namespace FluentData
 			{
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
 
-				if (ignoreProperty == null
-					&& ReflectionHelper.IsBasicClrType(property.Value.GetType()))
-				{
-					ColumnAction(property.Key, property.Value, typeof(object), propertyNameIsParameterName);
-				}
+				if (ignoreProperty == null)
+					ColumnAction(property.Key, property.Value, typeof(object));
 			}
 		}
 
 		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
 		{
-			var parameter = new Parameter();
-			parameter.ParameterName = name;
-			parameter.Value = value;
-			parameter.DataType = dataType;
-			parameter.Direction = direction;
-			parameter.IsId = isId;
-			parameter.Size = size;
-
-			_data.Command.Parameter(parameter.ParameterName, parameter.Value, parameter.DataType, parameter.Direction, parameter.Size);
+			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
@@ -127,7 +113,7 @@ namespace FluentData
 
 		internal void WhereAction(string columnName, object value)
 		{
-			var parameterName = "id" + _data.Where.Count().ToString();
+			var parameterName = columnName;
 			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
@@ -221,7 +207,7 @@ namespace FluentData
 
 		public IDeleteBuilder Where(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}
@@ -235,13 +221,13 @@ namespace FluentData
 		}
 		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 
 		public IDeleteBuilder<T> Where(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}
@@ -323,13 +309,13 @@ namespace FluentData
 
 		public IInsertBuilder Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}
@@ -344,7 +330,7 @@ namespace FluentData
 
 		public IInsertBuilderDynamic Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
@@ -356,19 +342,19 @@ namespace FluentData
 
 		public IInsertBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
@@ -389,37 +375,37 @@ namespace FluentData
 
 		public IInsertBuilder<T> Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		public IInsertBuilder<T> Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 
 		public IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 	}
@@ -720,7 +706,7 @@ namespace FluentData
 
 		public IStoredProcedureBuilder Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 
@@ -741,13 +727,13 @@ namespace FluentData
 
 		public IStoredProcedureBuilderDynamic Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 
 		public IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(true, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
@@ -768,19 +754,19 @@ namespace FluentData
 
 		public IStoredProcedureBuilder<T> Parameter(string name, object value)
 		{
-			Actions.ColumnValueAction(name, value, true);
+			Actions.ColumnValueAction(name, value);
 			return this;
 		}
 
 		public IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(true, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, true);
+			Actions.ColumnValueAction(expression);
 
 			return this;
 		}
@@ -878,13 +864,13 @@ namespace FluentData
 
 		public IUpdateBuilder Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 	}
@@ -905,7 +891,7 @@ namespace FluentData
 
 		public IUpdateBuilderDynamic Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
@@ -924,19 +910,19 @@ namespace FluentData
 
 		public IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(false, ignoreProperties);
+			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
@@ -957,19 +943,19 @@ namespace FluentData
 
 		public IUpdateBuilder<T> Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		public IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 
@@ -987,19 +973,19 @@ namespace FluentData
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
 		{
-			Actions.AutoMapColumnsAction(false, ignoreProperties);
+			Actions.AutoMapColumnsAction(ignoreProperties);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
 		{
-			Actions.ColumnValueAction(columnName, value, false);
+			Actions.ColumnValueAction(columnName, value);
 			return this;
 		}
 
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
 		{
-			Actions.ColumnValueAction(expression, false);
+			Actions.ColumnValueAction(expression);
 			return this;
 		}
 	}
@@ -1568,7 +1554,7 @@ namespace FluentData
 		/// <returns>Numbers of records affected.</returns>
 		public int Execute()
 		{
-			int recordsAffected = 0;
+			var recordsAffected = 0;
 
 			_data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
@@ -1940,19 +1926,15 @@ namespace FluentData
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
+				if(_data.InnerCommand.Connection.State != ConnectionState.Open)
+					OpenConnection();
+
 				if (_data.ContextData.UseTransaction)
 				{
 					if (_data.ContextData.Transaction == null)
-					{
-						OpenConnection();
 						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
-					}
+					
 					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
-				}
-				else
-				{
-					if (_data.InnerCommand.Connection.State != ConnectionState.Open)
-						OpenConnection();
 				}
 
 				if (_data.ContextData.OnExecuting != null)
@@ -2434,11 +2416,9 @@ namespace FluentData
 			if (ContextData.Connection == null)
 				return;
 
-			if (ContextData.UseTransaction)
-			{
-				if (ContextData.TransactionState == TransactionStates.None)
+			if (ContextData.UseTransaction
+				&& ContextData.Transaction != null)
 					Rollback();
-			}
 
 			ContextData.Connection.Close();
 
@@ -2459,7 +2439,6 @@ namespace FluentData
 		public System.Data.IDbConnection Connection { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }
-		public TransactionStates TransactionState { get; set; }
 		public IDbProvider Provider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
@@ -2854,44 +2833,25 @@ namespace FluentData
 
 		public IDbContext Commit()
 		{
-			VerifyTransactionSupport();
-
-			if (ContextData.TransactionState == TransactionStates.Rollbacked)
-				throw new FluentDataException("The transaction has already been rolledback");
-
-			ContextData.Transaction.Commit();
-			ContextData.TransactionState = TransactionStates.Committed;
+			TransactionAction(() => ContextData.Transaction.Commit());
 			return this;
 		}
 
 		public IDbContext Rollback()
 		{
-			if (ContextData.TransactionState == TransactionStates.Rollbacked)
-				return this;
-
-			VerifyTransactionSupport();
-
-			if (ContextData.TransactionState == TransactionStates.Committed)
-				throw new FluentDataException("The transaction has already been commited");
-
-			if (ContextData.Transaction != null)
-				ContextData.Transaction.Rollback();
-			ContextData.TransactionState = TransactionStates.Rollbacked;
+			TransactionAction(() => ContextData.Transaction.Rollback());
 			return this;
 		}
 
-		private void VerifyTransactionSupport()
+		private void TransactionAction(Action action)
 		{
-			if (!ContextData.UseTransaction)
+			if(ContextData.Transaction == null)
+				return;
+			if(!ContextData.UseTransaction)
 				throw new FluentDataException("Transaction support has not been enabled.");
+			action();
+			ContextData.Transaction = null;
 		}
-	}
-
-	public enum TransactionStates
-	{
-		None = 0,
-		Committed = 1,
-		Rollbacked = 2
 	}
 
 	internal class DataReaderHelper

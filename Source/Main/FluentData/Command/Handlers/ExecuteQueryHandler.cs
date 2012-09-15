@@ -51,19 +51,15 @@ namespace FluentData
 				if (_data.ContextData.CommandTimeout != Int32.MinValue)
 					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
 
+				if(_data.InnerCommand.Connection.State != ConnectionState.Open)
+					OpenConnection();
+
 				if (_data.ContextData.UseTransaction)
 				{
 					if (_data.ContextData.Transaction == null)
-					{
-						OpenConnection();
 						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
-					}
+					
 					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
-				}
-				else
-				{
-					if (_data.InnerCommand.Connection.State != ConnectionState.Open)
-						OpenConnection();
 				}
 
 				if (_data.ContextData.OnExecuting != null)

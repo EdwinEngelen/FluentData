@@ -9,7 +9,6 @@ namespace FluentData
 		public System.Data.IDbConnection Connection { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }
-		public TransactionStates TransactionState { get; set; }
 		public IDbProvider Provider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }

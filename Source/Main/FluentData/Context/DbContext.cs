@@ -16,11 +16,9 @@ namespace FluentData
 			if (ContextData.Connection == null)
 				return;
 
-			if (ContextData.UseTransaction)
-			{
-				if (ContextData.TransactionState == TransactionStates.None)
+			if (ContextData.UseTransaction
+				&& ContextData.Transaction != null)
 					Rollback();
-			}
 
 			ContextData.Connection.Close();
 

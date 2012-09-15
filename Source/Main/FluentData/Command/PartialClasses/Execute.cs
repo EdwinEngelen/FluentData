@@ -5,7 +5,7 @@
 		/// <returns>Numbers of records affected.</returns>
 		public int Execute()
 		{
-			int recordsAffected = 0;
+			var recordsAffected = 0;
 
 			_data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{

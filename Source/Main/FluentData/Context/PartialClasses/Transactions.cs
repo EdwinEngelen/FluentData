@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System;
+
+namespace FluentData
 {
 	public partial class DbContext : IDbContext
 	{
@@ -22,36 +24,24 @@
 
 		public IDbContext Commit()
 		{
-			VerifyTransactionSupport();
-
-			if (ContextData.TransactionState == TransactionStates.Rollbacked)
-				throw new FluentDataException("The transaction has already been rolledback");
-
-			ContextData.Transaction.Commit();
-			ContextData.TransactionState = TransactionStates.Committed;
+			TransactionAction(() => ContextData.Transaction.Commit());
 			return this;
 		}
 
 		public IDbContext Rollback()
 		{
-			if (ContextData.TransactionState == TransactionStates.Rollbacked)
-				return this;
-
-			VerifyTransactionSupport();
-
-			if (ContextData.TransactionState == TransactionStates.Committed)
-				throw new FluentDataException("The transaction has already been commited");
-
-			if (ContextData.Transaction != null)
-				ContextData.Transaction.Rollback();
-			ContextData.TransactionState = TransactionStates.Rollbacked;
+			TransactionAction(() => ContextData.Transaction.Rollback());
 			return this;
 		}
 
-		private void VerifyTransactionSupport()
+		private void TransactionAction(Action action)
 		{
-			if (!ContextData.UseTransaction)
+			if(ContextData.Transaction == null)
+				return;
+			if(!ContextData.UseTransaction)
 				throw new FluentDataException("Transaction support has not been enabled.");
+			action();
+			ContextData.Transaction = null;
 		}
 	}
 }

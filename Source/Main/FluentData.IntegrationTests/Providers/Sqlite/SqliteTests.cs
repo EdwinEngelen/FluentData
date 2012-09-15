@@ -114,7 +114,7 @@ namespace FluentData.Providers.Sqlite
 
 		public void Custom_mapper_using_dynamic(Product product, IDataReader row)
 		{
-			product.ProductId = row.Value.ProductId;
+			product.ProductId = (int) row.Value.ProductId;
 			product.Name = row.Value.Name;
 		}
 
@@ -255,7 +255,7 @@ namespace FluentData.Providers.Sqlite
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.AutoMap(x => x.ProductId)
+								.AutoMap(x => x.ProductId, x => x.Category)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -291,7 +291,7 @@ namespace FluentData.Providers.Sqlite
 
 			var rowsAffected = Context().Update<Product>("Product", product)
 										.Where(x => x.ProductId)
-										.AutoMap(x => x.ProductId)
+										.AutoMap(x => x.ProductId, x => x.Category)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);

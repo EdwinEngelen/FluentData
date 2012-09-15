@@ -223,7 +223,7 @@ namespace FluentData.Providers.SqlServerCompact
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.AutoMap(x => x.ProductId)
+								.AutoMap(x => x.ProductId, x=> x.Category)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -258,7 +258,7 @@ namespace FluentData.Providers.SqlServerCompact
 			product.Name = "The Warren Buffet Way";
 
 			var rowsAffected = Context().Update<Product>("Product", product)
-										.AutoMap(x => x.ProductId)
+										.AutoMap(x => x.ProductId, x => x.Category)
 										.Where(x => x.ProductId)
 										.Execute();
 
