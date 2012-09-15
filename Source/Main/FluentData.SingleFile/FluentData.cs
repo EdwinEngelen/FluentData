@@ -457,7 +457,7 @@ namespace FluentData
 		List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null);
 		void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null);
-		TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper);
+		TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper);
 	}
 
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
@@ -579,9 +579,9 @@ namespace FluentData
 			return Command.QuerySingle(customMapper);
 		}
 
-		public TEntity QuerySingleComplex(Func<IDataReader, TEntity> customMapper)
+		public TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleComplex(customMapper);
+			return Command.QueryComplexSingle(customMapper);
 		}
 	}
 
@@ -652,9 +652,9 @@ namespace FluentData
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
 
-		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleComplex(customMapper);
+			return Command.QueryComplexSingle(customMapper);
 		}
 
 		public DataTable QueryDataTable()
@@ -673,7 +673,7 @@ namespace FluentData
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
+		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 	}
 
 	public interface IStoredProcedureBuilder : IBaseStoredProcedureBuilder, IDisposable
@@ -1216,8 +1216,7 @@ namespace FluentData
 	public interface IDbCommand : IDisposable
 	{
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
-		IDbCommand Parameter(string name, object value);
-		IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0);
+		IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		int ExecuteReturnLastId(string identityColumnName = null);
@@ -1228,7 +1227,7 @@ namespace FluentData
 		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
+		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
 		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
@@ -1490,13 +1489,13 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
 			var item = default(TEntity);
 
 			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleComplexHandler<TEntity>().ExecuteSingleComplex(_data, customMapper);
+				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(_data, customMapper);
 			});
 
 			return item;
@@ -1566,7 +1565,7 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
+		public IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
 		{
 			if (ReflectionHelper.IsList(value))
 				AddListParameterToInnerCommand(name, value);
@@ -1623,12 +1622,6 @@ namespace FluentData
 			_data.InnerCommand.Parameters.Add(dbParameter);
 
 			return dbParameter;
-		}
-
-		public IDbCommand Parameter(string name, object value)
-		{
-			Parameter(name, value, DataTypes.Object, ParameterDirection.Input);
-			return this;
 		}
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
@@ -1743,7 +1736,7 @@ namespace FluentData
 		}
 	}
 
-	internal class QuerySingleComplexHandler<TEntity>
+	internal class QueryComplexSingleHandler<TEntity>
 	{
 		internal TEntity ExecuteSingleComplex(DbCommandData data,
 			Func<IDataReader, TEntity> customMapperReader)

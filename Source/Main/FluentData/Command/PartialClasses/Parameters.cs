@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Data;
-using System.Linq;
 using System;
 using System.Text;
 
@@ -8,7 +7,7 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public IDbCommand Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size = 0)
+		public IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
 		{
 			if (ReflectionHelper.IsList(value))
 				AddListParameterToInnerCommand(name, value);
@@ -65,12 +64,6 @@ namespace FluentData
 			_data.InnerCommand.Parameters.Add(dbParameter);
 
 			return dbParameter;
-		}
-
-		public IDbCommand Parameter(string name, object value)
-		{
-			Parameter(name, value, DataTypes.Object, ParameterDirection.Input);
-			return this;
 		}
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
