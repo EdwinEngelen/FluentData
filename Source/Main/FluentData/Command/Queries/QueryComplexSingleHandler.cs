@@ -2,7 +2,7 @@
 
 namespace FluentData
 {
-	internal class QuerySingleComplexHandler<TEntity>
+	internal class QueryComplexSingleHandler<TEntity>
 	{
 		internal TEntity ExecuteSingleComplex(DbCommandData data,
 			Func<IDataReader, TEntity> customMapperReader)

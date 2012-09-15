@@ -71,9 +71,9 @@ namespace FluentData
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
 
-		public TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QuerySingleComplex(customMapper);
+			return Command.QueryComplexSingle(customMapper);
 		}
 
 		public DataTable QueryDataTable()

@@ -13,6 +13,6 @@ namespace FluentData
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		dynamic QuerySingle();
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TEntity QuerySingleComplex<TEntity>(Func<IDataReader, TEntity> customMapper);
+		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 	}
 }

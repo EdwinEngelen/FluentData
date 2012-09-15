@@ -92,7 +92,7 @@
     <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\PartialClasses\QueryDataTable.cs" />
-    <Compile Include="Command\PartialClasses\QuerySingleComplex.cs" />
+    <Compile Include="Command\PartialClasses\QueryComplexSingle.cs" />
     <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
@@ -101,11 +101,11 @@
     <Compile Include="Command\PartialClasses\QueryComplex.cs" />
     <Compile Include="Command\PartialClasses\QueryDynamic.cs" />
     <Compile Include="Command\PartialClasses\QuerySingle.cs" />
-    <Compile Include="Command\Queries\QuerySingleComplexHandler.cs" />
+    <Compile Include="Command\Queries\QueryComplexSingleHandler.cs" />
     <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />
     <Compile Include="Command\Queries\GenericQueryHandler.cs" />
-    <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
+    <Compile Include="Command\Queries\ExecuteQueryHandler.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
     <Compile Include="Command\Reader\DynamicDataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />
@@ -151,7 +151,9 @@
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Command\Handlers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
