@@ -7,6 +7,38 @@ namespace FluentData.Providers.MySql
 	[TestClass]
 	public class MySqlTests : IDbProviderTests
 	{
+		public MySqlTests()
+		{
+			Context().Sql(@"drop table if exists Category;
+							drop table if exists Product;
+							drop procedure if exists ProductUpdate;
+
+							CREATE TABLE Category(
+								CategoryId INTEGER PRIMARY KEY,
+								Name VARCHAR(50));
+
+							CREATE TABLE Product(
+								ProductId INTEGER PRIMARY KEY AUTO_INCREMENT,
+								Name VARCHAR(50),
+								CategoryId INTEGER);
+
+							CREATE PROCEDURE ProductUpdate (IN ParamName VARCHAR(50), IN ParamProductId INTEGER)
+							BEGIN
+								UPDATE Product set Name = ParamName where ProductId = ParamProductId;
+							END;
+
+							insert into Category(CategoryId, Name)
+							select 1, 'Books'
+							union select 2, 'Movies';
+
+							insert into Product(ProductId, Name, CategoryId)
+							select 1, 'The Warren Buffet Way', 1
+							union select 2, 'Bill Gates Bio', 1
+							union select 3, 'James Bond - Goldeneye', 2
+							union select 4, 'The Bourne Identity', 2
+							").Execute();
+		}
+
 		protected IDbContext Context()
 		{
 			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("MySql"), DbProviderTypes.MySql);
@@ -229,7 +261,7 @@ namespace FluentData.Providers.MySql
 			product.Name = "The Warren Buffet Way";
 
 			var productId = Context().Insert<Product>("Product", product)
-								.AutoMap(x => x.ProductId)
+								.AutoMap(x => x.ProductId, x => x.Category)
 								.ExecuteReturnLastId();
 
 			Assert.IsTrue(productId > 0);
@@ -265,7 +297,7 @@ namespace FluentData.Providers.MySql
 
 			var rowsAffected = Context().Update<Product>("Product", product)
 										.Where(x => x.ProductId)
-										.AutoMap()
+										.AutoMap(x => x.ProductId, x => x.Category)
 										.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
