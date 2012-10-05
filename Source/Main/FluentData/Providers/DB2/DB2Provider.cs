@@ -104,10 +104,10 @@ namespace FluentData.Providers.DB2Provider
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
-				command.Data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			command.Data.Sql.Append("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
+			command.Data.InnerCommand.CommandText += "select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;";
 
 			var lastId = default(T);
 

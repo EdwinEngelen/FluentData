@@ -104,16 +104,16 @@ namespace FluentData.Providers.Sqlite
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
-				command.Data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			command.Data.Sql.Append("select last_insert_rowid();");
+			command.Data.InnerCommand.CommandText += "select last_insert_rowid();";
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = command.Data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;

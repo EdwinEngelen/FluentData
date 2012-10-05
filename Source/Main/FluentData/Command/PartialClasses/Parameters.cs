@@ -39,7 +39,7 @@ namespace FluentData
 			newInStatement.Append(")");
 
 			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
-			Data.Sql.Replace(oldInStatement, newInStatement.ToString());
+			Data.InnerCommand.CommandText = Data.InnerCommand.CommandText.Replace(oldInStatement, newInStatement.ToString());
 		}
 
 		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)

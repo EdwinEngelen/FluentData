@@ -43,23 +43,6 @@ namespace FluentData._Documentation
 		}
 
 		[TestMethod]
-		public void Query_auto_mapping_alias_expression()
-		{
-			List<Product> products = Context().Sql<Product>(@"select p.*,
-											c.CategoryId as {0},
-											c.Name as {1}
-											from Product p
-											inner join Category c on p.CategoryId = c.CategoryId",
-												x => x.Category.CategoryId,
-												x => x.Category.Name)
-									.Query<Product>();
-
-			Assert.IsNotNull(products[0]);
-			Assert.IsNotNull(products[0].Category);
-			Assert.IsNotNull(products[0].Category.Name);
-		}
-
-		[TestMethod]
 		public void Query_custom_mapping_dynamic()
 		{
 			List<Product> products = Context().Sql(@"select * from Product")

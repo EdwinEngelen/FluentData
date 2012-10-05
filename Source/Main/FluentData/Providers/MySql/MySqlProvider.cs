@@ -104,10 +104,10 @@ namespace FluentData.Providers.MySql
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
-				command.Data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			command.Data.Sql.Append("select LAST_INSERT_ID() as `LastInsertedId`");
+			command.Data.InnerCommand.CommandText += "select LAST_INSERT_ID() as `LastInsertedId`";
 
 			T lastId = default(T);
 

@@ -126,10 +126,10 @@ namespace FluentData.Providers.SqlServer
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
-				command.Data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			command.Data.Sql.Append("select SCOPE_IDENTITY()");
+			command.Data.InnerCommand.CommandText += "select SCOPE_IDENTITY()";
 
 			var lastId = default(T);
 

@@ -106,10 +106,10 @@ namespace FluentData.Providers.PostgreSql
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
-				command.Data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			command.Data.Sql.Append("select lastval();");
+			command.Data.InnerCommand.CommandText += "select lastval();";
 
 			T lastId = default(T);
 

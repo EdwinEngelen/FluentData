@@ -23,7 +23,6 @@ namespace FluentData
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
-		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 }

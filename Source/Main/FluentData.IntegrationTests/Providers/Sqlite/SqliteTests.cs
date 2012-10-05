@@ -87,23 +87,6 @@ namespace FluentData.Providers.Sqlite
 		}
 
 		[TestMethod]
-		public void Query_auto_mapping_alias2()
-		{
-			var product = Context().Sql<Product>(@"select p.*,
-														c.CategoryId as {0},
-														c.Name as {1}
-													from Product p
-													inner join Category c on p.CategoryId = c.CategoryId
-													where ProductId = 1",
-														x => x.Category.CategoryId,
-														x => x.Category.Name).QuerySingle<Product>();
-
-			Assert.IsNotNull(product);
-			Assert.IsNotNull(product.Category);
-			Assert.IsNotNull(product.Category.Name);
-		}
-
-		[TestMethod]
 		public void Query_custom_mapping_dynamic()
 		{
 			var products = Context().Sql(@"select * from Product")

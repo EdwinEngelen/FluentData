@@ -41,13 +41,6 @@ namespace FluentData
 			return command;
 		}
 
-		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
-		{
-			var command = CreateCommand.Sql(sql, mappingExpressions);
-			
-			return command;
-		}
-
 		public IDbCommand MultiResultSql()
 		{
 			return CreateCommand.UseMultipleResultset;
@@ -61,12 +54,6 @@ namespace FluentData
 				for(var i = 0; i < parameters.Count(); i++)
 					command.Parameter(i.ToString(), parameters[i]);
 			}
-			return command;
-		}
-
-		public IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
-		{
-			var command = CreateCommand.UseMultipleResultset.Sql(sql, mappingExpressions);
 			return command;
 		}
 	}

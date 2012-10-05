@@ -12,10 +12,8 @@ namespace FluentData
 		IDbContext UseSharedConnection(bool useSharedConnection);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
-		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand MultiResultSql();
 		IDbCommand MultiResultSql(string sql, params object[] parameters);
-		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		IInsertBuilder Insert(string tableName);
