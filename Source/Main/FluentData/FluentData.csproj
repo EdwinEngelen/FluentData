@@ -89,7 +89,6 @@
     <Compile Include="Command\Mappers\DataReaderField.cs" />
     <Compile Include="Command\Mappers\DynamicTypeAutoMapper.cs" />
     <Compile Include="Command\Parameter.cs" />
-    <Compile Include="Command\ParameterCollection.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\PartialClasses\QueryDataTable.cs" />
     <Compile Include="Command\PartialClasses\QueryComplexSingle.cs" />

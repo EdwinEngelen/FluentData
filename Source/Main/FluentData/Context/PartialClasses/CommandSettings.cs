@@ -4,7 +4,7 @@
 	{
 		public IDbContext CommandTimeout(int timeout)
 		{
-			ContextData.CommandTimeout = timeout;
+			Data.CommandTimeout = timeout;
 			return this;
 		}
 	}

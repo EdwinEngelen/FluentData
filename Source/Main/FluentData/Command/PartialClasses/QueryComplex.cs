@@ -7,10 +7,10 @@ namespace FluentData
 	{
 		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				while(_data.Reader.Read())
-					customMapper(list, _data.Reader);
+				while(Data.Reader.Read())
+					customMapper(list, Data.Reader);
 			});
 		}
 	}

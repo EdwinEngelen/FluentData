@@ -12,7 +12,7 @@ namespace FluentData.Providers.Access
 		{
 			get
 			{
-				return "System.Data.OleDb";
+				return "System.command.Data.OleDb";
 			}
 		}
 
@@ -86,19 +86,19 @@ namespace FluentData.Providers.Access
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				lastId = HandleExecuteReturnLastId<T>(command);
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 			
 		}
@@ -108,17 +108,17 @@ namespace FluentData.Providers.Access
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
+			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
 			T lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
-				data.InnerCommand.CommandText = "select @@Identity";
+				command.Data.InnerCommand.CommandText = "select @@Identity";
 
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				lastId = (T) value;
 			}

@@ -38,8 +38,8 @@ namespace FluentData
 			}
 			newInStatement.Append(")");
 
-			var oldInStatement = string.Format(" in({0})", _data.ContextData.Provider.GetParameterName(name));
-			_data.Sql.Replace(oldInStatement, newInStatement.ToString());
+			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
+			Data.Sql.Replace(oldInStatement, newInStatement.ToString());
 		}
 
 		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
@@ -50,25 +50,25 @@ namespace FluentData
 			if (value.GetType().IsEnum)
 				value = (int) value;
 
-			var dbParameter = _data.InnerCommand.CreateParameter();
+			var dbParameter = Data.InnerCommand.CreateParameter();
 			if (parameterType == DataTypes.Object)
-				dbParameter.DbType = (System.Data.DbType) _data.ContextData.Provider.GetDbTypeForClrType(value.GetType());
+				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.Provider.GetDbTypeForClrType(value.GetType());
 			else
 				dbParameter.DbType = (System.Data.DbType) parameterType;
 
-			dbParameter.ParameterName = _data.ContextData.Provider.GetParameterName(name);
+			dbParameter.ParameterName = Data.Context.Data.Provider.GetParameterName(name);
 			dbParameter.Direction = (System.Data.ParameterDirection) direction;
 			dbParameter.Value = value;
 			if (size > 0)
 				dbParameter.Size = size;
-			_data.InnerCommand.Parameters.Add(dbParameter);
+			Data.InnerCommand.Parameters.Add(dbParameter);
 
 			return dbParameter;
 		}
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
-			if (!_data.ContextData.Provider.SupportsOutputParameters)
+			if (!Data.Context.Data.Provider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
 			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
@@ -76,11 +76,11 @@ namespace FluentData
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			outputParameterName = _data.ContextData.Provider.GetParameterName(outputParameterName);
-			if (!_data.InnerCommand.Parameters.Contains(outputParameterName))
+			outputParameterName = Data.Context.Data.Provider.GetParameterName(outputParameterName);
+			if (!Data.InnerCommand.Parameters.Contains(outputParameterName))
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 
-			var value = (_data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
+			var value = (Data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
 
 			if (value == null)
 				return default(TParameterType);

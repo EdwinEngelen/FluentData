@@ -11,7 +11,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			get
 			{
-				return "System.Data.SqlServerCe.4.0";
+				return "System.command.Data.SqlServerCe.4.0";
 			}
 		}
 
@@ -60,9 +60,9 @@ namespace FluentData.Providers.SqlServerCompact
 			var sql = "";
 			sql = "select " + data.Select;
 			sql += " from " + data.From;
-			if (data.WhereSql.Length > 0)
+			if(data.WhereSql.Length > 0)
 				sql += " where " + data.WhereSql;
-			if (data.GroupBy.Length > 0)
+			if(data.GroupBy.Length > 0)
 				sql += " group by " + data.GroupBy;
 			if (data.Having.Length > 0)
 				sql += " having " + data.Having;
@@ -103,19 +103,19 @@ namespace FluentData.Providers.SqlServerCompact
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				lastId = HandleExecuteReturnLastId<T>(command);
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 			
 		}
@@ -125,17 +125,17 @@ namespace FluentData.Providers.SqlServerCompact
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
+			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
 			T lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
-				data.InnerCommand.CommandText = "select cast(@@identity as int)";
+				command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
 
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				lastId = (T) value;
 			}

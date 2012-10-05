@@ -7,6 +7,7 @@ namespace FluentData
 {
 	public interface IDbCommand : IDisposable
 	{
+		DbCommandData Data { get; }
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
 		IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);

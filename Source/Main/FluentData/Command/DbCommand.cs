@@ -2,58 +2,52 @@
 
 namespace FluentData
 {
-	internal partial class DbCommand : IDisposable, IDbCommand
+	internal partial class DbCommand : IDbCommand
 	{
-		private readonly DbCommandData _data;
+		public DbCommandData Data { get; private set; }
 
 		public DbCommand(
 			DbContext dbContext,
-			System.Data.IDbCommand dbCommand,
-			DbContextData dbContextData)
+			System.Data.IDbCommand innerCommand)
 		{
-			_data = new DbCommandData();
-			_data.Context = dbContext;
-			_data.ContextData = dbContextData;
-			_data.InnerCommand = dbCommand;
-			_data.Command = this;
-			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data, this);
+			Data = new DbCommandData(dbContext, innerCommand);
+			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
 		internal IDbCommand UseMultipleResultset
 		{
 			get
 			{
-				if (!_data.ContextData.Provider.SupportsMultipleResultset)
+				if (!Data.Context.Data.Provider.SupportsMultipleResultset)
 					throw new FluentDataException("The selected database does not support multiple resultset");
 
-				_data.UseMultipleResultsets = true;
+				Data.UseMultipleResultsets = true;
 				return this;
 			}
 		}
 
 		public IDbCommand CommandType(DbCommandTypes dbCommandType)
 		{
-			_data.CommandType = dbCommandType;
-			_data.InnerCommand.CommandType = (System.Data.CommandType) dbCommandType;
+			Data.InnerCommand.CommandType = (System.Data.CommandType) dbCommandType;
 			return this;
 		}
 
 		internal void ClosePrivateConnection()
 		{
-			if (!_data.ContextData.UseTransaction
-				&& !_data.ContextData.UseSharedConnection)
+			if (!Data.Context.Data.UseTransaction
+				&& !Data.Context.Data.UseSharedConnection)
 			{
-				_data.InnerCommand.Connection.Close();
+				Data.InnerCommand.Connection.Close();
 
-				if (_data.ContextData.OnConnectionClosed != null)
-					_data.ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(_data.InnerCommand.Connection));
+				if (Data.Context.Data.OnConnectionClosed != null)
+					Data.Context.Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.InnerCommand.Connection));
 			}
 		}
 
 		public void Dispose()
 		{
-			if (_data.Reader != null)
-				_data.Reader.Close();
+			if (Data.Reader != null)
+				Data.Reader.Close();
 
 			ClosePrivateConnection();
 		}

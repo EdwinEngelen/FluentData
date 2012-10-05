@@ -4,7 +4,7 @@
 	{
 		public IDbContext EntityFactory(IEntityFactory entityFactory)
 		{
-			ContextData.EntityFactory = entityFactory;
+			Data.EntityFactory = entityFactory;
 			return this;
 		}
 	}

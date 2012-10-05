@@ -6,42 +6,42 @@ namespace FluentData
 	{
 		public IDbContext UseTransaction(bool useTransaction)
 		{
-			ContextData.UseTransaction = useTransaction;
+			Data.UseTransaction = useTransaction;
 			return this;
 		}
 
 		public IDbContext UseSharedConnection(bool useSharedConnection)
 		{
-			ContextData.UseSharedConnection = useSharedConnection;
+			Data.UseSharedConnection = useSharedConnection;
 			return this;
 		}
 
 		public IDbContext IsolationLevel(IsolationLevel isolationLevel)
 		{
-			ContextData.IsolationLevel = isolationLevel;
+			Data.IsolationLevel = isolationLevel;
 			return this;
 		}
 
 		public IDbContext Commit()
 		{
-			TransactionAction(() => ContextData.Transaction.Commit());
+			TransactionAction(() => Data.Transaction.Commit());
 			return this;
 		}
 
 		public IDbContext Rollback()
 		{
-			TransactionAction(() => ContextData.Transaction.Rollback());
+			TransactionAction(() => Data.Transaction.Rollback());
 			return this;
 		}
 
 		private void TransactionAction(Action action)
 		{
-			if(ContextData.Transaction == null)
+			if(Data.Transaction == null)
 				return;
-			if(!ContextData.UseTransaction)
+			if(!Data.UseTransaction)
 				throw new FluentDataException("Transaction support has not been enabled.");
 			action();
-			ContextData.Transaction = null;
+			Data.Transaction = null;
 		}
 	}
 }

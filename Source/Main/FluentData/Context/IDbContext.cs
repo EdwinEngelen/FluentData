@@ -6,6 +6,7 @@ namespace FluentData
 {
 	public interface IDbContext : IDisposable
 	{
+		DbContextData Data { get; }
 		IDbContext IgnoreIfAutoMapFails { get; }
 		IDbContext UseTransaction(bool useTransaction);
 		IDbContext UseSharedConnection(bool useSharedConnection);

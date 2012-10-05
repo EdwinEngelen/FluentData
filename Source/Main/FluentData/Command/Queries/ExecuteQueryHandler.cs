@@ -5,13 +5,11 @@ namespace FluentData
 {
 	internal class ExecuteQueryHandler
 	{
-		private readonly DbCommandData _data;
 		private readonly DbCommand _command;
 		private bool _queryAlreadyExecuted;
 
-		public ExecuteQueryHandler(DbCommandData data, DbCommand command)
+		public ExecuteQueryHandler(DbCommand command)
 		{
-			_data = data;
 			_command = command;
 		}
 
@@ -23,8 +21,8 @@ namespace FluentData
 
 				action();
 
-				if (_data.ContextData.OnExecuted != null)
-					_data.ContextData.OnExecuted(new OnExecutedEventArgs(_data.InnerCommand));
+				if (_command.Data.Context.Data.OnExecuted != null)
+					_command.Data.Context.Data.OnExecuted(new OnExecutedEventArgs(_command.Data.InnerCommand));
 			}
 			catch (Exception exception)
 			{
@@ -40,36 +38,33 @@ namespace FluentData
 		{
 			if (_queryAlreadyExecuted)
 			{
-				if (_data.UseMultipleResultsets)
-					_data.Reader.NextResult();
+				if(_command.Data.UseMultipleResultsets)
+					_command.Data.Reader.NextResult();
 				else
 					throw new FluentDataException("A query has already been executed on this command object. Please create a new command object.");
 			}
 			else
 			{
-				_data.InnerCommand.CommandText = _data.Sql.ToString();
-				if (_data.ContextData.CommandTimeout != Int32.MinValue)
-					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
+				_command.Data.InnerCommand.CommandText = _command.Data.Sql.ToString();
+				if(_command.Data.Context.Data.CommandTimeout != Int32.MinValue)
+					_command.Data.InnerCommand.CommandTimeout = _command.Data.Context.Data.CommandTimeout;
 
-				if(_data.InnerCommand.Connection.State != ConnectionState.Open)
+				if(_command.Data.InnerCommand.Connection.State != ConnectionState.Open)
 					OpenConnection();
 
-				if (_data.ContextData.UseTransaction)
+				if(_command.Data.Context.Data.UseTransaction)
 				{
-					if (_data.ContextData.Transaction == null)
-						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
-					
-					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
+					if(_command.Data.Context.Data.Transaction == null)
+						_command.Data.Context.Data.Transaction = _command.Data.Context.Data.Connection.BeginTransaction((System.Data.IsolationLevel)_command.Data.Context.Data.IsolationLevel);
+
+					_command.Data.InnerCommand.Transaction = _command.Data.Context.Data.Transaction;
 				}
 
-				if (_data.ContextData.OnExecuting != null)
-					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
+				if(_command.Data.Context.Data.OnExecuting != null)
+					_command.Data.Context.Data.OnExecuting(new OnExecutingEventArgs(_command.Data.InnerCommand));
 
 				if (useReader)
-				{
-					_data.InnerReader = _data.InnerCommand.ExecuteReader();
-					_data.Reader = new DataReader(_data.InnerReader);
-				}
+					_command.Data.Reader = new DataReader(_command.Data.InnerCommand.ExecuteReader());
 
 				_queryAlreadyExecuted = true;
 			}
@@ -77,21 +72,21 @@ namespace FluentData
 
 		private void OpenConnection()
 		{
-			if (_data.ContextData.OnConnectionOpening != null)
-				_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
+			if(_command.Data.Context.Data.OnConnectionOpening != null)
+				_command.Data.Context.Data.OnConnectionOpening(new OnConnectionOpeningEventArgs(_command.Data.InnerCommand.Connection));
 
-			_data.InnerCommand.Connection.Open();
+			_command.Data.InnerCommand.Connection.Open();
 
-			if (_data.ContextData.OnConnectionOpened != null)
-				_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
+			if(_command.Data.Context.Data.OnConnectionOpened != null)
+				_command.Data.Context.Data.OnConnectionOpened(new OnConnectionOpenedEventArgs(_command.Data.InnerCommand.Connection));
 		}
 
 		private void HandleQueryFinally()
 		{
-			if (!_data.UseMultipleResultsets)
+			if(!_command.Data.UseMultipleResultsets)
 			{
-				if (_data.Reader != null)
-					_data.Reader.Close();
+				if(_command.Data.Reader != null)
+					_command.Data.Reader.Close();
 
 				_command.ClosePrivateConnection();
 			}
@@ -99,15 +94,15 @@ namespace FluentData
 
 		private void HandleQueryException(Exception exception)
 		{
-			if (_data.Reader != null)
-				_data.Reader.Close();
+			if(_command.Data.Reader != null)
+				_command.Data.Reader.Close();
 
 			_command.ClosePrivateConnection();
-			if (_data.ContextData.UseTransaction)
-				_data.Context.CloseSharedConnection();
+			if(_command.Data.Context.Data.UseTransaction)
+				_command.Data.Context.CloseSharedConnection();
 
-			if (_data.ContextData.OnError != null)
-				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
+			if(_command.Data.Context.Data.OnError != null)
+				_command.Data.Context.Data.OnError(new OnErrorEventArgs(_command.Data.InnerCommand, exception));
 			
 			throw exception;
 		}

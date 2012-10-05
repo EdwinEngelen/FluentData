@@ -11,7 +11,7 @@ namespace FluentData
 					)
 			where TList : IList<TEntity>
 		{
-			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
+			var items = (TList) data.Context.Data.EntityFactory.Create(typeof(TList));
 
 			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
@@ -19,7 +19,7 @@ namespace FluentData
 
 				while (data.Reader.Read())
 				{
-					var item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+					var item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
 
 					if (customMapperReader == null)
 						autoMapper.AutoMap(item);
@@ -60,7 +60,7 @@ namespace FluentData
 
 				if (data.Reader.Read())
 				{
-					item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+					item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
 
 					if (customMapper == null)
 						autoMapper.AutoMap(item);

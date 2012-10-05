@@ -12,7 +12,7 @@ namespace FluentData.Providers.DB2Provider
 		{
 			get
 			{
-				return "IBM.Data.DB2";
+				return "IBM.data.DB2";
 			}
 		}
 		public bool SupportsOutputParameters
@@ -102,18 +102,18 @@ namespace FluentData.Providers.DB2Provider
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Data.Sql.Append(';');
 
-			data.Sql.Append("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
+			command.Data.Sql.Append("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -124,7 +124,7 @@ namespace FluentData.Providers.DB2Provider
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 

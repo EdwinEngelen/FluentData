@@ -9,10 +9,10 @@
 
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
+			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
 				throw new FluentDataException("The selected database does not support this method.");
 
-			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
+			var lastId = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
 
 			return lastId;
 		}

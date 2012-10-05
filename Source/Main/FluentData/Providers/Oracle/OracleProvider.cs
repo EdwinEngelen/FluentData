@@ -125,28 +125,28 @@ namespace FluentData.Providers.Oracle
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			data.Command.ParameterOut("FluentDataLastId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
-			data.Command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
+			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.Provider.GetDbTypeForClrType(typeof(T)));
+			command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				data.InnerCommand.ExecuteNonQuery();
+				command.Data.InnerCommand.ExecuteNonQuery();
 
-				lastId = data.Command.ParameterValue<T>("FluentDataLastId");
+				lastId = command.ParameterValue<T>("FluentDataLastId");
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
-			if (data.InnerCommand.CommandType == CommandType.Text)
+			if (command.Data.InnerCommand.CommandType == CommandType.Text)
 			{
-				dynamic innerCommand = data.InnerCommand;
+				dynamic innerCommand = command.Data.InnerCommand;
 				innerCommand.BindByName = true;
 			}
 		}

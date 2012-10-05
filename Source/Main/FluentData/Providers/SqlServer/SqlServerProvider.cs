@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Data.Common;
-using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -13,7 +11,7 @@ namespace FluentData.Providers.SqlServer
 		{ 
 			get
 			{
-				return "System.Data.SqlClient";
+				return "System.data.SqlClient";
 			} 
 		}
 
@@ -126,18 +124,18 @@ namespace FluentData.Providers.SqlServer
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Data.Sql.Append(';');
 
-			data.Sql.Append("select SCOPE_IDENTITY()");
+			command.Data.Sql.Append("select SCOPE_IDENTITY()");
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -148,7 +146,7 @@ namespace FluentData.Providers.SqlServer
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 

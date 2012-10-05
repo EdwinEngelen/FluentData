@@ -8,9 +8,9 @@ namespace FluentData
 		{
 			var item = default(TEntity);
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(_data, customMapper);
+				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(Data, customMapper);
 			});
 
 			return item;

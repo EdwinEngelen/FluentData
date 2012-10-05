@@ -12,7 +12,7 @@ namespace FluentData.Providers.Sqlite
 		{ 
 			get
 			{
-				return "System.Data.SQLite";
+				return "System.command.Data.SQLite";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -102,18 +102,18 @@ namespace FluentData.Providers.Sqlite
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Data.Sql.Append(';');
 
-			data.Sql.Append("select last_insert_rowid();");
+			command.Data.Sql.Append("select last_insert_rowid();");
 
 			T lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				object value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -124,7 +124,7 @@ namespace FluentData.Providers.Sqlite
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 

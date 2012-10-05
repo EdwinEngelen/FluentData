@@ -13,20 +13,20 @@ namespace FluentData
 			{
 				IDbConnection connection = null;
 
-				if (ContextData.UseTransaction
-					|| ContextData.UseSharedConnection)
+				if (Data.UseTransaction
+					|| Data.UseSharedConnection)
 				{
-					if (ContextData.Connection == null)
-						ContextData.Connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
-					connection = ContextData.Connection;
+					if (Data.Connection == null)
+						Data.Connection = Data.Provider.CreateConnection(Data.ConnectionString);
+					connection = Data.Connection;
 				}
 				else
-					connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
+					connection = Data.Provider.CreateConnection(Data.ConnectionString);
 
 				var cmd = connection.CreateCommand();
 				cmd.Connection = connection;
 
-				return new DbCommand(this, cmd, ContextData);
+				return new DbCommand(this, cmd);
 			}
 		}
 

@@ -6,7 +6,7 @@
 		{
 			get
 			{
-				ContextData.IgnoreIfAutoMapFails = true;
+				Data.IgnoreIfAutoMapFails = true;
 				return this;
 			}
 		}

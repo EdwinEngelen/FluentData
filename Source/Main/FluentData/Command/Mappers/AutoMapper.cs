@@ -40,7 +40,7 @@ namespace FluentData
 						wasMapped = HandleComplexField(item, field, value);
 				}
 
-				if (!wasMapped && !_dbCommandData.ContextData.IgnoreIfAutoMapFails)
+				if (!wasMapped && !_dbCommandData.Context.Data.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
@@ -84,7 +84,7 @@ namespace FluentData
 
 			if (instance == null)
 			{
-				instance = _dbCommandData.ContextData.EntityFactory.Create(property.PropertyType);
+				instance = _dbCommandData.Context.Data.EntityFactory.Create(property.PropertyType);
 
 				property.SetValue(item, instance, null);
 			}

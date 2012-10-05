@@ -9,7 +9,7 @@ namespace FluentData
 		{
 			var dataTable = new DataTable();
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(_data.InnerReader, LoadOption.OverwriteChanges));
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(Data.Reader.InnerReader, LoadOption.OverwriteChanges));
 
 			return dataTable;
 		}

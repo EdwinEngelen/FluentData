@@ -6,37 +6,37 @@ namespace FluentData
 	{
 		public IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action)
 		{
-			ContextData.OnConnectionOpening = action;
+			Data.OnConnectionOpening = action;
 			return this;
 		}
 
 		public IDbContext OnConnectionOpened(Action<OnConnectionOpenedEventArgs> action)
 		{
-			ContextData.OnConnectionOpened = action;
+			Data.OnConnectionOpened = action;
 			return this;
 		}
 
 		public IDbContext OnConnectionClosed(Action<OnConnectionClosedEventArgs> action)
 		{
-			ContextData.OnConnectionClosed = action;
+			Data.OnConnectionClosed = action;
 			return this;
 		}
 
 		public IDbContext OnExecuting(Action<OnExecutingEventArgs> action)
 		{
-			ContextData.OnExecuting = action;
+			Data.OnExecuting = action;
 			return this;
 		}
 
 		public IDbContext OnExecuted(Action<OnExecutedEventArgs> action)
 		{
-			ContextData.OnExecuted = action;
+			Data.OnExecuted = action;
 			return this;
 		}
 
 		public IDbContext OnError(Action<OnErrorEventArgs> action)
 		{
-			ContextData.OnError = action;
+			Data.OnError = action;
 			return this;
 		}
 	}

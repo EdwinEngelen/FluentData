@@ -149,10 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="x64\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="x86\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="_Data\FluentDataDB.accdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

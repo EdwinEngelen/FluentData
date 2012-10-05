@@ -8,7 +8,7 @@ namespace FluentData
 	{
 		public IDbCommand Sql(string sql)
 		{
-			_data.Sql.Append(sql);
+			Data.Sql.Append(sql);
 			return this;
 		}
 
@@ -24,7 +24,7 @@ namespace FluentData
 					propertyNames[i] = propertyNames[i].Replace('.', '_');
 				}
 
-				_data.Sql.AppendFormat(sql, propertyNames.ToArray());
+				Data.Sql.AppendFormat(sql, propertyNames.ToArray());
 			}
 			return this;
 		}

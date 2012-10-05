@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Text;
 
 namespace FluentData
 {
@@ -21,8 +20,8 @@ namespace FluentData
 		string GetSqlForDeleteBuilder(BuilderData data);
 		string GetSqlForStoredProcedureBuilder(BuilderData data);
 		DataTypes GetDbTypeForClrType(Type clrType);
-		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
-		void OnCommandExecuting(DbCommandData data);
+		T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName);
+		void OnCommandExecuting(IDbCommand command);
 		string EscapeColumnName(string name);
 	}
 }

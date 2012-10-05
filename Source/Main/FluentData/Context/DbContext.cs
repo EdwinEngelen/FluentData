@@ -4,26 +4,26 @@ namespace FluentData
 {
 	public partial class DbContext : IDbContext
 	{
-		protected DbContextData ContextData;
+		public DbContextData Data { get; private set; }
 
 		public DbContext()
 		{
-			ContextData = new DbContextData();
+			Data = new DbContextData();
 		}
 
 		internal void CloseSharedConnection()
 		{
-			if (ContextData.Connection == null)
+			if (Data.Connection == null)
 				return;
 
-			if (ContextData.UseTransaction
-				&& ContextData.Transaction != null)
+			if (Data.UseTransaction
+				&& Data.Transaction != null)
 					Rollback();
 
-			ContextData.Connection.Close();
+			Data.Connection.Close();
 
-			if (ContextData.OnConnectionClosed != null)
-				ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(ContextData.Connection));
+			if (Data.OnConnectionClosed != null)
+				Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.Connection));
 		}
 
 		public void Dispose()
