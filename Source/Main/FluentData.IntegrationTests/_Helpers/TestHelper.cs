@@ -181,7 +181,7 @@ namespace FluentData._Helpers
 			var productId = context.Insert("Product")
 									.Column("Name", name)
 									.Column("CategoryId", categoryId)
-									.ExecuteReturnLastId();
+									.ExecuteReturnLastId<int>();
 			return productId;
 		}
 	}

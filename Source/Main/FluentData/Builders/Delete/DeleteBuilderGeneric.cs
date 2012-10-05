@@ -5,8 +5,8 @@ namespace FluentData
 {
 	internal class DeleteBuilder<T> : BaseDeleteBuilder, IDeleteBuilder<T>
 	{
-		public DeleteBuilder(IDbProvider provider, IDbCommand command, string tableName, T item)
-			: base(provider, command, tableName)
+		public DeleteBuilder(IDbCommand command, string tableName, T item)
+			: base(command, tableName)
 		{
 			Data.Item = item;
 		}

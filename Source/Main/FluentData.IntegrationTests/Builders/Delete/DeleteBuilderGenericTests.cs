@@ -14,7 +14,7 @@ namespace FluentData
 				var productId = db.Insert("Product")
 									.Column("Name", "Test")
 									.Column("CategoryId", 1)
-									.ExecuteReturnLastId();
+									.ExecuteReturnLastId<int>();
 
 				var product = TestHelper.GetProduct(db, productId);
 				Assert.IsNotNull(product);

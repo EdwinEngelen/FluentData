@@ -14,7 +14,7 @@ namespace FluentData
 				var productId = context.Insert("Product")
 									.Column("Name", "TestProduct")
 									.Column("CategoryId", 1)
-									.ExecuteReturnLastId();
+									.ExecuteReturnLastId<int>();
 
 				var product = TestHelper.GetProduct(context, productId);
 				Assert.AreEqual("TestProduct", product.Name);

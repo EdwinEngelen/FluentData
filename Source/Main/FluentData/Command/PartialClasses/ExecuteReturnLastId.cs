@@ -2,11 +2,6 @@
 {
 	internal partial class DbCommand
 	{
-		public int ExecuteReturnLastId(string identityColumnName = null)
-		{
-			return ExecuteReturnLastId<int>(identityColumnName);
-		}
-
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))

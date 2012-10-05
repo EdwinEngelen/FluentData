@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace FluentData
+﻿namespace FluentData
 {
 	public partial class DbContext : IDbContext
 	{

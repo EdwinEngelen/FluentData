@@ -9,14 +9,14 @@
 		{
 			get
 			{
-				Data.Command.Sql(Data.Provider.GetSqlForDeleteBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public BaseDeleteBuilder(IDbProvider provider, IDbCommand command, string name)
+		public BaseDeleteBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 

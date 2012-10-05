@@ -18,7 +18,7 @@ namespace FluentData
 				product.ProductId = context.Insert<Product>("Product", product)
 									.Column("Name", "TestProduct")
 									.Column(x => x.CategoryId)
-									.ExecuteReturnLastId();
+									.ExecuteReturnLastId<int>();
 
 				var createdProduct = TestHelper.GetProduct(context, product.ProductId);
 				Assert.AreEqual("TestProduct", createdProduct.Name);
@@ -38,7 +38,7 @@ namespace FluentData
 			{
 				product.ProductId = context.Insert<Product>("Product", product)
 									.AutoMap(x => x.ProductId, x => x.Category)
-									.ExecuteReturnLastId();
+									.ExecuteReturnLastId<int>();
 
 				var createdProduct = TestHelper.GetProduct(context, product.ProductId);
 				Assert.AreEqual("TestProduct", createdProduct.Name);

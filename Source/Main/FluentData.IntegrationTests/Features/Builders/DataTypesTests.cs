@@ -23,7 +23,7 @@ namespace FluentData.Features.Builders
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
 							.Column("FloatValue", value.FloatValue)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -55,7 +55,7 @@ namespace FluentData.Features.Builders
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
 							.Column("FloatValue", value.FloatValue)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -87,7 +87,7 @@ namespace FluentData.Features.Builders
 							.Column(x => x.StringValue)
 							.Column(x => x.DateTimeValue)
 							.Column("FloatValue", value.FloatValue)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -116,7 +116,7 @@ namespace FluentData.Features.Builders
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.AutoMap(x => x.Id)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -145,7 +145,7 @@ namespace FluentData.Features.Builders
 							.Column("StringValue", value.StringValue)
 							.Column("DateTimeValue", value.DateTimeValue)
 							.Column("FloatValue", value.FloatValue)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -175,7 +175,7 @@ namespace FluentData.Features.Builders
 							.Column(x => x.StringValue)
 							.Column(x => x.DateTimeValue)
 							.Column("FloatValue", value.FloatValue)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 
@@ -202,7 +202,7 @@ namespace FluentData.Features.Builders
 
 				value.Id = context.Insert("DataTypeValue", value)
 							.AutoMap(x => x.Id)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 				Assert.IsTrue(value.Id > 0);
 

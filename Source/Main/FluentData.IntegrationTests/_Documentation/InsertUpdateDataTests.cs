@@ -15,7 +15,7 @@ namespace FluentData._Documentation
 
 			var insertBuilder = Context().Insert<Product>("Product", product);
 			FillBuilder((IInsertUpdateBuilder<Product>) insertBuilder);
-			product.ProductId = insertBuilder.ExecuteReturnLastId();
+			product.ProductId = insertBuilder.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(product.ProductId > 0);
 

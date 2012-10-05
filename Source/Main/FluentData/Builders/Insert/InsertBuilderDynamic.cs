@@ -5,8 +5,8 @@ namespace FluentData
 {
 	internal class InsertBuilderDynamic : BaseInsertBuilder, IInsertBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
-		internal InsertBuilderDynamic(IDbProvider provider, IDbCommand command, string name, ExpandoObject item)
-			: base(provider, command, name)
+		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
+			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
 		}

@@ -4,8 +4,8 @@ namespace FluentData
 {
 	internal class StoredProcedureBuilder : BaseStoredProcedureBuilder, IStoredProcedureBuilder
 	{
-		internal StoredProcedureBuilder(IDbProvider dbProvider, IDbCommand command, string name)
-			: base(dbProvider, command, name)
+		internal StoredProcedureBuilder(IDbCommand command, string name)
+			: base(command, name)
 		{
 		}
 

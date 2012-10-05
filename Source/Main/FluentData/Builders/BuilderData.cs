@@ -9,8 +9,6 @@ namespace FluentData
 		public List<TableColumn> Columns { get; set; }
 		public object Item { get; set; }
 		public string ObjectName { get; set; }
-		public DbCommandData CommandData { get; set; }
-		public IDbProvider Provider { get; set; }
 		public IDbCommand Command { get; set; }
 		public List<TableColumn> Where { get; set; }
 		public string Having { get; set; }
@@ -20,9 +18,8 @@ namespace FluentData
 		public string Select { get; set; }
 		public string WhereSql { get; set; }
 
-		public BuilderData(IDbProvider provider, IDbCommand command, string objectName)
+		public BuilderData(IDbCommand command, string objectName)
 		{
-			Provider = provider;
 			ObjectName = objectName;
 			Command = command;
 			Columns = new List<TableColumn>();

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq.Expressions;
 
 namespace FluentData
 {
 	internal class StoredProcedureBuilderDynamic : BaseStoredProcedureBuilder, IStoredProcedureBuilderDynamic
 	{
 		internal StoredProcedureBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
-			: base(dbProvider, command, name)
+			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
 		}

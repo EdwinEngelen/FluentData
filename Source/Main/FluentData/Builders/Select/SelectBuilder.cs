@@ -17,14 +17,14 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 					throw new FluentDataException("Order by must defined when using Paging.");
 
-				Data.Command.Sql(Data.Provider.GetSqlForSelectBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public SelectBuilder(IDbProvider provider, IDbCommand command)
+		public SelectBuilder(IDbCommand command)
 		{
-			Data =  new BuilderData(provider, command, "");
+			Data =  new BuilderData(command, "");
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -36,7 +36,7 @@ namespace FluentData
 
 		public ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
-			var alias = Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
+			var alias = Data.Command.Data.Context.Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
 			if (Data.Select.Length > 0)
 				Data.Select += ",";
 

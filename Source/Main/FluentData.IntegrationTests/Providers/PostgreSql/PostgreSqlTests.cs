@@ -222,7 +222,7 @@ namespace FluentData.Providers.PostgreSql
 		public void Insert_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -233,7 +233,7 @@ namespace FluentData.Providers.PostgreSql
 			var productId = Context().Insert("Product")
 								.Column("CategoryId", 1)
 								.Column("Name", "The Warren Buffet Way")
-								.ExecuteReturnLastId();
+								.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -247,7 +247,7 @@ namespace FluentData.Providers.PostgreSql
 
 			var productId = Context().Insert<Product>("Product", product)
 								.AutoMap(x => x.ProductId)
-								.ExecuteReturnLastId();
+								.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -292,7 +292,7 @@ namespace FluentData.Providers.PostgreSql
 		public void Delete_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(:0, :1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 			var rowsAffected = Context().Sql("delete from Product where ProductId = :0", productId)
 									.Execute();
@@ -304,7 +304,7 @@ namespace FluentData.Providers.PostgreSql
 		public void Delete_data_builder()
 		{
 			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(:0, :1)", "The Warren Buffet Way", 1)
-								.ExecuteReturnLastId();
+								.ExecuteReturnLastId<int>();
 
 			var rowsAffected = Context().Delete("Product")
 									.Where("ProductId", productId)

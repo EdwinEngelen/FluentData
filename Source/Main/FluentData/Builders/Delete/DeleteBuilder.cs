@@ -2,8 +2,8 @@
 {
 	internal class DeleteBuilder : BaseDeleteBuilder, IDeleteBuilder
 	{
-		public DeleteBuilder(IDbProvider provider, IDbCommand command, string tableName)
-			: base(provider, command, tableName)
+		public DeleteBuilder(IDbCommand command, string tableName)
+			: base(command, tableName)
 		{
 		}
 

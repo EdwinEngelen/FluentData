@@ -14,14 +14,14 @@ namespace FluentData
 			get
 			{
 				Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-				Data.Command.Sql(Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public BaseStoredProcedureBuilder(IDbProvider provider, IDbCommand command, string name)
+		public BaseStoredProcedureBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 

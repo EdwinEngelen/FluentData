@@ -34,7 +34,7 @@ namespace FluentData._Samples
 			var productId = Context().Insert("Product")
 										.Column("Name", "The Warren Buffet Way")
 										.Column("CategoryId", 1)
-										.ExecuteReturnLastId();
+										.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -43,7 +43,7 @@ namespace FluentData._Samples
 		public void Insert_a_new_product_sql()
 		{
 			var productId = Context().Sql(@"insert into Product(Name, CategoryId)
-											values('The Warren Buffet Way', 1);").ExecuteReturnLastId();
+											values('The Warren Buffet Way', 1);").ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -76,7 +76,7 @@ namespace FluentData._Samples
 			var productId = Context().Insert("Product")
 										.Column("Name", "The Warren Buffet Way")
 										.Column("CategoryId", 1)
-										.ExecuteReturnLastId();
+										.ExecuteReturnLastId<int>();
 
 			var rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId).Execute();
 
@@ -89,7 +89,7 @@ namespace FluentData._Samples
 			var productId = Context().Insert("Product")
 										.Column("Name", "The Warren Buffet Way")
 										.Column("CategoryId", 1)
-										.ExecuteReturnLastId();
+										.ExecuteReturnLastId<int>();
 
 			var rowsAffected = Context().Delete("Product").Where("ProductId", productId).Execute();
 

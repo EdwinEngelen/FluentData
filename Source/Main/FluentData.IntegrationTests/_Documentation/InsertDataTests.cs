@@ -10,7 +10,7 @@ namespace FluentData._Documentation
 		public void Insert_data_sql()
 		{
 			int productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId();
+							.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -21,7 +21,7 @@ namespace FluentData._Documentation
 			int productId = Context().Insert("Product")
 								.Column("Name", "The Warren Buffet Way")
 								.Column("CategoryId", 1)
-								.ExecuteReturnLastId();
+								.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -35,7 +35,7 @@ namespace FluentData._Documentation
 
 			product.ProductId = Context().Insert<Product>("Product", product)
 								.AutoMap(x => x.ProductId, x => x.Category)
-								.ExecuteReturnLastId();
+								.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(product.ProductId > 0);
 		}

@@ -5,8 +5,8 @@ namespace FluentData
 {
 	internal class InsertBuilder<T> : BaseInsertBuilder, IInsertBuilder<T>, IInsertUpdateBuilder<T>
 	{
-		internal InsertBuilder(IDbProvider provider, IDbCommand command, string name, T item)
-			: base(provider, command, name)
+		internal InsertBuilder(IDbCommand command, string name, T item)
+			: base(command, name)
 		{
 			Data.Item = item;
 		}

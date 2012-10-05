@@ -8,27 +8,27 @@ namespace FluentData
 	{
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
 		{
-			return new SelectBuilder<TEntity>(Data.Provider, CreateCommand).Select(sql);
+			return new SelectBuilder<TEntity>(CreateCommand).Select(sql);
 		}
 
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
-			return new SelectBuilder<TEntity>(Data.Provider, CreateCommand).Select(sql, mapToProperty);
+			return new SelectBuilder<TEntity>(CreateCommand).Select(sql, mapToProperty);
 		}
 
 		public IInsertBuilder Insert(string tableName)
 		{
-			return new InsertBuilder(Data.Provider, CreateCommand, tableName);
+			return new InsertBuilder(CreateCommand, tableName);
 		}
 
 		public IInsertBuilder<T> Insert<T>(string tableName, T item)
 		{
-			return new InsertBuilder<T>(Data.Provider, CreateCommand, tableName, item);
+			return new InsertBuilder<T>(CreateCommand, tableName, item);
 		}
 
 		public IInsertBuilderDynamic Insert(string tableName, ExpandoObject item)
 		{
-			return new InsertBuilderDynamic(Data.Provider, CreateCommand, tableName, item);
+			return new InsertBuilderDynamic(CreateCommand, tableName, item);
 		}
 
 		public IUpdateBuilder Update(string tableName)
@@ -48,12 +48,12 @@ namespace FluentData
 
 		public IDeleteBuilder Delete(string tableName)
 		{
-			return new DeleteBuilder(Data.Provider, CreateCommand, tableName);
+			return new DeleteBuilder(CreateCommand, tableName);
 		}
 
 		public IDeleteBuilder<T> Delete<T>(string tableName, T item)
 		{
-			return new DeleteBuilder<T>(Data.Provider, CreateCommand, tableName, item);
+			return new DeleteBuilder<T>(CreateCommand, tableName, item);
 		}
 
 		private void VerifyStoredProcedureSupport()
@@ -65,25 +65,25 @@ namespace FluentData
 		public IStoredProcedureBuilder StoredProcedure(string storedProcedureName)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(Data.Provider, CreateCommand, storedProcedureName);
+			return new StoredProcedureBuilder(CreateCommand, storedProcedureName);
 		}
 
 		public IStoredProcedureBuilder MultiResultStoredProcedure(string storedProcedureName)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(Data.Provider, CreateCommand.UseMultipleResultset, storedProcedureName);
+			return new StoredProcedureBuilder(CreateCommand.UseMultipleResultset, storedProcedureName);
 		}
 
 		public IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(Data.Provider, CreateCommand, storedProcedureName, item);
+			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
 		}
 
 		public IStoredProcedureBuilder<T> MultiResultStoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(Data.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
+			return new StoredProcedureBuilder<T>(CreateCommand.UseMultipleResultset, storedProcedureName, item);
 		}
 
 		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)

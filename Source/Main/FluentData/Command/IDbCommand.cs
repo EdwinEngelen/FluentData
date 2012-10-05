@@ -12,7 +12,6 @@ namespace FluentData
 		IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
-		int ExecuteReturnLastId(string identityColumnName = null);
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		dynamic QuerySingle();
