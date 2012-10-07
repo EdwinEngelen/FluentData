@@ -10,15 +10,15 @@ namespace FluentData
 		{
 			Data.Item = item;
 		}
-		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression)
+		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 
-		public IDeleteBuilder<T> Where(string columnName, object value)
+		public IDeleteBuilder<T> Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}

@@ -9,15 +9,15 @@ namespace FluentData
 		{
 		}
 
-		public IInsertBuilder Column(string columnName, object value)
+		public IInsertBuilder Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
+		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}

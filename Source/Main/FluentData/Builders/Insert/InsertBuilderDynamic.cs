@@ -11,15 +11,15 @@ namespace FluentData
 			Data.Item = (IDictionary<string, object>) item;
 		}
 
-		public IInsertBuilderDynamic Column(string columnName, object value)
+		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IInsertBuilderDynamic Column(string propertyName)
+		public IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 
@@ -29,21 +29,15 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName)
-		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 	}

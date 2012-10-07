@@ -2,8 +2,7 @@
 {
 	public interface IInsertUpdateBuilderDynamic
 	{
-		IInsertUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IInsertUpdateBuilderDynamic Column(string columnName, object value);
-		IInsertUpdateBuilderDynamic Column(string propertyName);
+		IInsertUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 }

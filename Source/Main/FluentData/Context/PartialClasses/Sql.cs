@@ -41,12 +41,7 @@ namespace FluentData
 			return command;
 		}
 
-		public IDbCommand MultiResultSql()
-		{
-			return CreateCommand.UseMultipleResultset;
-		}
-
-		public IDbCommand MultiResultSql(string sql, params object[] parameters)
+		public IDbCommand MultiResultSql(string sql = "", params object[] parameters)
 		{
 			var command = CreateCommand.UseMultipleResultset.Sql(sql);
 			if(parameters != null)

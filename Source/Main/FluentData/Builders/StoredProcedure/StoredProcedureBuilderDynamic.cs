@@ -11,9 +11,9 @@ namespace FluentData
 			Data.Item = (IDictionary<string, object>) item;
 		}
 
-		public IStoredProcedureBuilderDynamic Parameter(string name, object value)
+		public IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(name, value);
+			Actions.ColumnValueAction(name, value, parameterType, size);
 			return this;
 		}
 

@@ -27,6 +27,8 @@ namespace FluentData._Helpers
 							drop table [Order]
 						if  exists (select * from sys.objects where object_Id = object_Id('datatypevalue') and type in ('u'))
 							drop table DataTypeValue
+						if  exists (select * from sys.objects where object_Id = object_Id('Table With Space') and type in ('u'))
+							drop table [Table With Space]
 						if  exists (select * from sys.objects where object_Id = object_Id('customer') and type in ('u'))
 							drop table Customer
 						if  exists (select * from sys.objects where object_Id = object_Id('category') and type in ('u'))
@@ -62,6 +64,10 @@ namespace FluentData._Helpers
 							DecimalValue numeric(18, 0) null,
 							DatetimeValue datetime null,
 							FloatValue real null)
+
+						create table [Table With Space](
+							Id int Identity(1,1) not null primary key,
+							[Field With Space] nvarchar(50) null)
 
 						create table Customer(
 							CustomerId int Identity(1,1) not null primary key,

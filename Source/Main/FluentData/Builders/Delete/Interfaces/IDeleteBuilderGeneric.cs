@@ -6,7 +6,7 @@ namespace FluentData
 	public interface IDeleteBuilder<T>
 	{
 		int Execute();
-		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression);
-		IDeleteBuilder<T> Where(string columnName, object value);
+		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IDeleteBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 }

@@ -11,9 +11,9 @@ namespace FluentData
 			Data.Item = item;
 		}
 
-		public IUpdateBuilder<T> Column(string columnName, object value)
+		public IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
@@ -23,39 +23,33 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression)
+		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 
-		public virtual IUpdateBuilder<T> Where(string columnName, object value)
+		public virtual IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(columnName, value);
+			Actions.WhereAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilder<T> Where(Expression<Func<T, object>> expression)
+		public IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(expression);
+			Actions.WhereAction(expression, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
-		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 	}

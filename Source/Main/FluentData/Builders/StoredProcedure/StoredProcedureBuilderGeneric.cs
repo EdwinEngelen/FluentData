@@ -11,9 +11,9 @@ namespace FluentData
 			Data.Item = item;
 		}
 
-		public IStoredProcedureBuilder<T> Parameter(string name, object value)
+		public IStoredProcedureBuilder<T> Parameter(string name, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(name, value);
+			Actions.ColumnValueAction(name, value, parameterType, size);
 			return this;
 		}
 
@@ -23,9 +23,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression)
+		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 
 			return this;
 		}

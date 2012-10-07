@@ -7,9 +7,9 @@ namespace FluentData
 	{
 		int Execute();
 		IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
-		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression);
-		IUpdateBuilder<T> Where(string columnName, object value);
-		IUpdateBuilder<T> Column(string columnName, object value);
-		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression);
+		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 }

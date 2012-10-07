@@ -28,32 +28,35 @@ namespace FluentData
 			_data = data;
 		}
 
-		internal void ColumnValueAction(string columnName, object value)
+		internal void ColumnValueAction(string columnName, object value, DataTypes parameterType, int size)
 		{
-			ColumnAction(columnName, value, typeof(object));
+			ColumnAction(columnName, value, typeof(object), parameterType, size);
 		}
 
-		private void ColumnAction(string columnName, object value, Type type)
+		private void ColumnAction(string columnName, object value, Type type, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
 
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
-			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
+			if(parameterType == DataTypes.Object)
+				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
+
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false, size);
 		}
 
-		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression)
+		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
 
-			ColumnAction(parser.Name, parser.Value, parser.Type);
+			ColumnAction(parser.Name, parser.Value, parser.Type, parameterType, size);
 		}
 
-		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)
+		internal void ColumnValueDynamic(ExpandoObject item, string propertyName, DataTypes parameterType, int size)
 		{
 			var propertyValue = (item as IDictionary<string, object>) [propertyName];
 
-			ColumnAction(propertyName, propertyValue, typeof(object));
+			ColumnAction(propertyName, propertyValue, typeof(object), parameterType, size);
 		}
 
 		internal void AutoMapColumnsAction<T>(params Expression<Func<T, object>>[] ignorePropertyExpressions)
@@ -78,7 +81,7 @@ namespace FluentData
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
 				var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
-				ColumnAction(property.Value.Name, propertyValue, propertyType);
+				ColumnAction(property.Value.Name, propertyValue, propertyType, DataTypes.Object, 0);
 			}
 		}
 
@@ -97,11 +100,11 @@ namespace FluentData
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
 
 				if (ignoreProperty == null)
-					ColumnAction(property.Key, property.Value, typeof(object));
+					ColumnAction(property.Key, property.Value, typeof(object), DataTypes.Object, 0);
 			}
 		}
 
-		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size)
 		{
 			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
@@ -111,18 +114,18 @@ namespace FluentData
 			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
 		}
 
-		internal void WhereAction(string columnName, object value)
+		internal void WhereAction(string columnName, object value, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
-			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, true, 0);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
 		}
 
-		internal void WhereAction<T>(Expression<Func<T, object>> expression)
+		internal void WhereAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
-			WhereAction(parser.Name, parser.Value);
+			WhereAction(parser.Name, parser.Value, parameterType, size);
 		}
 	}
 
@@ -133,8 +136,6 @@ namespace FluentData
 		public List<TableColumn> Columns { get; set; }
 		public object Item { get; set; }
 		public string ObjectName { get; set; }
-		public DbCommandData CommandData { get; set; }
-		public IDbProvider Provider { get; set; }
 		public IDbCommand Command { get; set; }
 		public List<TableColumn> Where { get; set; }
 		public string Having { get; set; }
@@ -144,9 +145,8 @@ namespace FluentData
 		public string Select { get; set; }
 		public string WhereSql { get; set; }
 
-		public BuilderData(IDbProvider provider, IDbCommand command, string objectName)
+		public BuilderData(IDbCommand command, string objectName)
 		{
-			Provider = provider;
 			ObjectName = objectName;
 			Command = command;
 			Columns = new List<TableColumn>();
@@ -181,14 +181,14 @@ namespace FluentData
 		{
 			get
 			{
-				Data.Command.Sql(Data.Provider.GetSqlForDeleteBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public BaseDeleteBuilder(IDbProvider provider, IDbCommand command, string name)
+		public BaseDeleteBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -200,34 +200,34 @@ namespace FluentData
 
 	internal class DeleteBuilder : BaseDeleteBuilder, IDeleteBuilder
 	{
-		public DeleteBuilder(IDbProvider provider, IDbCommand command, string tableName)
-			: base(provider, command, tableName)
+		public DeleteBuilder(IDbCommand command, string tableName)
+			: base(command, tableName)
 		{
 		}
 
-		public IDeleteBuilder Where(string columnName, object value)
+		public IDeleteBuilder Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}
 
 	internal class DeleteBuilder<T> : BaseDeleteBuilder, IDeleteBuilder<T>
 	{
-		public DeleteBuilder(IDbProvider provider, IDbCommand command, string tableName, T item)
-			: base(provider, command, tableName)
+		public DeleteBuilder(IDbCommand command, string tableName, T item)
+			: base(command, tableName)
 		{
 			Data.Item = item;
 		}
-		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression)
+		public IDeleteBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 
-		public IDeleteBuilder<T> Where(string columnName, object value)
+		public IDeleteBuilder<T> Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}
@@ -235,33 +235,31 @@ namespace FluentData
 	public interface IDeleteBuilder
 	{
 		int Execute();
-		IDeleteBuilder Where(string columnName, object value);
+		IDeleteBuilder Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IDeleteBuilder<T>
 	{
 		int Execute();
-		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression);
-		IDeleteBuilder<T> Where(string columnName, object value);
+		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IDeleteBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertUpdateBuilder
 	{
-		IInsertUpdateBuilder Column(string columnName, object value);
+		IInsertUpdateBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertUpdateBuilderDynamic
 	{
-		IInsertUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IInsertUpdateBuilderDynamic Column(string columnName, object value);
-		IInsertUpdateBuilderDynamic Column(string propertyName);
+		IInsertUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertUpdateBuilder<T>
 	{
-		IInsertUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
-		IInsertUpdateBuilder<T> Column(string columnName, object value);
-		IInsertUpdateBuilder<T> Column(Expression<Func<T, object>> expression);
+		IInsertUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	internal abstract class BaseInsertBuilder
@@ -273,25 +271,20 @@ namespace FluentData
 		{
 			get
 			{
-				Data.Command.Sql(Data.Provider.GetSqlForInsertBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public BaseInsertBuilder(IDbProvider provider, IDbCommand command, string name)
+		public BaseInsertBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
 		public int Execute()
 		{
 			return Command.Execute();
-		}
-
-		public int ExecuteReturnLastId(string identityColumnName = null)
-		{
-			return Command.ExecuteReturnLastId(identityColumnName);
 		}
 
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
@@ -302,41 +295,41 @@ namespace FluentData
 
 	internal class InsertBuilder : BaseInsertBuilder, IInsertBuilder, IInsertUpdateBuilder
 	{
-		internal InsertBuilder(IDbProvider provider, IDbCommand command, string name)
-			: base(provider, command, name)
+		internal InsertBuilder(IDbCommand command, string name)
+			: base(command, name)
 		{
 		}
 
-		public IInsertBuilder Column(string columnName, object value)
+		public IInsertBuilder Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
+		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}
 
 	internal class InsertBuilderDynamic : BaseInsertBuilder, IInsertBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
-		internal InsertBuilderDynamic(IDbProvider provider, IDbCommand command, string name, ExpandoObject item)
-			: base(provider, command, name)
+		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
+			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
 		}
 
-		public IInsertBuilderDynamic Column(string columnName, object value)
+		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IInsertBuilderDynamic Column(string propertyName)
+		public IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 
@@ -346,42 +339,36 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName)
-		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 	}
 
 	internal class InsertBuilder<T> : BaseInsertBuilder, IInsertBuilder<T>, IInsertUpdateBuilder<T>
 	{
-		internal InsertBuilder(IDbProvider provider, IDbCommand command, string name, T item)
-			: base(provider, command, name)
+		internal InsertBuilder(IDbCommand command, string name, T item)
+			: base(command, name)
 		{
 			Data.Item = item;
 		}
 
-		public IInsertBuilder<T> Column(string columnName, object value)
+		public IInsertBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IInsertBuilder<T> Column(Expression<Func<T, object>> expression)
+		public IInsertBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 
@@ -391,21 +378,15 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
-		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 	}
@@ -413,29 +394,26 @@ namespace FluentData
 	public interface IInsertBuilder
 	{
 		int Execute();
-		int ExecuteReturnLastId(string identityColumnName = null);
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
-		IInsertBuilder Column(string columnName, object value);
+		IInsertBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertBuilder<T>
 	{
 		int Execute();
-		int ExecuteReturnLastId(string identityColumnName = null);
 		TReturn ExecuteReturnLastId<TReturn>(string identityColumnName = null);
 		IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
-		IInsertBuilder<T> Column(string columnName, object value);
-		IInsertBuilder<T> Column(Expression<Func<T, object>> expression);
+		IInsertBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertBuilderDynamic
 	{
 		int Execute();
-		int ExecuteReturnLastId(string identityColumnName = null);
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		IInsertBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IInsertBuilderDynamic Column(string columnName, object value);
-		IInsertBuilderDynamic Column(string propertyName);
+		IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface ISelectBuilder<TEntity>
@@ -473,14 +451,14 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 					throw new FluentDataException("Order by must defined when using Paging.");
 
-				Data.Command.Sql(Data.Provider.GetSqlForSelectBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public SelectBuilder(IDbProvider provider, IDbCommand command)
+		public SelectBuilder(IDbCommand command)
 		{
-			Data =  new BuilderData(provider, command, "");
+			Data =  new BuilderData(command, "");
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -492,7 +470,7 @@ namespace FluentData
 
 		public ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
-			var alias = Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
+			var alias = Data.Command.Data.Context.Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
 			if (Data.Select.Length > 0)
 				Data.Select += ",";
 
@@ -595,14 +573,14 @@ namespace FluentData
 			get
 			{
 				Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-				Data.Command.Sql(Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
 				return Data.Command;
 			}
 		}
 
-		public BaseStoredProcedureBuilder(IDbProvider provider, IDbCommand command, string name)
+		public BaseStoredProcedureBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -678,35 +656,35 @@ namespace FluentData
 
 	public interface IStoredProcedureBuilder : IBaseStoredProcedureBuilder, IDisposable
 	{
-		IStoredProcedureBuilder Parameter(string name, object value);
+		IStoredProcedureBuilder Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilder ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 
 	public interface IStoredProcedureBuilderDynamic : IBaseStoredProcedureBuilder, IDisposable
 	{
 		IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IStoredProcedureBuilderDynamic Parameter(string name, object value);
+		IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 
 	public interface IStoredProcedureBuilder<T> : IBaseStoredProcedureBuilder, IDisposable
 	{
 		IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
-		IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression);
-		IStoredProcedureBuilder<T> Parameter(string name, object value);
+		IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IStoredProcedureBuilder<T> Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 
 	internal class StoredProcedureBuilder : BaseStoredProcedureBuilder, IStoredProcedureBuilder
 	{
-		internal StoredProcedureBuilder(IDbProvider dbProvider, IDbCommand command, string name)
-			: base(dbProvider, command, name)
+		internal StoredProcedureBuilder(IDbCommand command, string name)
+			: base(command, name)
 		{
 		}
 
-		public IStoredProcedureBuilder Parameter(string name, object value)
+		public IStoredProcedureBuilder Parameter(string name, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(name, value);
+			Actions.ColumnValueAction(name, value, parameterType, size);
 			return this;
 		}
 
@@ -720,14 +698,14 @@ namespace FluentData
 	internal class StoredProcedureBuilderDynamic : BaseStoredProcedureBuilder, IStoredProcedureBuilderDynamic
 	{
 		internal StoredProcedureBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
-			: base(dbProvider, command, name)
+			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
 		}
 
-		public IStoredProcedureBuilderDynamic Parameter(string name, object value)
+		public IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(name, value);
+			Actions.ColumnValueAction(name, value, parameterType, size);
 			return this;
 		}
 
@@ -746,15 +724,15 @@ namespace FluentData
 
 	internal class StoredProcedureBuilder<T> : BaseStoredProcedureBuilder, IStoredProcedureBuilder<T>
 	{
-		internal StoredProcedureBuilder(IDbProvider dbProvider, IDbCommand command, string name, T item)
-			: base(dbProvider, command, name)
+		internal StoredProcedureBuilder(IDbCommand command, string name, T item)
+			: base(command, name)
 		{
 			Data.Item = item;
 		}
 
-		public IStoredProcedureBuilder<T> Parameter(string name, object value)
+		public IStoredProcedureBuilder<T> Parameter(string name, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(name, value);
+			Actions.ColumnValueAction(name, value, parameterType, size);
 			return this;
 		}
 
@@ -764,9 +742,9 @@ namespace FluentData
 			return this;
 		}
 
-		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression)
+		public IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 
 			return this;
 		}
@@ -805,14 +783,14 @@ namespace FluentData
 					|| Data.Where.Count == 0)
 					throw new FluentDataException("Columns or where filter have not yet been added.");
 
-				Data.Command.Sql(Data.Provider.GetSqlForUpdateBuilder(Data));
+				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
 				return Data.Command;
 			}
 		}
 
 		public BaseUpdateBuilder(IDbProvider provider, IDbCommand command, string name)
 		{
-			Data =  new BuilderData(provider, command, name);
+			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -825,28 +803,28 @@ namespace FluentData
 	public interface IUpdateBuilder
 	{
 		int Execute();
-		IUpdateBuilder Column(string columnName, object value);
-		IUpdateBuilder Where(string columnName, object value);
+		IUpdateBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IUpdateBuilderDynamic
 	{
 		int Execute();
 		IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IUpdateBuilderDynamic Column(string columnName, object value);
-		IUpdateBuilderDynamic Column(string propertyName);
-		IUpdateBuilderDynamic Where(string name);
-		IUpdateBuilderDynamic Where(string columnName, object value);
+		IUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilderDynamic Where(string name, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilderDynamic Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IUpdateBuilder<T>
 	{
 		int Execute();
 		IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
-		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression);
-		IUpdateBuilder<T> Where(string columnName, object value);
-		IUpdateBuilder<T> Column(string columnName, object value);
-		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression);
+		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	internal class UpdateBuilder : BaseUpdateBuilder, IUpdateBuilder, IInsertUpdateBuilder
@@ -856,21 +834,21 @@ namespace FluentData
 		{
 		}
 
-		public virtual IUpdateBuilder Where(string columnName, object value)
+		public virtual IUpdateBuilder Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(columnName, value);
+			Actions.WhereAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilder Column(string columnName, object value)
+		public IUpdateBuilder Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value)
+		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 	}
@@ -883,28 +861,28 @@ namespace FluentData
 			Data.Item = (IDictionary<string, object>) item;
 		}
 
-		public virtual IUpdateBuilderDynamic Where(string columnName, object value)
+		public virtual IUpdateBuilderDynamic Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(columnName, value);
+			Actions.WhereAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilderDynamic Column(string columnName, object value)
+		public IUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilderDynamic Column(string propertyName)
+		public IUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilderDynamic Where(string name)
+		public IUpdateBuilderDynamic Where(string name, DataTypes parameterType, int size)
 		{
 			var propertyValue = ReflectionHelper.GetPropertyValueDynamic(Data.Item, name);
-			Where(name, propertyValue);
+			Where(name, propertyValue, parameterType, size);
 			return this;
 		}
 
@@ -914,21 +892,15 @@ namespace FluentData
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.AutoMap(params string[] ignoreProperties)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value)
+		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName)
-		{
-			Actions.ColumnValueDynamic((ExpandoObject) Data.Item, propertyName);
+			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
 	}
@@ -941,9 +913,9 @@ namespace FluentData
 			Data.Item = item;
 		}
 
-		public IUpdateBuilder<T> Column(string columnName, object value)
+		public IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
@@ -953,39 +925,33 @@ namespace FluentData
 			return this;
 		}
 
-		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression)
+		public IUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 
-		public virtual IUpdateBuilder<T> Where(string columnName, object value)
+		public virtual IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(columnName, value);
+			Actions.WhereAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		public IUpdateBuilder<T> Where(Expression<Func<T, object>> expression)
+		public IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.WhereAction(expression);
+			Actions.WhereAction(expression, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.AutoMap(params Expression<Func<T, object>>[] ignoreProperties)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
-			Actions.AutoMapColumnsAction(ignoreProperties);
+			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
 
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(string columnName, object value)
+		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
-			Actions.ColumnValueAction(columnName, value);
-			return this;
-		}
-
-		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression)
-		{
-			Actions.ColumnValueAction(expression);
+			Actions.ColumnValueAction(expression, parameterType, size);
 			return this;
 		}
 	}
@@ -1121,58 +1087,52 @@ namespace FluentData
 		DateTimeOffset = 27,
 	}
 
-	internal partial class DbCommand : IDisposable, IDbCommand
+	internal partial class DbCommand : IDbCommand
 	{
-		private readonly DbCommandData _data;
+		public DbCommandData Data { get; private set; }
 
 		public DbCommand(
 			DbContext dbContext,
-			System.Data.IDbCommand dbCommand,
-			DbContextData dbContextData)
+			System.Data.IDbCommand innerCommand)
 		{
-			_data = new DbCommandData();
-			_data.Context = dbContext;
-			_data.ContextData = dbContextData;
-			_data.InnerCommand = dbCommand;
-			_data.Command = this;
-			_data.ExecuteQueryHandler = new ExecuteQueryHandler(_data, this);
+			Data = new DbCommandData(dbContext, innerCommand);
+			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		internal IDbCommand UseMultipleResultset
+		public IDbCommand UseMultipleResultset
 		{
 			get
 			{
-				if (!_data.ContextData.Provider.SupportsMultipleResultset)
+				if (!Data.Context.Data.Provider.SupportsMultipleResultset)
 					throw new FluentDataException("The selected database does not support multiple resultset");
 
-				_data.UseMultipleResultsets = true;
+				Data.UseMultipleResultsets = true;
 				return this;
 			}
 		}
 
 		public IDbCommand CommandType(DbCommandTypes dbCommandType)
 		{
-			_data.CommandType = dbCommandType;
-			_data.InnerCommand.CommandType = (System.Data.CommandType) dbCommandType;
+			Data.InnerCommand.CommandType = (System.Data.CommandType) dbCommandType;
 			return this;
 		}
 
 		internal void ClosePrivateConnection()
 		{
-			if (!_data.ContextData.UseTransaction
-				&& !_data.ContextData.UseSharedConnection)
+			if (!Data.Context.Data.UseTransaction
+				&& !Data.Context.Data.UseSharedConnection)
 			{
-				_data.InnerCommand.Connection.Close();
+				Data.InnerCommand.Connection.Close();
 
-				if (_data.ContextData.OnConnectionClosed != null)
-					_data.ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(_data.InnerCommand.Connection));
+				if (Data.Context.Data.OnConnectionClosed != null)
+					Data.Context.Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.InnerCommand.Connection));
 			}
 		}
 
 		public void Dispose()
 		{
-			if (_data.Reader != null)
-				_data.Reader.Close();
+			if (Data.Reader != null)
+				Data.Reader.Close();
 
 			ClosePrivateConnection();
 		}
@@ -1180,21 +1140,17 @@ namespace FluentData
 
 	public class DbCommandData
 	{
-		public IDbCommand Command { get; set; }
-		public DbContext Context { get; set; }
-		public DbContextData ContextData { get; set; }
-		public System.Data.IDbCommand InnerCommand { get; set; }
-		public StringBuilder Sql { get; set; }
+		public DbContext Context { get; private set; }
+		public System.Data.IDbCommand InnerCommand { get; private set; }
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
-		public System.Data.IDataReader InnerReader { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
-		public DbCommandTypes CommandType { get; set; }
 
-		public DbCommandData()
+		public DbCommandData(DbContext context, System.Data.IDbCommand innerCommand)
 		{
-			CommandType = DbCommandTypes.Text;
-			Sql = new StringBuilder();
+			Context = context;
+			InnerCommand = innerCommand;
+			InnerCommand.CommandType = (System.Data.CommandType)DbCommandTypes.Text;
 		}
 	}
 
@@ -1215,11 +1171,11 @@ namespace FluentData
 
 	public interface IDbCommand : IDisposable
 	{
+		DbCommandData Data { get; }
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
 		IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
-		int ExecuteReturnLastId(string identityColumnName = null);
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		List<dynamic> Query();
 		dynamic QuerySingle();
@@ -1230,7 +1186,6 @@ namespace FluentData
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
-		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 
@@ -1270,7 +1225,7 @@ namespace FluentData
 						wasMapped = HandleComplexField(item, field, value);
 				}
 
-				if (!wasMapped && !_dbCommandData.ContextData.IgnoreIfAutoMapFails)
+				if (!wasMapped && !_dbCommandData.Context.Data.IgnoreIfAutoMapFails)
 					throw new FluentDataException("Could not map: " + field.Name);
 			}
 		}
@@ -1314,7 +1269,7 @@ namespace FluentData
 
 			if (instance == null)
 			{
-				instance = _dbCommandData.ContextData.EntityFactory.Create(property.PropertyType);
+				instance = _dbCommandData.Context.Data.EntityFactory.Create(property.PropertyType);
 
 				property.SetValue(item, instance, null);
 			}
@@ -1433,32 +1388,6 @@ namespace FluentData
 		}
 	}
 
-	public class Parameter
-	{
-		public string ParameterName { get; set; }
-		public DataTypes DataType { get; set; }
-		public object Value { get; set; }
-		public ParameterDirection Direction { get; set; }
-		public bool IsId { get; set; }
-		public int Size { get; set; }
-
-		public string GetParameterName(IDbProvider provider)
-		{
-			return provider.GetParameterName(ParameterName);
-		}
-	}
-
-	public class ParameterCollection : List<Parameter>
-	{
-		public Parameter this[string name]
-		{
-			get
-			{
-				return this.SingleOrDefault(x => x.ParameterName == name);
-			}
-		}
-	}
-
 	public enum ParameterDirection
 	{
 		// The parameter is an input parameter.
@@ -1481,7 +1410,7 @@ namespace FluentData
 		{
 			var dataTable = new DataTable();
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(_data.InnerReader, LoadOption.OverwriteChanges));
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(Data.Reader.InnerReader, LoadOption.OverwriteChanges));
 
 			return dataTable;
 		}
@@ -1493,9 +1422,9 @@ namespace FluentData
 		{
 			var item = default(TEntity);
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(_data, customMapper);
+				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(Data, customMapper);
 			});
 
 			return item;
@@ -1504,17 +1433,12 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public int ExecuteReturnLastId(string identityColumnName = null)
-		{
-			return ExecuteReturnLastId<int>(identityColumnName);
-		}
-
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (!_data.ContextData.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
+			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
 				throw new FluentDataException("The selected database does not support this method.");
 
-			var lastId = _data.ContextData.Provider.ExecuteReturnLastId<T>(_data, identityColumnName);
+			var lastId = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
 
 			return lastId;
 		}
@@ -1526,24 +1450,7 @@ namespace FluentData
 	{
 		public IDbCommand Sql(string sql)
 		{
-			_data.Sql.Append(sql);
-			return this;
-		}
-
-		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
-		{
-			if (mappingExpressions == null)
-				Sql(sql);
-			else
-			{
-				var propertyNames = ReflectionHelper.GetPropertyNamesFromExpressions(mappingExpressions);
-				for (int i = 0; i < propertyNames.Count; i++)
-				{
-					propertyNames[i] = propertyNames[i].Replace('.', '_');
-				}
-
-				_data.Sql.AppendFormat(sql, propertyNames.ToArray());
-			}
+			Data.InnerCommand.CommandText += sql;
 			return this;
 		}
 	}
@@ -1555,9 +1462,9 @@ namespace FluentData
 		{
 			var recordsAffected = 0;
 
-			_data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				recordsAffected = new ExecuteHandler().Execute<int>(_data);
+				recordsAffected = new ExecuteHandler().Execute<int>(Data);
 			});
 			return recordsAffected;
 		}
@@ -1596,8 +1503,8 @@ namespace FluentData
 			}
 			newInStatement.Append(")");
 
-			var oldInStatement = string.Format(" in({0})", _data.ContextData.Provider.GetParameterName(name));
-			_data.Sql.Replace(oldInStatement, newInStatement.ToString());
+			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
+			Data.InnerCommand.CommandText = Data.InnerCommand.CommandText.Replace(oldInStatement, newInStatement.ToString());
 		}
 
 		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
@@ -1608,25 +1515,25 @@ namespace FluentData
 			if (value.GetType().IsEnum)
 				value = (int) value;
 
-			var dbParameter = _data.InnerCommand.CreateParameter();
+			var dbParameter = Data.InnerCommand.CreateParameter();
 			if (parameterType == DataTypes.Object)
-				dbParameter.DbType = (System.Data.DbType) _data.ContextData.Provider.GetDbTypeForClrType(value.GetType());
+				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.Provider.GetDbTypeForClrType(value.GetType());
 			else
 				dbParameter.DbType = (System.Data.DbType) parameterType;
 
-			dbParameter.ParameterName = _data.ContextData.Provider.GetParameterName(name);
+			dbParameter.ParameterName = Data.Context.Data.Provider.GetParameterName(name);
 			dbParameter.Direction = (System.Data.ParameterDirection) direction;
 			dbParameter.Value = value;
 			if (size > 0)
 				dbParameter.Size = size;
-			_data.InnerCommand.Parameters.Add(dbParameter);
+			Data.InnerCommand.Parameters.Add(dbParameter);
 
 			return dbParameter;
 		}
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
-			if (!_data.ContextData.Provider.SupportsOutputParameters)
+			if (!Data.Context.Data.Provider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
 			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
@@ -1634,11 +1541,11 @@ namespace FluentData
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			outputParameterName = _data.ContextData.Provider.GetParameterName(outputParameterName);
-			if (!_data.InnerCommand.Parameters.Contains(outputParameterName))
+			outputParameterName = Data.Context.Data.Provider.GetParameterName(outputParameterName);
+			if (!Data.InnerCommand.Parameters.Contains(outputParameterName))
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 
-			var value = (_data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
+			var value = (Data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
 
 			if (value == null)
 				return default(TParameterType);
@@ -1663,9 +1570,9 @@ namespace FluentData
 		{
 			var items = default(TList);
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new GenericQueryHandler<TEntity>().ExecuteListReader<TList>(_data, customMapper);
+				items = new GenericQueryHandler<TEntity>().ExecuteListReader<TList>(Data, customMapper);
 			});
 
 			return items;
@@ -1681,10 +1588,10 @@ namespace FluentData
 	{
 		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				while(_data.Reader.Read())
-					customMapper(list, _data.Reader);
+				while(Data.Reader.Read())
+					customMapper(list, Data.Reader);
 			});
 		}
 	}
@@ -1695,9 +1602,9 @@ namespace FluentData
 		{
 			List<dynamic> items = null;
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new DynamicQueryHandler().ExecuteList(_data);
+				items = new DynamicQueryHandler().ExecuteList(Data);
 			});
 
 			return items;
@@ -1707,9 +1614,9 @@ namespace FluentData
 		{
 			dynamic item = null;
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new DynamicQueryHandler().ExecuteSingle(_data);
+				item = new DynamicQueryHandler().ExecuteSingle(Data);
 			});
 
 			return item;
@@ -1727,9 +1634,9 @@ namespace FluentData
 		{
 			var item = default(TEntity);
 
-			_data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new GenericQueryHandler<TEntity>().ExecuteSingle(_data, customMapper);
+				item = new GenericQueryHandler<TEntity>().ExecuteSingle(Data, customMapper);
 			});
 
 			return item;
@@ -1799,7 +1706,7 @@ namespace FluentData
 					)
 			where TList : IList<TEntity>
 		{
-			var items = (TList) data.ContextData.EntityFactory.Create(typeof(TList));
+			var items = (TList) data.Context.Data.EntityFactory.Create(typeof(TList));
 
 			if(ReflectionHelper.IsCustomEntity<TEntity>())
 			{
@@ -1807,7 +1714,7 @@ namespace FluentData
 
 				while (data.Reader.Read())
 				{
-					var item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+					var item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
 
 					if (customMapperReader == null)
 						autoMapper.AutoMap(item);
@@ -1848,7 +1755,7 @@ namespace FluentData
 
 				if (data.Reader.Read())
 				{
-					item = (TEntity) data.ContextData.EntityFactory.Create(typeof (TEntity));
+					item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
 
 					if (customMapper == null)
 						autoMapper.AutoMap(item);
@@ -1873,13 +1780,11 @@ namespace FluentData
 
 	internal class ExecuteQueryHandler
 	{
-		private readonly DbCommandData _data;
 		private readonly DbCommand _command;
 		private bool _queryAlreadyExecuted;
 
-		public ExecuteQueryHandler(DbCommandData data, DbCommand command)
+		public ExecuteQueryHandler(DbCommand command)
 		{
-			_data = data;
 			_command = command;
 		}
 
@@ -1891,8 +1796,8 @@ namespace FluentData
 
 				action();
 
-				if (_data.ContextData.OnExecuted != null)
-					_data.ContextData.OnExecuted(new OnExecutedEventArgs(_data.InnerCommand));
+				if (_command.Data.Context.Data.OnExecuted != null)
+					_command.Data.Context.Data.OnExecuted(new OnExecutedEventArgs(_command.Data.InnerCommand));
 			}
 			catch (Exception exception)
 			{
@@ -1908,36 +1813,32 @@ namespace FluentData
 		{
 			if (_queryAlreadyExecuted)
 			{
-				if (_data.UseMultipleResultsets)
-					_data.Reader.NextResult();
+				if(_command.Data.UseMultipleResultsets)
+					_command.Data.Reader.NextResult();
 				else
 					throw new FluentDataException("A query has already been executed on this command object. Please create a new command object.");
 			}
 			else
 			{
-				_data.InnerCommand.CommandText = _data.Sql.ToString();
-				if (_data.ContextData.CommandTimeout != Int32.MinValue)
-					_data.InnerCommand.CommandTimeout = _data.ContextData.CommandTimeout;
+				if(_command.Data.Context.Data.CommandTimeout != Int32.MinValue)
+					_command.Data.InnerCommand.CommandTimeout = _command.Data.Context.Data.CommandTimeout;
 
-				if(_data.InnerCommand.Connection.State != ConnectionState.Open)
+				if(_command.Data.InnerCommand.Connection.State != ConnectionState.Open)
 					OpenConnection();
 
-				if (_data.ContextData.UseTransaction)
+				if(_command.Data.Context.Data.UseTransaction)
 				{
-					if (_data.ContextData.Transaction == null)
-						_data.ContextData.Transaction = _data.ContextData.Connection.BeginTransaction((System.Data.IsolationLevel) _data.ContextData.IsolationLevel);
-					
-					_data.InnerCommand.Transaction = _data.ContextData.Transaction;
+					if(_command.Data.Context.Data.Transaction == null)
+						_command.Data.Context.Data.Transaction = _command.Data.Context.Data.Connection.BeginTransaction((System.Data.IsolationLevel)_command.Data.Context.Data.IsolationLevel);
+
+					_command.Data.InnerCommand.Transaction = _command.Data.Context.Data.Transaction;
 				}
 
-				if (_data.ContextData.OnExecuting != null)
-					_data.ContextData.OnExecuting(new OnExecutingEventArgs(_data.InnerCommand));
+				if(_command.Data.Context.Data.OnExecuting != null)
+					_command.Data.Context.Data.OnExecuting(new OnExecutingEventArgs(_command.Data.InnerCommand));
 
 				if (useReader)
-				{
-					_data.InnerReader = _data.InnerCommand.ExecuteReader();
-					_data.Reader = new DataReader(_data.InnerReader);
-				}
+					_command.Data.Reader = new DataReader(_command.Data.InnerCommand.ExecuteReader());
 
 				_queryAlreadyExecuted = true;
 			}
@@ -1945,21 +1846,21 @@ namespace FluentData
 
 		private void OpenConnection()
 		{
-			if (_data.ContextData.OnConnectionOpening != null)
-				_data.ContextData.OnConnectionOpening(new OnConnectionOpeningEventArgs(_data.InnerCommand.Connection));
+			if(_command.Data.Context.Data.OnConnectionOpening != null)
+				_command.Data.Context.Data.OnConnectionOpening(new OnConnectionOpeningEventArgs(_command.Data.InnerCommand.Connection));
 
-			_data.InnerCommand.Connection.Open();
+			_command.Data.InnerCommand.Connection.Open();
 
-			if (_data.ContextData.OnConnectionOpened != null)
-				_data.ContextData.OnConnectionOpened(new OnConnectionOpenedEventArgs(_data.InnerCommand.Connection));
+			if(_command.Data.Context.Data.OnConnectionOpened != null)
+				_command.Data.Context.Data.OnConnectionOpened(new OnConnectionOpenedEventArgs(_command.Data.InnerCommand.Connection));
 		}
 
 		private void HandleQueryFinally()
 		{
-			if (!_data.UseMultipleResultsets)
+			if(!_command.Data.UseMultipleResultsets)
 			{
-				if (_data.Reader != null)
-					_data.Reader.Close();
+				if(_command.Data.Reader != null)
+					_command.Data.Reader.Close();
 
 				_command.ClosePrivateConnection();
 			}
@@ -1967,297 +1868,298 @@ namespace FluentData
 
 		private void HandleQueryException(Exception exception)
 		{
-			if (_data.Reader != null)
-				_data.Reader.Close();
+			if(_command.Data.Reader != null)
+				_command.Data.Reader.Close();
 
 			_command.ClosePrivateConnection();
-			if (_data.ContextData.UseTransaction)
-				_data.Context.CloseSharedConnection();
+			if(_command.Data.Context.Data.UseTransaction)
+				_command.Data.Context.CloseSharedConnection();
 
-			if (_data.ContextData.OnError != null)
-				_data.ContextData.OnError(new OnErrorEventArgs(_data.InnerCommand, exception));
+			if(_command.Data.Context.Data.OnError != null)
+				_command.Data.Context.Data.OnError(new OnErrorEventArgs(_command.Data.InnerCommand, exception));
 			
 			throw exception;
 		}
 	}
 
-	internal class DataReader : System.Data.IDataReader, IDataReader
+	internal class DataReader : IDataReader
 	{
-		private readonly System.Data.IDataReader _innerReader;
+		public System.Data.IDataReader InnerReader { get; private set; }
 		private DynamicDataReader _dynamicReader;
 
 		public DataReader(System.Data.IDataReader reader)
 		{
-			_innerReader = reader;
+			InnerReader = reader;
 		}
 
-		public dynamic Value {
+		public dynamic Value
+		{
 			get
 			{
 				if(_dynamicReader == null)
-					_dynamicReader = new DynamicDataReader(_innerReader);
+					_dynamicReader = new DynamicDataReader(InnerReader);
 				return _dynamicReader;
 			}
 		}
 
 		public void Close()
 		{
-			_innerReader.Close();
+			InnerReader.Close();
 		}
 
 		public int Depth
 		{
-			get { return _innerReader.Depth; }
+			get { return InnerReader.Depth; }
 		}
 
 		public DataTable GetSchemaTable()
 		{
-			return _innerReader.GetSchemaTable();
+			return InnerReader.GetSchemaTable();
 		}
 
 		public bool IsClosed
 		{
-			get { return _innerReader.IsClosed; }
+			get { return InnerReader.IsClosed; }
 		}
 
 		public bool NextResult()
 		{
-			return _innerReader.NextResult();
+			return InnerReader.NextResult();
 		}
 
 		public bool Read()
 		{
-			return _innerReader.Read();
+			return InnerReader.Read();
 		}
 
 		public int RecordsAffected
 		{
-			get { return _innerReader.RecordsAffected; }
+			get { return InnerReader.RecordsAffected; }
 		}
 
 		public void Dispose()
 		{
-			_innerReader.Dispose();
+			InnerReader.Dispose();
 		}
 
 		public int FieldCount
 		{
-			get { return _innerReader.FieldCount; }
+			get { return InnerReader.FieldCount; }
 		}
 
 		public bool GetBoolean(int i)
 		{
-			return _innerReader.GetBoolean(i);
+			return InnerReader.GetBoolean(i);
 		}
 
 		public bool GetBoolean(string name)
 		{
-			return _innerReader.GetBoolean(GetOrdinal(name));
+			return InnerReader.GetBoolean(GetOrdinal(name));
 		}
 
 		public byte GetByte(int i)
 		{
-			return _innerReader.GetByte(i);
+			return InnerReader.GetByte(i);
 		}
 
 		public byte GetByte(string name)
 		{
-			return _innerReader.GetByte(GetOrdinal(name));
+			return InnerReader.GetByte(GetOrdinal(name));
 		}
 
 		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return _innerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+			return InnerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return _innerReader.GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
+			return InnerReader.GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public char GetChar(int i)
 		{
-			return _innerReader.GetChar(i);
+			return InnerReader.GetChar(i);
 		}
 
 		public char GetChar(string name)
 		{
-			return _innerReader.GetChar(GetOrdinal(name));
+			return InnerReader.GetChar(GetOrdinal(name));
 		}
 
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return _innerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+			return InnerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public long GetChars(string name, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return _innerReader.GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
+			return InnerReader.GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public System.Data.IDataReader GetData(int i)
 		{
-			return _innerReader.GetData(i);
+			return InnerReader.GetData(i);
 		}
 
 		public System.Data.IDataReader GetData(string name)
 		{
-			return _innerReader.GetData(GetOrdinal(name));
+			return InnerReader.GetData(GetOrdinal(name));
 		}
 
 		public string GetDataTypeName(int i)
 		{
-			return _innerReader.GetDataTypeName(i);
+			return InnerReader.GetDataTypeName(i);
 		}
 
 		public string GetDataTypeName(string name)
 		{
-			return _innerReader.GetDataTypeName(GetOrdinal(name));
+			return InnerReader.GetDataTypeName(GetOrdinal(name));
 		}
 
 		public DateTime GetDateTime(int i)
 		{
-			return _innerReader.GetDateTime(i);
+			return InnerReader.GetDateTime(i);
 		}
 
 		public DateTime GetDateTime(string name)
 		{
-			return _innerReader.GetDateTime(GetOrdinal(name));
+			return InnerReader.GetDateTime(GetOrdinal(name));
 		}
 
 		public decimal GetDecimal(int i)
 		{
-			return _innerReader.GetDecimal(i);
+			return InnerReader.GetDecimal(i);
 		}
 
 		public decimal GetDecimal(string name)
 		{
-			return _innerReader.GetDecimal(GetOrdinal(name));
+			return InnerReader.GetDecimal(GetOrdinal(name));
 		}
 
 		public double GetDouble(int i)
 		{
-			return _innerReader.GetDouble(i);
+			return InnerReader.GetDouble(i);
 		}
 
 		public double GetDouble(string name)
 		{
-			return _innerReader.GetDouble(GetOrdinal(name));
+			return InnerReader.GetDouble(GetOrdinal(name));
 		}
 
 		public Type GetFieldType(int i)
 		{
-			return _innerReader.GetFieldType(i);
+			return InnerReader.GetFieldType(i);
 		}
 
 		public Type GetFieldType(string name)
 		{
-			return _innerReader.GetFieldType(GetOrdinal(name));
+			return InnerReader.GetFieldType(GetOrdinal(name));
 		}
 
 		public float GetFloat(int i)
 		{
-			return _innerReader.GetFloat(i);
+			return InnerReader.GetFloat(i);
 		}
 
 		public float GetFloat(string name)
 		{
-			return _innerReader.GetFloat(GetOrdinal(name));
+			return InnerReader.GetFloat(GetOrdinal(name));
 		}
 
 		public Guid GetGuid(int i)
 		{
-			return _innerReader.GetGuid(i);
+			return InnerReader.GetGuid(i);
 		}
 
 		public Guid GetGuid(string name)
 		{
-			return _innerReader.GetGuid(GetOrdinal(name));
+			return InnerReader.GetGuid(GetOrdinal(name));
 		}
 
 		public short GetInt16(int i)
 		{
-			return _innerReader.GetInt16(i);
+			return InnerReader.GetInt16(i);
 		}
 
 		public short GetInt16(string name)
 		{
-			return _innerReader.GetInt16(GetOrdinal(name));
+			return InnerReader.GetInt16(GetOrdinal(name));
 		}
 
 		public int GetInt32(int i)
 		{
-			return _innerReader.GetInt32(i);
+			return InnerReader.GetInt32(i);
 		}
 
 		public int GetInt32(string name)
 		{
-			return _innerReader.GetInt32(GetOrdinal(name));
+			return InnerReader.GetInt32(GetOrdinal(name));
 		}
 
 		public long GetInt64(int i)
 		{
-			return _innerReader.GetInt64(i);
+			return InnerReader.GetInt64(i);
 		}
 
 		public long GetInt64(string name)
 		{
-			return _innerReader.GetInt64(GetOrdinal(name));
+			return InnerReader.GetInt64(GetOrdinal(name));
 		}
 
 		public string GetName(int i)
 		{
-			return _innerReader.GetName(i);
+			return InnerReader.GetName(i);
 		}
 
 		public string GetName(string name)
 		{
-			return _innerReader.GetName(GetOrdinal(name));
+			return InnerReader.GetName(GetOrdinal(name));
 		}
 
 		public int GetOrdinal(string name)
 		{
-			return _innerReader.GetOrdinal(name);
+			return InnerReader.GetOrdinal(name);
 		}
 
 		public string GetString(int i)
 		{
-			return _innerReader.GetString(i);
+			return InnerReader.GetString(i);
 		}
 
 		public string GetString(string name)
 		{
-			return _innerReader.GetString(GetOrdinal(name));
+			return InnerReader.GetString(GetOrdinal(name));
 		}
 
 		public object GetValue(int i)
 		{
-			return _innerReader.GetValue(i);
+			return InnerReader.GetValue(i);
 		}
 
 		public object GetValue(string name)
 		{
-			return _innerReader.GetValue(GetOrdinal(name));
+			return InnerReader.GetValue(GetOrdinal(name));
 		}
 
 		public int GetValues(object[] values)
 		{
-			return _innerReader.GetValues(values);
+			return InnerReader.GetValues(values);
 		}
 
 		public bool IsDBNull(int i)
 		{
-			return _innerReader.IsDBNull(i);
+			return InnerReader.IsDBNull(i);
 		}
 
 		public bool IsDBNull(string name)
 		{
-			return _innerReader.IsDBNull(GetOrdinal(name));
+			return InnerReader.IsDBNull(GetOrdinal(name));
 		}
 
 		public object this[string name]
 		{
-			get { return _innerReader[name]; }
+			get { return InnerReader[name]; }
 		}
 
 		public object this[int i]
@@ -2285,62 +2187,29 @@ namespace FluentData
 		}
 	}
 
-	public interface IDataReader
+	public interface IDataReader : System.Data.IDataReader
 	{
+		System.Data.IDataReader InnerReader { get; }
 		dynamic Value { get;  }
-		void Close();
-		int Depth { get; }
-		void Dispose();
-		int FieldCount { get; }
-		bool GetBoolean(int i);
 		bool GetBoolean(string name);
-		byte GetByte(int i);
 		byte GetByte(string name);
-		long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length);
 		long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length);
-		char GetChar(int i);
 		char GetChar(string name);
-		long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length);
 		long GetChars(string name, long fieldoffset, char[] buffer, int bufferoffset, int length);
-		global::System.Data.IDataReader GetData(int i);
 		global::System.Data.IDataReader GetData(string name);
-		string GetDataTypeName(int i);
 		string GetDataTypeName(string name);
-		DateTime GetDateTime(int i);
 		DateTime GetDateTime(string name);
-		decimal GetDecimal(int i);
 		decimal GetDecimal(string name);
-		double GetDouble(int i);
 		double GetDouble(string name);
-		Type GetFieldType(int i);
 		Type GetFieldType(string name);
-		float GetFloat(int i);
 		float GetFloat(string name);
-		Guid GetGuid(int i);
 		Guid GetGuid(string name);
-		short GetInt16(int i);
 		short GetInt16(string name);
-		int GetInt32(int i);
 		int GetInt32(string name);
-		long GetInt64(int i);
 		long GetInt64(string name);
-		string GetName(int i);
 		string GetName(string name);
-		int GetOrdinal(string name);
-		global::System.Data.DataTable GetSchemaTable();
-		string GetString(int i);
 		string GetString(string name);
-		object GetValue(int i);
 		object GetValue(string name);
-		int GetValues(object[] values);
-		bool IsClosed { get; }
-		bool IsDBNull(int i);
-		bool IsDBNull(string name);
-		bool NextResult();
-		bool Read();
-		int RecordsAffected { get; }
-		object this[int i] { get; }
-		object this[string name] { get; }
 	}
 
 	public class OnConnectionClosedEventArgs : EventArgs
@@ -2397,26 +2266,26 @@ namespace FluentData
 
 	public partial class DbContext : IDbContext
 	{
-		protected DbContextData ContextData;
+		public DbContextData Data { get; private set; }
 
 		public DbContext()
 		{
-			ContextData = new DbContextData();
+			Data = new DbContextData();
 		}
 
 		internal void CloseSharedConnection()
 		{
-			if (ContextData.Connection == null)
+			if (Data.Connection == null)
 				return;
 
-			if (ContextData.UseTransaction
-				&& ContextData.Transaction != null)
+			if (Data.UseTransaction
+				&& Data.Transaction != null)
 					Rollback();
 
-			ContextData.Connection.Close();
+			Data.Connection.Close();
 
-			if (ContextData.OnConnectionClosed != null)
-				ContextData.OnConnectionClosed(new OnConnectionClosedEventArgs(ContextData.Connection));
+			if (Data.OnConnectionClosed != null)
+				Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.Connection));
 		}
 
 		public void Dispose()
@@ -2465,15 +2334,13 @@ namespace FluentData
 
 	public interface IDbContext : IDisposable
 	{
+		DbContextData Data { get; }
 		IDbContext IgnoreIfAutoMapFails { get; }
 		IDbContext UseTransaction(bool useTransaction);
 		IDbContext UseSharedConnection(bool useSharedConnection);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
-		IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpression);
-		IDbCommand MultiResultSql();
-		IDbCommand MultiResultSql(string sql, params object[] parameters);
-		IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions);
+		IDbCommand MultiResultSql(string sql = "", params object[] parameters);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		IInsertBuilder Insert(string tableName);
@@ -2538,7 +2405,7 @@ namespace FluentData
 		{
 			get
 			{
-				ContextData.IgnoreIfAutoMapFails = true;
+				Data.IgnoreIfAutoMapFails = true;
 				return this;
 			}
 		}
@@ -2548,94 +2415,94 @@ namespace FluentData
 	{
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
 		{
-			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql);
+			return new SelectBuilder<TEntity>(CreateCommand).Select(sql);
 		}
 
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
 		{
-			return new SelectBuilder<TEntity>(ContextData.Provider, CreateCommand).Select(sql, mapToProperty);
+			return new SelectBuilder<TEntity>(CreateCommand).Select(sql, mapToProperty);
 		}
 
 		public IInsertBuilder Insert(string tableName)
 		{
-			return new InsertBuilder(ContextData.Provider, CreateCommand, tableName);
+			return new InsertBuilder(CreateCommand, tableName);
 		}
 
 		public IInsertBuilder<T> Insert<T>(string tableName, T item)
 		{
-			return new InsertBuilder<T>(ContextData.Provider, CreateCommand, tableName, item);
+			return new InsertBuilder<T>(CreateCommand, tableName, item);
 		}
 
 		public IInsertBuilderDynamic Insert(string tableName, ExpandoObject item)
 		{
-			return new InsertBuilderDynamic(ContextData.Provider, CreateCommand, tableName, item);
+			return new InsertBuilderDynamic(CreateCommand, tableName, item);
 		}
 
 		public IUpdateBuilder Update(string tableName)
 		{
-			return new UpdateBuilder(ContextData.Provider, CreateCommand, tableName);
+			return new UpdateBuilder(Data.Provider, CreateCommand, tableName);
 		}
 
 		public IUpdateBuilder<T> Update<T>(string tableName, T item)
 		{
-			return new UpdateBuilder<T>(ContextData.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilder<T>(Data.Provider, CreateCommand, tableName, item);
 		}
 
 		public IUpdateBuilderDynamic Update(string tableName, ExpandoObject item)
 		{
-			return new UpdateBuilderDynamic(ContextData.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilderDynamic(Data.Provider, CreateCommand, tableName, item);
 		}
 
 		public IDeleteBuilder Delete(string tableName)
 		{
-			return new DeleteBuilder(ContextData.Provider, CreateCommand, tableName);
+			return new DeleteBuilder(CreateCommand, tableName);
 		}
 
 		public IDeleteBuilder<T> Delete<T>(string tableName, T item)
 		{
-			return new DeleteBuilder<T>(ContextData.Provider, CreateCommand, tableName, item);
+			return new DeleteBuilder<T>(CreateCommand, tableName, item);
 		}
 
 		private void VerifyStoredProcedureSupport()
 		{
-			if (!ContextData.Provider.SupportsStoredProcedures)
+			if (!Data.Provider.SupportsStoredProcedures)
 				throw new FluentDataException("The selected database does not support stored procedures.");
 		}
 
 		public IStoredProcedureBuilder StoredProcedure(string storedProcedureName)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(ContextData.Provider, CreateCommand, storedProcedureName);
+			return new StoredProcedureBuilder(CreateCommand, storedProcedureName);
 		}
 
 		public IStoredProcedureBuilder MultiResultStoredProcedure(string storedProcedureName)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(ContextData.Provider, CreateCommand.UseMultipleResultset, storedProcedureName);
+			return new StoredProcedureBuilder(CreateCommand.UseMultipleResultset, storedProcedureName);
 		}
 
 		public IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(ContextData.Provider, CreateCommand, storedProcedureName, item);
+			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
 		}
 
 		public IStoredProcedureBuilder<T> MultiResultStoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(ContextData.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
+			return new StoredProcedureBuilder<T>(CreateCommand.UseMultipleResultset, storedProcedureName, item);
 		}
 
 		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(ContextData.Provider, CreateCommand, storedProcedureName, item);
+			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand, storedProcedureName, item);
 		}
 
 		public IStoredProcedureBuilderDynamic MultiResultStoredProcedure(string storedProcedureName, ExpandoObject item)
 		{
 			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(ContextData.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
+			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
 		}
 	}
 
@@ -2643,7 +2510,7 @@ namespace FluentData
 	{
 		public IDbContext CommandTimeout(int timeout)
 		{
-			ContextData.CommandTimeout = timeout;
+			Data.CommandTimeout = timeout;
 			return this;
 		}
 	}
@@ -2652,9 +2519,9 @@ namespace FluentData
 	{
 		private void ConnectionStringInternal(string connectionString, DbProviderTypes dbProviderType, IDbProvider dbProvider)
 		{
-			ContextData.ConnectionString = connectionString;
-			ContextData.ProviderType = dbProviderType;
-			ContextData.Provider = dbProvider;
+			Data.ConnectionString = connectionString;
+			Data.ProviderType = dbProviderType;
+			Data.Provider = dbProvider;
 		}
 
 		public IDbContext ConnectionString(string connectionString, DbProviderTypes dbProviderType)
@@ -2694,7 +2561,7 @@ namespace FluentData
 	{
 		public IDbContext EntityFactory(IEntityFactory entityFactory)
 		{
-			ContextData.EntityFactory = entityFactory;
+			Data.EntityFactory = entityFactory;
 			return this;
 		}
 	}
@@ -2703,37 +2570,37 @@ namespace FluentData
 	{
 		public IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action)
 		{
-			ContextData.OnConnectionOpening = action;
+			Data.OnConnectionOpening = action;
 			return this;
 		}
 
 		public IDbContext OnConnectionOpened(Action<OnConnectionOpenedEventArgs> action)
 		{
-			ContextData.OnConnectionOpened = action;
+			Data.OnConnectionOpened = action;
 			return this;
 		}
 
 		public IDbContext OnConnectionClosed(Action<OnConnectionClosedEventArgs> action)
 		{
-			ContextData.OnConnectionClosed = action;
+			Data.OnConnectionClosed = action;
 			return this;
 		}
 
 		public IDbContext OnExecuting(Action<OnExecutingEventArgs> action)
 		{
-			ContextData.OnExecuting = action;
+			Data.OnExecuting = action;
 			return this;
 		}
 
 		public IDbContext OnExecuted(Action<OnExecutedEventArgs> action)
 		{
-			ContextData.OnExecuted = action;
+			Data.OnExecuted = action;
 			return this;
 		}
 
 		public IDbContext OnError(Action<OnErrorEventArgs> action)
 		{
-			ContextData.OnError = action;
+			Data.OnError = action;
 			return this;
 		}
 	}
@@ -2746,20 +2613,20 @@ namespace FluentData
 			{
 				IDbConnection connection = null;
 
-				if (ContextData.UseTransaction
-					|| ContextData.UseSharedConnection)
+				if (Data.UseTransaction
+					|| Data.UseSharedConnection)
 				{
-					if (ContextData.Connection == null)
-						ContextData.Connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
-					connection = ContextData.Connection;
+					if (Data.Connection == null)
+						Data.Connection = Data.Provider.CreateConnection(Data.ConnectionString);
+					connection = Data.Connection;
 				}
 				else
-					connection = ContextData.Provider.CreateConnection(ContextData.ConnectionString);
+					connection = Data.Provider.CreateConnection(Data.ConnectionString);
 
 				var cmd = connection.CreateCommand();
 				cmd.Connection = connection;
 
-				return new DbCommand(this, cmd, ContextData);
+				return new DbCommand(this, cmd);
 			}
 		}
 
@@ -2774,19 +2641,7 @@ namespace FluentData
 			return command;
 		}
 
-		public IDbCommand Sql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
-		{
-			var command = CreateCommand.Sql(sql, mappingExpressions);
-			
-			return command;
-		}
-
-		public IDbCommand MultiResultSql()
-		{
-			return CreateCommand.UseMultipleResultset;
-		}
-
-		public IDbCommand MultiResultSql(string sql, params object[] parameters)
+		public IDbCommand MultiResultSql(string sql = "", params object[] parameters)
 		{
 			var command = CreateCommand.UseMultipleResultset.Sql(sql);
 			if(parameters != null)
@@ -2796,54 +2651,48 @@ namespace FluentData
 			}
 			return command;
 		}
-
-		public IDbCommand MultiResultSql<T>(string sql, params Expression<Func<T, object>>[] mappingExpressions)
-		{
-			var command = CreateCommand.UseMultipleResultset.Sql(sql, mappingExpressions);
-			return command;
-		}
 	}
 
 	public partial class DbContext : IDbContext
 	{
 		public IDbContext UseTransaction(bool useTransaction)
 		{
-			ContextData.UseTransaction = useTransaction;
+			Data.UseTransaction = useTransaction;
 			return this;
 		}
 
 		public IDbContext UseSharedConnection(bool useSharedConnection)
 		{
-			ContextData.UseSharedConnection = useSharedConnection;
+			Data.UseSharedConnection = useSharedConnection;
 			return this;
 		}
 
 		public IDbContext IsolationLevel(IsolationLevel isolationLevel)
 		{
-			ContextData.IsolationLevel = isolationLevel;
+			Data.IsolationLevel = isolationLevel;
 			return this;
 		}
 
 		public IDbContext Commit()
 		{
-			TransactionAction(() => ContextData.Transaction.Commit());
+			TransactionAction(() => Data.Transaction.Commit());
 			return this;
 		}
 
 		public IDbContext Rollback()
 		{
-			TransactionAction(() => ContextData.Transaction.Rollback());
+			TransactionAction(() => Data.Transaction.Rollback());
 			return this;
 		}
 
 		private void TransactionAction(Action action)
 		{
-			if(ContextData.Transaction == null)
+			if(Data.Transaction == null)
 				return;
-			if(!ContextData.UseTransaction)
+			if(!Data.UseTransaction)
 				throw new FluentDataException("Transaction support has not been enabled.");
 			action();
-			ContextData.Transaction = null;
+			Data.Transaction = null;
 		}
 	}
 
@@ -3081,7 +2930,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "System.Data.OleDb";
+				return "System.command.Data.OleDb";
 			}
 		}
 
@@ -3155,19 +3004,19 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				lastId = HandleExecuteReturnLastId<T>(command);
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 			
 		}
@@ -3177,17 +3026,17 @@ namespace FluentData
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
+			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
 			T lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
-				data.InnerCommand.CommandText = "select @@Identity";
+				command.Data.InnerCommand.CommandText = "select @@Identity";
 
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				lastId = (T) value;
 			}
@@ -3337,7 +3186,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "IBM.Data.DB2";
+				return "IBM.data.DB2";
 			}
 		}
 		public bool SupportsOutputParameters
@@ -3427,18 +3276,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			data.Sql.Append("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
+			command.Data.InnerCommand.CommandText += "select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;";
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -3449,7 +3298,7 @@ namespace FluentData
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 
@@ -3557,18 +3406,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			data.Sql.Append("select lastval();");
+			command.Data.InnerCommand.CommandText += "select lastval();";
 
 			T lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				object value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -3579,7 +3428,7 @@ namespace FluentData
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 
@@ -3595,7 +3444,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "MySql.Data.MySqlClient";
+				return "MySql.command.Data.MySqlClient";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -3685,18 +3534,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			data.Sql.Append("select LAST_INSERT_ID() as `LastInsertedId`");
+			command.Data.InnerCommand.CommandText += "select LAST_INSERT_ID() as `LastInsertedId`";
 
 			T lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				object value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -3707,7 +3556,7 @@ namespace FluentData
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 
@@ -3786,8 +3635,8 @@ namespace FluentData
 		string GetSqlForDeleteBuilder(BuilderData data);
 		string GetSqlForStoredProcedureBuilder(BuilderData data);
 		DataTypes GetDbTypeForClrType(Type clrType);
-		T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName);
-		void OnCommandExecuting(DbCommandData data);
+		T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName);
+		void OnCommandExecuting(IDbCommand command);
 		string EscapeColumnName(string name);
 	}
 
@@ -3910,28 +3759,28 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			data.Command.ParameterOut("FluentDataLastId", data.ContextData.Provider.GetDbTypeForClrType(typeof(T)));
-			data.Command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
+			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.Provider.GetDbTypeForClrType(typeof(T)));
+			command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				data.InnerCommand.ExecuteNonQuery();
+				command.Data.InnerCommand.ExecuteNonQuery();
 
-				lastId = data.Command.ParameterValue<T>("FluentDataLastId");
+				lastId = command.ParameterValue<T>("FluentDataLastId");
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
-			if (data.InnerCommand.CommandType == CommandType.Text)
+			if (command.Data.InnerCommand.CommandType == CommandType.Text)
 			{
-				dynamic innerCommand = data.InnerCommand;
+				dynamic innerCommand = command.Data.InnerCommand;
 				innerCommand.BindByName = true;
 			}
 		}
@@ -3948,7 +3797,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "System.Data.SQLite";
+				return "System.command.Data.SQLite";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -4038,18 +3887,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			data.Sql.Append("select last_insert_rowid();");
+			command.Data.InnerCommand.CommandText += "select last_insert_rowid();";
 
-			T lastId = default(T);
+			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -4060,7 +3909,7 @@ namespace FluentData
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 
@@ -4076,7 +3925,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "System.Data.SqlServerCe.4.0";
+				return "System.command.Data.SqlServerCe.4.0";
 			}
 		}
 
@@ -4125,9 +3974,9 @@ namespace FluentData
 			var sql = "";
 			sql = "select " + data.Select;
 			sql += " from " + data.From;
-			if (data.WhereSql.Length > 0)
+			if(data.WhereSql.Length > 0)
 				sql += " where " + data.WhereSql;
-			if (data.GroupBy.Length > 0)
+			if(data.GroupBy.Length > 0)
 				sql += " group by " + data.GroupBy;
 			if (data.Having.Length > 0)
 				sql += " having " + data.Having;
@@ -4168,19 +4017,19 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(data);
+				lastId = HandleExecuteReturnLastId<T>(command);
 			});
 
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 			
 		}
@@ -4190,17 +4039,17 @@ namespace FluentData
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			int recordsAffected = data.InnerCommand.ExecuteNonQuery();
+			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
 			T lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
-				data.InnerCommand.CommandText = "select cast(@@identity as int)";
+				command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
 
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				lastId = (T) value;
 			}
@@ -4215,7 +4064,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "System.Data.SqlClient";
+				return "System.data.SqlClient";
 			} 
 		}
 
@@ -4328,18 +4177,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(DbCommandData data, string identityColumnName = null)
+		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if (data.Sql[data.Sql.Length - 1] != ';')
-				data.Sql.Append(';');
+			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
+				command.Data.InnerCommand.CommandText += ';';
 
-			data.Sql.Append("select SCOPE_IDENTITY()");
+			command.Data.InnerCommand.CommandText += "select SCOPE_IDENTITY()";
 
 			var lastId = default(T);
 
-			data.ExecuteQueryHandler.ExecuteQuery(false, () =>
+			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
 				if (value.GetType() == typeof(T))
 					lastId = (T) value;
@@ -4350,7 +4199,7 @@ namespace FluentData
 			return lastId;
 		}
 
-		public void OnCommandExecuting(DbCommandData data)
+		public void OnCommandExecuting(IDbCommand command)
 		{
 		}
 

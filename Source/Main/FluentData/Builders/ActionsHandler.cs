@@ -15,32 +15,35 @@ namespace FluentData
 			_data = data;
 		}
 
-		internal void ColumnValueAction(string columnName, object value)
+		internal void ColumnValueAction(string columnName, object value, DataTypes parameterType, int size)
 		{
-			ColumnAction(columnName, value, typeof(object));
+			ColumnAction(columnName, value, typeof(object), parameterType, size);
 		}
 
-		private void ColumnAction(string columnName, object value, Type type)
+		private void ColumnAction(string columnName, object value, Type type, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
 
 			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
 
-			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, false);
+			if(parameterType == DataTypes.Object)
+				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
+
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false, size);
 		}
 
-		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression)
+		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
 
-			ColumnAction(parser.Name, parser.Value, parser.Type);
+			ColumnAction(parser.Name, parser.Value, parser.Type, parameterType, size);
 		}
 
-		internal void ColumnValueDynamic(ExpandoObject item, string propertyName)
+		internal void ColumnValueDynamic(ExpandoObject item, string propertyName, DataTypes parameterType, int size)
 		{
 			var propertyValue = (item as IDictionary<string, object>) [propertyName];
 
-			ColumnAction(propertyName, propertyValue, typeof(object));
+			ColumnAction(propertyName, propertyValue, typeof(object), parameterType, size);
 		}
 
 		internal void AutoMapColumnsAction<T>(params Expression<Func<T, object>>[] ignorePropertyExpressions)
@@ -65,7 +68,7 @@ namespace FluentData
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
 				var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
-				ColumnAction(property.Value.Name, propertyValue, propertyType);
+				ColumnAction(property.Value.Name, propertyValue, propertyType, DataTypes.Object, 0);
 			}
 		}
 
@@ -84,11 +87,11 @@ namespace FluentData
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Key, StringComparison.CurrentCultureIgnoreCase));
 
 				if (ignoreProperty == null)
-					ColumnAction(property.Key, property.Value, typeof(object));
+					ColumnAction(property.Key, property.Value, typeof(object), DataTypes.Object, 0);
 			}
 		}
 
-		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size = 0)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size)
 		{
 			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
@@ -98,18 +101,18 @@ namespace FluentData
 			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
 		}
 
-		internal void WhereAction(string columnName, object value)
+		internal void WhereAction(string columnName, object value, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
-			ParameterAction(parameterName, value, DataTypes.Object, ParameterDirection.Input, true);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, true, 0);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
 		}
 
-		internal void WhereAction<T>(Expression<Func<T, object>> expression)
+		internal void WhereAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			var parser = new PropertyExpressionParser<T>(_data.Item, expression);
-			WhereAction(parser.Name, parser.Value);
+			WhereAction(parser.Name, parser.Value, parameterType, size);
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace FluentData
 			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		internal IDbCommand UseMultipleResultset
+		public IDbCommand UseMultipleResultset
 		{
 			get
 			{
