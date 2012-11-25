@@ -9,7 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_single_dynamic()
 		{
-			dynamic product = Context().Sql("select * from Product where ProductId = 1").QuerySingle();
+			dynamic product = Context().Sql("select * from Product where ProductId = 1").QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
 		}

@@ -12,11 +12,11 @@ namespace FluentData.Command
 			using (var cmd = TestHelper.Context().MultiResultSql())
 			{
 				var category1 = cmd.Sql(@"select * from Category where CategoryId = 1;
-						select * from Category where CategoryId = 2;").QuerySingle();
+						select * from Category where CategoryId = 2;").QuerySingle<dynamic>();
 
 				Assert.AreEqual("Books", category1.Name);
 
-				var category2 = cmd.QuerySingle();
+				var category2 = cmd.QuerySingle<dynamic>();
 				Assert.AreEqual("Movies", category2.Name);
 			}
 		}

@@ -11,11 +11,11 @@ namespace FluentData.Features.Transaction
 		{
 			using (var context = TestHelper.Context().UseTransaction(true))
 			{
-				var category = context.Sql("select top 1 * from category").QuerySingle();
+				var category = context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 
 				context.Commit();
 
-				category = context.Sql("select top 1 * from category").QuerySingle();
+				category = context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 			}
 		}
 
@@ -24,11 +24,11 @@ namespace FluentData.Features.Transaction
 		{
 			using(var context = TestHelper.Context().UseTransaction(true))
 			{
-				var category = context.Sql("select top 1 * from category").QuerySingle();
+				var category = context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 
 				context.Commit();
 
-				category = context.Sql("select top 1 * from category").QuerySingle();
+				category = context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 
 				context.Commit();
 			}

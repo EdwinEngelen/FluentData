@@ -11,17 +11,17 @@ namespace FluentData.Context
 		{
 			using (var db = TestHelper.Context().UseTransaction(true))
 			{
-				var category = db.Sql("select * from Category where CategoryId = 1").QuerySingle();
+				var category = db.Sql("select * from Category where CategoryId = 1").QuerySingle<dynamic>();
 				Assert.AreEqual("Books", category.Name);
 
 				var affectedRows = db.Sql("update Category set Name = 'BooksChanged' where CategoryId=1").Execute();
 				Assert.AreEqual(1, affectedRows);
 
-				var updatedCategory = db.Sql("select * from Category where CategoryId = 1").QuerySingle();
+				var updatedCategory = db.Sql("select * from Category where CategoryId = 1").QuerySingle<dynamic>();
 				Assert.AreEqual("BooksChanged", updatedCategory.Name);
 			}
 
-			var rollbackedCategory = TestHelper.Context().Sql("select * from Category where CategoryId = 1").QuerySingle();
+			var rollbackedCategory = TestHelper.Context().Sql("select * from Category where CategoryId = 1").QuerySingle<dynamic>();
 
 			Assert.AreEqual("Books", rollbackedCategory.Name);
 		}

@@ -177,7 +177,7 @@ namespace FluentData._Helpers
 		{
 			var product = context
 							.Sql("select * from product where productid = @0", productId)
-							.QuerySingle();
+							.QuerySingle<dynamic>();
 
 			return product;
 		}

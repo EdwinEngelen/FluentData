@@ -9,7 +9,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Indexed_parameters()
 		{
-			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query();
+			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -17,7 +17,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Indexed_parameters_alternative()
 		{
-			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query();
+			dynamic products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2).Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -28,17 +28,17 @@ namespace FluentData._Documentation
 			dynamic products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
 
 		[TestMethod]
-		public void List_of_parameters_in_query()
+		public void List_of_parameters_in_Query()
 		{
 			List<int> ids = new List<int>() { 1, 2, 3, 4 };
 
-			dynamic products = Context().Sql("select * from Product where ProductId in(@0)", ids).Query();
+			dynamic products = Context().Sql("select * from Product where ProductId in(@0)", ids).Query<dynamic>();
 
 			Assert.AreEqual(4, products.Count);
 		}

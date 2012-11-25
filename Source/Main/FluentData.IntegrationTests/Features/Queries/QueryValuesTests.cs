@@ -25,5 +25,13 @@ namespace FluentData.Features.Queries
 			Assert.AreEqual("Books", categories[0]);
 			Assert.AreEqual("Movies", categories[1]);
 		}
+
+		[TestMethod]
+		public void Test_null()
+		{
+			var categoryId = TestHelper.Context().Sql("select null").QuerySingle<int>();
+
+			Assert.AreEqual(0, categoryId);
+		}
 	}
 }

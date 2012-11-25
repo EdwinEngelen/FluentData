@@ -11,9 +11,9 @@ namespace FluentData.Features.Connection
 		{
 			using (var context = TestHelper.Context().UseSharedConnection(true))
 			{
-				context.Sql("select top 1 * from category").QuerySingle();
+				context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 
-				context.Sql("select top 1 * from category").QuerySingle();
+				context.Sql("select top 1 * from category").QuerySingle<dynamic>();
 			}
 		}
 	}

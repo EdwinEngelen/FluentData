@@ -10,7 +10,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Product").Query();
+			var products = Context().Sql("select * from Product").Query<dynamic>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -32,11 +32,11 @@ namespace FluentData._Documentation
 		}
 
 		[TestMethod]
-		public void In_query()
+		public void In_Query()
 		{
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
-			var products = Context().Sql("select * from Product where ProductId in(@0)", ids).Query();
+			var products = Context().Sql("select * from Product where ProductId in(@0)", ids).Query<dynamic>();
 
 			Assert.AreEqual(4, products.Count);
 		}

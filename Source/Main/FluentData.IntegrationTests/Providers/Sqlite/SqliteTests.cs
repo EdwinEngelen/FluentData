@@ -41,7 +41,7 @@ namespace FluentData.Providers.Sqlite
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Product").Query();
+			var products = Context().Sql("select * from Product").Query<dynamic>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -49,7 +49,7 @@ namespace FluentData.Providers.Sqlite
 		[TestMethod]
 		public void Query_single_dynamic()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = 1").QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
 		}
@@ -138,7 +138,7 @@ namespace FluentData.Providers.Sqlite
 		[TestMethod]
 		public void Unnamed_parameters_one()
 		{
-			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle();
+			var product = Context().Sql("select * from Product where ProductId = @0", 1).QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
 		}
@@ -147,7 +147,7 @@ namespace FluentData.Providers.Sqlite
 		public void Unnamed_parameters_many()
 		{
 			var products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -158,18 +158,18 @@ namespace FluentData.Providers.Sqlite
 			var products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
 
 		[TestMethod]
-		public void In_query()
+		public void In_Query()
 		{
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
 			var products = Context().Sql("select * from Product where ProductId in(@0)", ids)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(4, products.Count);
 		}
@@ -202,8 +202,8 @@ namespace FluentData.Providers.Sqlite
 			using (var command = Context().MultiResultSql())
 			{
 				var categories = command.Sql(@"select * from Category;
-												select * from Product;").Query();
-				var products = command.Query();
+												select * from Product;").Query<dynamic>();
+				var products = command.Query<dynamic>();
 
 				Assert.IsTrue(categories.Count > 0);
 				Assert.IsTrue(products.Count > 0);

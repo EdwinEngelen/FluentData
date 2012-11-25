@@ -13,7 +13,7 @@ namespace FluentData.Features.Events
 
 			try
 			{
-				TestHelper.Context().OnError(args => eventFired = true).Sql("sql with error").Query();
+				TestHelper.Context().OnError(args => eventFired = true).Sql("sql with error").Query<dynamic>();
 			}
 			catch
 			{

@@ -8,7 +8,7 @@ namespace FluentData.Providers
 		void Custom_mapper_using_dynamic(Product product, IDataReader row);
 		void Delete_data_sql();
 		void Delete_data_builder();
-		void In_query();
+		void In_Query();
 		void SelectBuilder_Paging();
 		void Insert_data_builder_automapping();
 		void Insert_data_builder_no_automapping();

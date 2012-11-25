@@ -16,7 +16,7 @@ namespace FluentData.Providers.Oracle
 		public void Query_many_dynamic()
 		{
 			var products = Context().Sql("select * from Product")
-									.Query();
+									.Query<dynamic>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -25,7 +25,7 @@ namespace FluentData.Providers.Oracle
 		public void Query_single_dynamic()
 		{
 			var product = Context().Sql("select * from Product where ProductId = 1")
-									.QuerySingle();
+									.QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
 		}
@@ -117,7 +117,7 @@ namespace FluentData.Providers.Oracle
 		public void Unnamed_parameters_one()
 		{
 			var product = Context().Sql("select * from Product where ProductId = :0", 1)
-									.QuerySingle();
+									.QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
 		}
@@ -126,7 +126,7 @@ namespace FluentData.Providers.Oracle
 		public void Unnamed_parameters_many()
 		{
 			var products = Context().Sql("select * from Product where ProductId = :0 or ProductId = :1", 1, 2)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -137,18 +137,18 @@ namespace FluentData.Providers.Oracle
 			var products = Context().Sql("select * from Product where ProductId = :ProductId1 or ProductId = :ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
 
 		[TestMethod]
-		public void In_query()
+		public void In_Query()
 		{
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
 			var products = Context().Sql("select * from Product where ProductId in(:0)", ids)
-									.Query();
+									.Query<dynamic>();
 
 			Assert.AreEqual(3, products.Count);
 		}

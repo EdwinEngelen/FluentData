@@ -5,12 +5,6 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public TList Query<TEntity, TList>()
-			where TList : IList<TEntity>
-		{
-			return Query<TEntity, TList>(null);
-		}
-
 		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
 			where TList : IList<TEntity>
 		{

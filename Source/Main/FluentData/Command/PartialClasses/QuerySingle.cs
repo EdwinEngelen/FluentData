@@ -4,11 +4,6 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public TEntity QuerySingle<TEntity>()
-		{
-			return QuerySingle<TEntity>(null);
-		}
-
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
 			var item = default(TEntity);

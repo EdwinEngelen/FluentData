@@ -11,7 +11,7 @@ namespace FluentData.Features.Events
 		{
 			var eventFired = false;
 
-			TestHelper.Context().OnExecuted(args => eventFired = true).Sql("select top 1 * from product").Query();
+			TestHelper.Context().OnExecuted(args => eventFired = true).Sql("select top 1 * from product").Query<dynamic>();
 
 			Assert.IsTrue(eventFired);
 		}

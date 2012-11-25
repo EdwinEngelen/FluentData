@@ -41,11 +41,6 @@ namespace FluentData
 			return Command.Execute();
 		}
 
-		public List<dynamic> Query()
-		{
-			return Command.Query();
-		}
-
 		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.Query<TEntity, TList>(customMapper);
@@ -59,11 +54,6 @@ namespace FluentData
 		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			Command.QueryComplex<TEntity>(list, customMapper);
-		}
-
-		public dynamic QuerySingle()
-		{
-			return Command.QuerySingle();
 		}
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)

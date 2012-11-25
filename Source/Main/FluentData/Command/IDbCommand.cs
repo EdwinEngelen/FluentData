@@ -12,8 +12,6 @@ namespace FluentData
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
-		List<dynamic> Query();
-		dynamic QuerySingle();
 		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
