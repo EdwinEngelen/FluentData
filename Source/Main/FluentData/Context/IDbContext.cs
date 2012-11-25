@@ -1,6 +1,5 @@
 using System;
 using System.Dynamic;
-using System.Linq.Expressions;
 
 namespace FluentData
 {
@@ -14,7 +13,6 @@ namespace FluentData
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql(string sql = "", params object[] parameters);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql);
-		ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
 		IInsertBuilderDynamic Insert(string tableName, ExpandoObject item);

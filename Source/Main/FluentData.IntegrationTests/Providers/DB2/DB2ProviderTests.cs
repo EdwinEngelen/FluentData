@@ -193,16 +193,14 @@ namespace FluentData.Providers.DB2
 			var context = Context();
 
 			var category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(1, 1).QueryMany();
 			Assert.AreEqual("Books", category[0].Name);
 
 			category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(2, 1).QueryMany();

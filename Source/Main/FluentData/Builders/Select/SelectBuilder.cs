@@ -34,16 +34,6 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty)
-		{
-			var alias = Data.Command.Data.Context.Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
-			if (Data.Select.Length > 0)
-				Data.Select += ",";
-
-			Data.Select += alias;
-			return this;
-		}
-
 		public ISelectBuilder<TEntity> From(string sql)
 		{
 			Data.From += sql;

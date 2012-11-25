@@ -7,7 +7,6 @@ namespace FluentData
 	public interface ISelectBuilder<TEntity>
 	{
 		ISelectBuilder<TEntity> Select(string sql);
-		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
 		ISelectBuilder<TEntity> WhereAnd(string sql);

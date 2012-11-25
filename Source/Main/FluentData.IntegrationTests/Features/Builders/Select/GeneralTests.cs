@@ -11,10 +11,7 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = TestHelper.Context();
 
-			var products = context.Select<Product>("ProductId", x => x.ProductId)
-				.Select("p.Name", x => x.Name)
-				.Select("c.CategoryId", x => x.Category.CategoryId)
-				.Select("c.Name", x => x.Category.Name)
+			var products = context.Select<Product>("ProductId, p.Name, c.Category as Category_CategoryId, c.Name as Category_Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name")
@@ -29,8 +26,7 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = TestHelper.Context();
 			var categories = context
-								.Select<Category>("CategoryId", x => x.CategoryId)
-								.Select("Name", x => x.Name)
+								.Select<Category>("CategoryId, Name")
 								.From("Category").QueryMany();
 
 			Assert.IsTrue(categories.Count > 0);
@@ -40,9 +36,7 @@ namespace FluentData.Features.Builders.Select
 		public void Test3()
 		{
 			var context = TestHelper.Context();
-			var category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+			var category = context.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.Where("CategoryId = @CategoryId").Parameter("CategoryId", 1).QuerySingle();
 
@@ -55,16 +49,14 @@ namespace FluentData.Features.Builders.Select
 			var context = TestHelper.Context();
 
 			var category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(1, 1).QuerySingle();
 			Assert.AreEqual("Books", category.Name);
 
 			category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(2, 1).QuerySingle();
@@ -76,9 +68,8 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = TestHelper.Context();
 
-			var products = context.Select<Product>("p.ProductId, p.Name")
-				.Select("c.CategoryId", x => x.Category.CategoryId)
-				.Select("c.Name", x => x.Category.Name)
+			var products = context
+				.Select<Category>("CategoryId, Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name").QueryMany();

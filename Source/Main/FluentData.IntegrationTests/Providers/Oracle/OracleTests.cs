@@ -159,16 +159,14 @@ namespace FluentData.Providers.Oracle
 			var context = Context();
 
 			var category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(1, 1).QuerySingle();
 			Assert.AreEqual("Books", category.Name);
 
 			category = context
-				.Select<Category>("CategoryId", x => x.CategoryId)
-				.Select("Name", x => x.Name)
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
 				.Paging(2, 1).QuerySingle();

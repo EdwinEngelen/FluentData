@@ -11,11 +11,6 @@ namespace FluentData
 			return new SelectBuilder<TEntity>(CreateCommand).Select(sql);
 		}
 
-		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
-		{
-			return new SelectBuilder<TEntity>(CreateCommand).Select(sql, mapToProperty);
-		}
-
 		public IInsertBuilder Insert(string tableName)
 		{
 			return new InsertBuilder(CreateCommand, tableName);
