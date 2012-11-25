@@ -16,7 +16,7 @@ namespace FluentData.Features.Events
 			                                                		eventFired = true;
 			                                                		args.Command.CommandText = "select top 1 * from Product";
 			                                                	})
-				.Sql("sql with error").Query<dynamic>();
+				.Sql("sql with error").QueryMany<dynamic>();
 
 			Assert.IsTrue(products.Count == 1);
 			Assert.IsTrue(eventFired);

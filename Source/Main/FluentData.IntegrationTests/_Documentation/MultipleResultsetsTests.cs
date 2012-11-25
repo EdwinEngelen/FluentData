@@ -13,9 +13,9 @@ namespace FluentData._Documentation
 			using (var command = Context().MultiResultSql())
 			{
 				List<Category> categories = command.Sql(@"select * from Category;
-												select * from Product;").Query<Category>();
+												select * from Product;").QueryMany<Category>();
 
-				List<Product> products = command.Query<Product>();
+				List<Product> products = command.QueryMany<Product>();
 
 				Assert.IsTrue(categories.Count > 0);
 				Assert.IsTrue(products.Count > 0);

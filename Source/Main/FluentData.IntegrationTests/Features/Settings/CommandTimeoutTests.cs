@@ -9,7 +9,7 @@ namespace FluentData.Features.Settings
 		[TestMethod]
 		public void Test()
 		{
-			TestHelper.Context().OnExecuting(args => Assert.AreEqual(330, args.Command.CommandTimeout)).CommandTimeout(330).Sql("select top 1 * from product").Query<dynamic>();
+			TestHelper.Context().OnExecuting(args => Assert.AreEqual(330, args.Command.CommandTimeout)).CommandTimeout(330).Sql("select top 1 * from product").QueryMany<dynamic>();
 		}
 	}
 }

@@ -90,14 +90,12 @@
     <Compile Include="Command\Mappers\DynamicTypeAutoMapper.cs" />
     <Compile Include="Command\ParameterDirection.cs" />
     <Compile Include="Command\PartialClasses\QueryDataTable.cs" />
-    <Compile Include="Command\PartialClasses\QueryComplexSingle.cs" />
     <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
     <Compile Include="Command\PartialClasses\Sql.cs" />
     <Compile Include="Command\PartialClasses\Execute.cs" />
     <Compile Include="Command\PartialClasses\Parameters.cs" />
     <Compile Include="Command\PartialClasses\Query.cs" />
     <Compile Include="Command\PartialClasses\QueryComplex.cs" />
-    <Compile Include="Command\PartialClasses\QuerySingle.cs" />
     <Compile Include="Command\Queries\QueryComplexSingleHandler.cs" />
     <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />

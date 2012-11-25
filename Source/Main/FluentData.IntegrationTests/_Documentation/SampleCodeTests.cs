@@ -23,7 +23,7 @@ namespace FluentData._Samples
 		[TestMethod]
 		public void Get_many_products()
 		{
-			List<Product> products = Context().Sql(@"select * from Product").Query<Product>();
+			List<Product> products = Context().Sql(@"select * from Product").QueryMany<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}

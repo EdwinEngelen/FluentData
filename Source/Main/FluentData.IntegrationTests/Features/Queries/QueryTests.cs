@@ -9,7 +9,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_map_using_data_reader()
 		{
-			var categories = TestHelper.Context().Sql("select * from Category").Query<Category>(MapCategoryReader);
+			var categories = TestHelper.Context().Sql("select * from Category").QueryMany<Category>(MapCategoryReader);
 			Assert.IsTrue(categories.Count > 0);
 			Assert.IsTrue(categories[0].Name.Length > 0);
 			Assert.IsTrue(categories[0].CategoryId > 0);
@@ -24,7 +24,7 @@ namespace FluentData.Features.Queries
 		[TestMethod]
 		public void Test_map_using_dynamic()
 		{
-			var categories = TestHelper.Context().Sql("select * from Category").Query<Category>(MapCategoryDynamic);
+			var categories = TestHelper.Context().Sql("select * from Category").QueryMany<Category>(MapCategoryDynamic);
 			Assert.IsTrue(categories.Count > 0);
 			Assert.IsTrue(categories[0].Name.Length > 0);
 			Assert.IsTrue(categories[0].CategoryId > 0);

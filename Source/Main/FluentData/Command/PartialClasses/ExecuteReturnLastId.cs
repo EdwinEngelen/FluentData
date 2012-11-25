@@ -11,7 +11,5 @@
 
 			return lastId;
 		}
-
-		
 	}
 }

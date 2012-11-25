@@ -12,9 +12,9 @@ namespace FluentData
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
-		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();

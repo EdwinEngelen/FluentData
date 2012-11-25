@@ -19,9 +19,9 @@ namespace FluentData
 
 		ISelectBuilder<TEntity> Parameter(string name, object value);
 
-		TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
-		List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null);
-		void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null);
+		void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper);
 	}

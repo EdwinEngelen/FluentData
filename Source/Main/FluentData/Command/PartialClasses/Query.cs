@@ -5,7 +5,7 @@ namespace FluentData
 {
 	internal partial class DbCommand
 	{
-		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
+		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
 			where TList : IList<TEntity>
 		{
 			var items = default(TList);
@@ -18,9 +18,21 @@ namespace FluentData
 			return items;
 		}
 
-		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper)
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
-			return Query<TEntity, List<TEntity>>(customMapper);
+			return QueryMany<TEntity, List<TEntity>>(customMapper);
+		}
+
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
+		{
+			var item = default(TEntity);
+
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			{
+				item = new GenericQueryHandler<TEntity>().ExecuteSingle(Data, customMapper);
+			});
+
+			return item;
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace FluentData.Features.AutoMapping
 											inner join OrderLine l on o.OrderId = l.OrderId
 											inner join Product p on l.ProductId = p.ProductId
 											inner join Category c on p.CategoryId = c.CategoryId")
-									.Query<OrderReport>();
+									.QueryMany<OrderReport>();
 
 			Assert.IsTrue(report.Count > 0);
 		}

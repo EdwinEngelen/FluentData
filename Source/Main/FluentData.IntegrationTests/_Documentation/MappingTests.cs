@@ -12,7 +12,7 @@ namespace FluentData._Documentation
 		{
 			List<Product> products = Context().Sql(@"select *
 													from Product")
-									.Query<Product>();
+									.QueryMany<Product>();
 
 			Assert.IsNotNull(products[0]);
 		}
@@ -22,7 +22,7 @@ namespace FluentData._Documentation
 		{
 			List<Product> products = Context().Sql(@"select *
 													from Product")
-									.Query<Product, ProductionCollection>();
+									.QueryMany<Product, ProductionCollection>();
 
 			Assert.IsNotNull(products[0]);
 		}
@@ -35,7 +35,7 @@ namespace FluentData._Documentation
 											c.Name as Category_Name
 											from Product p
 											inner join Category c on p.CategoryId = c.CategoryId")
-									.Query<Product>();
+									.QueryMany<Product>();
 
 			Assert.IsNotNull(products[0]);
 			Assert.IsNotNull(products[0].Category);
@@ -46,7 +46,7 @@ namespace FluentData._Documentation
 		public void Query_custom_mapping_dynamic()
 		{
 			List<Product> products = Context().Sql(@"select * from Product")
-									.Query<Product>(Custom_mapper_using_dynamic);
+									.QueryMany<Product>(Custom_mapper_using_dynamic);
 
 			Assert.IsNotNull(products[0].Name);
 		}
@@ -61,7 +61,7 @@ namespace FluentData._Documentation
 		public void Query_custom_mapping_datareader()
 		{
 			List<Product> products = Context().Sql(@"select * from Product")
-									.Query<Product>(Custom_mapper_using_datareader);
+									.QueryMany<Product>(Custom_mapper_using_datareader);
 
 			Assert.IsNotNull(products[0].Name);
 		}

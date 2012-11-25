@@ -12,7 +12,7 @@ namespace FluentData.Features
 			using (var context = TestHelper.Context())
 			{
 				var categories = context.Sql(@"select *
-											from Category").Query<Category>();
+											from Category").QueryMany<Category>();
 
 				Assert.IsTrue(categories.Count > 0);
 			}
@@ -24,7 +24,7 @@ namespace FluentData.Features
 			using (var command = TestHelper.Context().Sql(@"select *
 											from Category"))
 			{
-				var categories = command.Query<Category>();
+				var categories = command.QueryMany<Category>();
 
 				Assert.IsTrue(categories.Count > 0);
 			}

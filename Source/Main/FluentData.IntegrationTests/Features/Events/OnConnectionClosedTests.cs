@@ -15,8 +15,8 @@ namespace FluentData.Features.Events
 
 			using (var context = TestHelper.Context().OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
 			{
-				context.Sql("select top 1 * from product").Query<dynamic>();
-				context.Sql("select top 1 * from product").Query<dynamic>();
+				context.Sql("select top 1 * from product").QueryMany<dynamic>();
+				context.Sql("select top 1 * from product").QueryMany<dynamic>();
 			}
 
 			Assert.AreEqual(2, eventFiredCounter);
@@ -32,8 +32,8 @@ namespace FluentData.Features.Events
 			var context = TestHelper.Context().OnConnectionClosed(args => { eventFired = true; connectionState = args.Connection.State; });
 			using (var cmd = context.MultiResultSql("select top 1 * from product;select top 1 * from Product"))
 			{
-				cmd.Query<dynamic>();
-				cmd.Query<dynamic>();
+				cmd.QueryMany<dynamic>();
+				cmd.QueryMany<dynamic>();
 			}
 
 			Assert.IsTrue(eventFired);
@@ -48,8 +48,8 @@ namespace FluentData.Features.Events
 
 			using (var context = TestHelper.Context().UseTransaction(true).OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
 			{
-				context.Sql("select top 1 * from product").Query<dynamic>();
-				context.Sql("select top 1 * from product").Query<dynamic>();
+				context.Sql("select top 1 * from product").QueryMany<dynamic>();
+				context.Sql("select top 1 * from product").QueryMany<dynamic>();
 			}
 
 			Assert.AreEqual(1, eventFiredCounter);

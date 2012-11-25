@@ -47,7 +47,7 @@ namespace FluentData.Providers.MySql
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Product").Query<dynamic>();
+			var products = Context().Sql("select * from Product").QueryMany<dynamic>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -63,7 +63,7 @@ namespace FluentData.Providers.MySql
 		[TestMethod]
 		public void Query_many_strongly_typed()
 		{
-			var products = Context().Sql("select * from Product").Query<Product>();
+			var products = Context().Sql("select * from Product").QueryMany<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -96,7 +96,7 @@ namespace FluentData.Providers.MySql
 		public void Query_custom_mapping_dynamic()
 		{
 			var products = Context().Sql(@"select * from Product")
-									.Query<Product>(Custom_mapper_using_dynamic);
+									.QueryMany<Product>(Custom_mapper_using_dynamic);
 
 			Assert.IsNotNull(products[0].Name);
 		}
@@ -111,7 +111,7 @@ namespace FluentData.Providers.MySql
 		public void Query_custom_mapping_datareader()
 		{
 			var products = Context().Sql(@"select * from Product")
-									.Query<Product>(Custom_mapper_using_datareader);
+									.QueryMany<Product>(Custom_mapper_using_datareader);
 
 			Assert.IsNotNull(products[0].Name);
 		}
@@ -134,7 +134,7 @@ namespace FluentData.Providers.MySql
 		[TestMethod]
 		public void QueryValues()
 		{
-			var categories = Context().Sql("select CategoryId from Category order by CategoryId").Query<int>();
+			var categories = Context().Sql("select CategoryId from Category order by CategoryId").QueryMany<int>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual(1, categories[0]);
@@ -153,7 +153,7 @@ namespace FluentData.Providers.MySql
 		public void Unnamed_parameters_many()
 		{
 			var products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2)
-									.Query<dynamic>();
+									.QueryMany<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -164,7 +164,7 @@ namespace FluentData.Providers.MySql
 			var products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
-									.Query<dynamic>();
+									.QueryMany<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
 		}
@@ -175,7 +175,7 @@ namespace FluentData.Providers.MySql
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
 			var products = Context().Sql("select * from Product where ProductId in(@0)", ids)
-									.Query<dynamic>();
+									.QueryMany<dynamic>();
 
 			Assert.AreEqual(4, products.Count);
 		}
@@ -208,8 +208,8 @@ namespace FluentData.Providers.MySql
 				using (var command = Context().MultiResultSql())
 				{
 					var categories = command.Sql(@"select * from Category;
-													select * from Product;").Query<dynamic>();
-					var products = command.Query<dynamic>();
+													select * from Product;").QueryMany<dynamic>();
+					var products = command.QueryMany<dynamic>();
 
 				Assert.IsTrue(categories.Count > 0);
 				Assert.IsTrue(products.Count > 0);

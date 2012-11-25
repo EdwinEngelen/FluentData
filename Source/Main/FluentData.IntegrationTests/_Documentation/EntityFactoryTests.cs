@@ -11,7 +11,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Test()
 		{
-			List<Product> products = Context().EntityFactory(new CustomEntityFactory()).Sql("select * from Product").Query<Product>();
+			List<Product> products = Context().EntityFactory(new CustomEntityFactory()).Sql("select * from Product").QueryMany<Product>();
 
 			Assert.IsTrue(products.Count > 0);
 		}

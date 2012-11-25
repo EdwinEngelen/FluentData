@@ -19,7 +19,7 @@ namespace FluentData.Features.Builders.Select
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name")
 																		
-				.Paging(1, 30).Query();
+				.Paging(1, 30).QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -31,7 +31,7 @@ namespace FluentData.Features.Builders.Select
 			var categories = context
 								.Select<Category>("CategoryId", x => x.CategoryId)
 								.Select("Name", x => x.Name)
-								.From("Category").Query();
+								.From("Category").QueryMany();
 
 			Assert.IsTrue(categories.Count > 0);
 		}
@@ -81,7 +81,7 @@ namespace FluentData.Features.Builders.Select
 				.Select("c.Name", x => x.Category.Name)
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
-				.OrderBy("c.Name").Query();
+				.OrderBy("c.Name").QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -91,7 +91,7 @@ namespace FluentData.Features.Builders.Select
 			var context = TestHelper.Context();
 
 			var products = context.Select<Product>("c.Name")
-				.Select("count(*) as Products").Query();
+				.Select("count(*) as Products").QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 			
