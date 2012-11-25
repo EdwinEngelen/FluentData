@@ -6,7 +6,7 @@ namespace FluentData
 {
 	internal class DataReaderHelper
 	{
-		internal static List<DataReaderField> GetDataReaderFields(IDataReader reader)
+		internal static List<DataReaderField> GetDataReaderFields(System.Data.IDataReader reader)
 		{
 			var columns = new List<DataReaderField>();
 
@@ -19,23 +19,6 @@ namespace FluentData
 			}
 
 			return columns;
-		}
-
-		internal static object GetDataReaderValue(IDataReader reader, int index, bool isNullable)
-		{
-			var value = reader[index];
-			var type = value.GetType();
-
-			if (value == DBNull.Value)
-			{
-				if (isNullable)
-					return null;
-
-				if (type == typeof(DateTime))
-					return DateTime.MinValue;
-			}
-
-			return value;
 		}
 	}
 }

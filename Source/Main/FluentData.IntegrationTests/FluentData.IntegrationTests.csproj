@@ -74,7 +74,6 @@
     <Compile Include="Features\AutoMapping\EnumTests.cs" />
     <Compile Include="Command\MultipleResultsetTests.cs" />
     <Compile Include="Command\PotentialErrorsTests.cs" />
-    <Compile Include="Command\SqlTests.cs" />
     <Compile Include="Context\TransactionTests.cs" />
     <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
     <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />

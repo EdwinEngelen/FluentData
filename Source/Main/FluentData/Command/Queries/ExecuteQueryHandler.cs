@@ -24,9 +24,9 @@ namespace FluentData
 				if (_command.Data.Context.Data.OnExecuted != null)
 					_command.Data.Context.Data.OnExecuted(new OnExecutedEventArgs(_command.Data.InnerCommand));
 			}
-			catch (Exception exception)
+			catch(Exception exception)
 			{
-			    HandleQueryException(exception);
+				HandleQueryException(exception);
 			}
 			finally
 			{

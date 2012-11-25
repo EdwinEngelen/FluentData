@@ -5,13 +5,13 @@ namespace FluentData
 {
 	internal class DynamicTypAutoMapper
 	{
-		private readonly DbCommandData _dbCommandData;
 		private readonly List<DataReaderField> _fields;
+		private readonly System.Data.IDataReader _reader;
 
 		public DynamicTypAutoMapper(DbCommandData dbCommandData)
 		{
-			_dbCommandData = dbCommandData;
-			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
+			_reader = dbCommandData.Reader.InnerReader;
+			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 
 		public ExpandoObject AutoMap()
@@ -22,9 +22,10 @@ namespace FluentData
 
 			foreach (var column in _fields)
 			{
-				var value = DataReaderHelper.GetDataReaderValue(_dbCommandData.Reader, column.Index, true);
-
-				itemDictionary.Add(column.Name, value); 
+				if (_reader.IsDBNull(column.Index))
+					itemDictionary.Add(column.Name, null);
+				else
+					itemDictionary.Add(column.Name, _reader[column.Index]);
 			}
 
 			return item;

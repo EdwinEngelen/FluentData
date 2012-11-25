@@ -9,12 +9,14 @@ namespace FluentData
 		private readonly DbCommandData _dbCommandData;
 		private readonly Dictionary<string, PropertyInfo> _properties;
 		private readonly List<DataReaderField> _fields;
+		private readonly System.Data.IDataReader _reader;
 
 		internal AutoMapper(DbCommandData dbCommandData, Type itemType)
 		{
 			_dbCommandData = dbCommandData;
+			_reader = dbCommandData.Reader.InnerReader;
 			_properties = ReflectionHelper.GetProperties(itemType);
-			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
+			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 
 		public void AutoMap(object item)
@@ -24,7 +26,7 @@ namespace FluentData
 				if (field.IsSystem)
 					continue;
 
-				var value = _dbCommandData.Reader.GetValue(field.Index);
+				var value = _reader.GetValue(field.Index);
 				var wasMapped = false;
 
 				PropertyInfo property = null;

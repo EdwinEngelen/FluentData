@@ -70,52 +70,52 @@ namespace FluentData
 
 		public bool GetBoolean(int i)
 		{
-			return InnerReader.GetBoolean(i);
+			return IsDBNull(i) ? false : InnerReader.GetBoolean(i);
 		}
 
 		public bool GetBoolean(string name)
 		{
-			return InnerReader.GetBoolean(GetOrdinal(name));
+			return GetBoolean(GetOrdinal(name));
 		}
 
 		public byte GetByte(int i)
 		{
-			return InnerReader.GetByte(i);
+			return IsDBNull(i) ? (byte) 0 : InnerReader.GetByte(i);
 		}
 
 		public byte GetByte(string name)
 		{
-			return InnerReader.GetByte(GetOrdinal(name));
+			return GetByte(GetOrdinal(name));
 		}
 
 		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+			return IsDBNull(i) ? 0 : InnerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
+			return GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public char GetChar(int i)
 		{
-			return InnerReader.GetChar(i);
+			return IsDBNull(i) ? char.MinValue : InnerReader.GetChar(i);
 		}
 
 		public char GetChar(string name)
 		{
-			return InnerReader.GetChar(GetOrdinal(name));
+			return GetChar(GetOrdinal(name));
 		}
 
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+			return IsDBNull(i) ? 0 : InnerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public long GetChars(string name, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
+			return GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public System.Data.IDataReader GetData(int i)
@@ -125,7 +125,7 @@ namespace FluentData
 
 		public System.Data.IDataReader GetData(string name)
 		{
-			return InnerReader.GetData(GetOrdinal(name));
+			return GetData(GetOrdinal(name));
 		}
 
 		public string GetDataTypeName(int i)
@@ -135,37 +135,37 @@ namespace FluentData
 
 		public string GetDataTypeName(string name)
 		{
-			return InnerReader.GetDataTypeName(GetOrdinal(name));
+			return GetDataTypeName(GetOrdinal(name));
 		}
 
 		public DateTime GetDateTime(int i)
 		{
-			return InnerReader.GetDateTime(i);
+			return IsDBNull(i) ? DateTime.MinValue : InnerReader.GetDateTime(i);
 		}
 
 		public DateTime GetDateTime(string name)
 		{
-			return InnerReader.GetDateTime(GetOrdinal(name));
+			return GetDateTime(GetOrdinal(name));
 		}
 
 		public decimal GetDecimal(int i)
 		{
-			return InnerReader.GetDecimal(i);
+			return IsDBNull(i) ? 0.0M : InnerReader.GetDecimal(i);
 		}
 
 		public decimal GetDecimal(string name)
 		{
-			return InnerReader.GetDecimal(GetOrdinal(name));
+			return GetDecimal(GetOrdinal(name));
 		}
 
 		public double GetDouble(int i)
 		{
-			return InnerReader.GetDouble(i);
+			return IsDBNull(i) ? 0.0D : InnerReader.GetDouble(i);
 		}
 
 		public double GetDouble(string name)
 		{
-			return InnerReader.GetDouble(GetOrdinal(name));
+			return GetDouble(GetOrdinal(name));
 		}
 
 		public Type GetFieldType(int i)
@@ -175,57 +175,57 @@ namespace FluentData
 
 		public Type GetFieldType(string name)
 		{
-			return InnerReader.GetFieldType(GetOrdinal(name));
+			return GetFieldType(GetOrdinal(name));
 		}
 
 		public float GetFloat(int i)
 		{
-			return InnerReader.GetFloat(i);
+			return IsDBNull(i) ? 0.0F : InnerReader.GetFloat(i);
 		}
 
 		public float GetFloat(string name)
 		{
-			return InnerReader.GetFloat(GetOrdinal(name));
+			return GetFloat(GetOrdinal(name));
 		}
 
 		public Guid GetGuid(int i)
 		{
-			return InnerReader.GetGuid(i);
+			return IsDBNull(i) ? Guid.Empty : InnerReader.GetGuid(i);
 		}
 
 		public Guid GetGuid(string name)
 		{
-			return InnerReader.GetGuid(GetOrdinal(name));
+			return GetGuid(GetOrdinal(name));
 		}
 
 		public short GetInt16(int i)
 		{
-			return InnerReader.GetInt16(i);
+			return IsDBNull(i) ? (short) 0 : InnerReader.GetInt16(i);
 		}
 
 		public short GetInt16(string name)
 		{
-			return InnerReader.GetInt16(GetOrdinal(name));
+			return GetInt16(GetOrdinal(name));
 		}
 
 		public int GetInt32(int i)
 		{
-			return InnerReader.GetInt32(i);
+			return IsDBNull(i) ? 0 : InnerReader.GetInt32(i);
 		}
 
 		public int GetInt32(string name)
 		{
-			return InnerReader.GetInt32(GetOrdinal(name));
+			return GetInt32(GetOrdinal(name));
 		}
 
 		public long GetInt64(int i)
 		{
-			return InnerReader.GetInt64(i);
+			return IsDBNull(i) ? 0 : InnerReader.GetInt64(i);
 		}
 
 		public long GetInt64(string name)
 		{
-			return InnerReader.GetInt64(GetOrdinal(name));
+			return GetInt64(GetOrdinal(name));
 		}
 
 		public string GetName(int i)
@@ -245,17 +245,17 @@ namespace FluentData
 
 		public string GetString(int i)
 		{
-			return InnerReader.GetString(i);
+			return IsDBNull(i) ? string.Empty : InnerReader.GetString(i);
 		}
 
 		public string GetString(string name)
 		{
-			return InnerReader.GetString(GetOrdinal(name));
+			return GetString(GetOrdinal(name));
 		}
 
 		public object GetValue(int i)
 		{
-			return InnerReader.GetValue(i);
+			return IsDBNull(i) ? null : InnerReader.GetValue(i);
 		}
 
 		public object GetValue(string name)
@@ -275,17 +275,20 @@ namespace FluentData
 
 		public bool IsDBNull(string name)
 		{
-			return InnerReader.IsDBNull(GetOrdinal(name));
+			return IsDBNull(GetOrdinal(name));
 		}
 
 		public object this[string name]
 		{
-			get { return InnerReader[name]; }
+			get { return this[GetOrdinal(name)]; }
 		}
 
 		public object this[int i]
 		{
-			get { return GetValue(i); }
+			get
+			{
+				return IsDBNull(i) ? null : InnerReader[i];
+			}
 		}
 	}
 }
