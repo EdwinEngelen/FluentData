@@ -1,6 +1,6 @@
 ﻿namespace FluentData
 {
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext EntityFactory(IEntityFactory entityFactory)
 		{

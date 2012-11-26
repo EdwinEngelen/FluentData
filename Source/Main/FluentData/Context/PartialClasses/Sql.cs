@@ -1,11 +1,9 @@
-﻿using System;
-using System.Data;
-using System.Linq.Expressions;
+﻿using System.Data;
 using System.Linq;
 
 namespace FluentData
 {
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		private DbCommand CreateCommand
 		{

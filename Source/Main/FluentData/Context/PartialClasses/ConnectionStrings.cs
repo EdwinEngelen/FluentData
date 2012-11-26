@@ -2,7 +2,7 @@
 
 namespace FluentData
 {
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		private void ConnectionStringInternal(string connectionString, DbProviderTypes dbProviderType, IDbProvider dbProvider)
 		{

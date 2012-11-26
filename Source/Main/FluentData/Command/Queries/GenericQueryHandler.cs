@@ -35,7 +35,7 @@ namespace FluentData
 
 				if (ReflectionHelper.IsCustomEntity<TEntity>())
 				{
-					var autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+					var autoMapper = new AutoMapper(data, typeof (TEntity));
 
 					while (data.Reader.Read())
 					{
@@ -88,9 +88,9 @@ namespace FluentData
 
 				if (ReflectionHelper.IsCustomEntity<TEntity>())
 				{
-					AutoMapper<TEntity> autoMapper = null;
+					AutoMapper autoMapper = null;
 
-					autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+					autoMapper = new AutoMapper(data, typeof (TEntity));
 
 					if (data.Reader.Read())
 					{

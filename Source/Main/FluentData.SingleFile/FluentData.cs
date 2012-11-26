@@ -1,6 +1,6 @@
 ﻿
 // FluentData version 2.3.0.0.
-// Copyright ©  2012 - Lars-Erik Kindblad (http://www.kindblad.com).
+// Copyright ©  2012 - The Fluent Data Project.
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
 using System;
@@ -42,7 +42,7 @@ namespace FluentData
 			if(parameterType == DataTypes.Object)
 				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
 
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false, size);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, size);
 		}
 
 		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
@@ -104,20 +104,20 @@ namespace FluentData
 			}
 		}
 
-		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, int size)
 		{
 			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
 		{
-			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
+			ParameterAction(name, null, dataTypes, ParameterDirection.Output, size);
 		}
 
 		internal void WhereAction(string columnName, object value, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, true, 0);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, 0);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
 		}
@@ -318,7 +318,7 @@ namespace FluentData
 		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
-			Data.Item = (IDictionary<string, object>) item;
+			Data.Item = item;
 		}
 
 		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
@@ -419,7 +419,6 @@ namespace FluentData
 	public interface ISelectBuilder<TEntity>
 	{
 		ISelectBuilder<TEntity> Select(string sql);
-		ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
 		ISelectBuilder<TEntity> WhereAnd(string sql);
@@ -431,9 +430,9 @@ namespace FluentData
 
 		ISelectBuilder<TEntity> Parameter(string name, object value);
 
-		TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
-		List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null);
-		void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null);
+		void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper);
 	}
@@ -465,16 +464,6 @@ namespace FluentData
 		public ISelectBuilder<TEntity> Select(string sql)
 		{
 			Data.Select += sql;
-			return this;
-		}
-
-		public ISelectBuilder<TEntity> Select(string sql, Expression<Func<TEntity, object>> mapToProperty)
-		{
-			var alias = Data.Command.Data.Context.Data.Provider.GetSelectBuilderAlias(sql, ReflectionHelper.GetPropertyNameFromExpression(mapToProperty).Replace(".", "_"));
-			if (Data.Select.Length > 0)
-				Data.Select += ",";
-
-			Data.Select += alias;
 			return this;
 		}
 
@@ -537,19 +526,19 @@ namespace FluentData
 			return this;
 		}
 
-		public TList Query<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
+		public TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
-			return Command.Query<TEntity, TList>(customMapper);
+			return Command.QueryMany<TEntity, TList>(customMapper);
 		}
 
-		public List<TEntity> Query(Action<TEntity, IDataReader> customMapper = null)
+		public List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.Query(customMapper);
+			return Command.QueryMany(customMapper);
 		}
 
-		public void QueryComplex(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
+		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			Command.QueryComplex<TEntity>(list, customMapper);
+			Command.QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null)
@@ -600,29 +589,19 @@ namespace FluentData
 			return Command.Execute();
 		}
 
-		public List<dynamic> Query()
+		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
-			return Command.Query();
+			return Command.QueryMany<TEntity, TList>(customMapper);
 		}
 
-		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.Query<TEntity, TList>(customMapper);
+			return Command.QueryMany<TEntity>(customMapper);
 		}
 
-		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null)
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			return Command.Query<TEntity>(customMapper);
-		}
-
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
-		{
-			Command.QueryComplex<TEntity>(list, customMapper);
-		}
-
-		public dynamic QuerySingle()
-		{
-			return Command.QuerySingle();
+			Command.QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)
@@ -645,11 +624,9 @@ namespace FluentData
 	{
 		TValue ParameterValue<TValue>(string name);
 		int Execute();
-		List<dynamic> Query();
-		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper) where TList : IList<TEntity>;
-		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
-		dynamic QuerySingle();
+		TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper) where TList : IList<TEntity>;
+		List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 	}
@@ -1177,11 +1154,9 @@ namespace FluentData
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
-		List<dynamic> Query();
-		dynamic QuerySingle();
-		List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
-		void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
+		List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null);
+		TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
@@ -1189,17 +1164,19 @@ namespace FluentData
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 
-	internal class AutoMapper<T>
+	internal class AutoMapper
 	{
 		private readonly DbCommandData _dbCommandData;
 		private readonly Dictionary<string, PropertyInfo> _properties;
 		private readonly List<DataReaderField> _fields;
+		private readonly System.Data.IDataReader _reader;
 
 		internal AutoMapper(DbCommandData dbCommandData, Type itemType)
 		{
 			_dbCommandData = dbCommandData;
+			_reader = dbCommandData.Reader.InnerReader;
 			_properties = ReflectionHelper.GetProperties(itemType);
-			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
+			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 
 		public void AutoMap(object item)
@@ -1209,7 +1186,7 @@ namespace FluentData
 				if (field.IsSystem)
 					continue;
 
-				var value = _dbCommandData.Reader.GetValue(field.Index);
+				var value = _reader.GetValue(field.Index);
 				var wasMapped = false;
 
 				PropertyInfo property = null;
@@ -1362,13 +1339,13 @@ namespace FluentData
 
 	internal class DynamicTypAutoMapper
 	{
-		private readonly DbCommandData _dbCommandData;
 		private readonly List<DataReaderField> _fields;
+		private readonly System.Data.IDataReader _reader;
 
 		public DynamicTypAutoMapper(DbCommandData dbCommandData)
 		{
-			_dbCommandData = dbCommandData;
-			_fields = DataReaderHelper.GetDataReaderFields(_dbCommandData.Reader);
+			_reader = dbCommandData.Reader.InnerReader;
+			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 
 		public ExpandoObject AutoMap()
@@ -1379,9 +1356,10 @@ namespace FluentData
 
 			foreach (var column in _fields)
 			{
-				var value = DataReaderHelper.GetDataReaderValue(_dbCommandData.Reader, column.Index, true);
-
-				itemDictionary.Add(column.Name, value); 
+				if (_reader.IsDBNull(column.Index))
+					itemDictionary.Add(column.Name, null);
+				else
+					itemDictionary.Add(column.Name, _reader[column.Index]);
 			}
 
 			return item;
@@ -1418,21 +1396,6 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
-		{
-			var item = default(TEntity);
-
-			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(Data, customMapper);
-			});
-
-			return item;
-		}
-	}
-
-	internal partial class DbCommand
-	{
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
 			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
@@ -1442,8 +1405,6 @@ namespace FluentData
 
 			return lastId;
 		}
-
-		
 	}
 
 	internal partial class DbCommand
@@ -1547,25 +1508,16 @@ namespace FluentData
 
 			var value = (Data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
 
-			if (value == null)
+			if (value == DBNull.Value)
 				return default(TParameterType);
 
-			if (value.GetType() == typeof(TParameterType))
-				return (TParameterType) value;
-
-			return (TParameterType) Convert.ChangeType(value, typeof(TParameterType));
+			return (TParameterType)value;
 		}
 	}
 
 	internal partial class DbCommand
 	{
-		public TList Query<TEntity, TList>()
-			where TList : IList<TEntity>
-		{
-			return Query<TEntity, TList>(null);
-		}
-
-		public TList Query<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
+		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null)
 			where TList : IList<TEntity>
 		{
 			var items = default(TList);
@@ -1578,56 +1530,9 @@ namespace FluentData
 			return items;
 		}
 
-		public List<TEntity> Query<TEntity>(Action<TEntity, IDataReader> customMapper)
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{
-			return Query<TEntity, List<TEntity>>(customMapper);
-		}
-	}
-
-	internal partial class DbCommand
-	{
-		public void QueryComplex<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
-		{
-			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				while(Data.Reader.Read())
-					customMapper(list, Data.Reader);
-			});
-		}
-	}
-
-	internal partial class DbCommand
-	{
-		public List<dynamic> Query()
-		{
-			List<dynamic> items = null;
-
-			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				items = new DynamicQueryHandler().ExecuteList(Data);
-			});
-
-			return items;
-		}
-
-		public dynamic QuerySingle()
-		{
-			dynamic item = null;
-
-			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
-			{
-				item = new DynamicQueryHandler().ExecuteSingle(Data);
-			});
-
-			return item;
-		}
-	}
-
-	internal partial class DbCommand
-	{
-		public TEntity QuerySingle<TEntity>()
-		{
-			return QuerySingle<TEntity>(null);
+			return QueryMany<TEntity, List<TEntity>>(customMapper);
 		}
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
@@ -1643,6 +1548,30 @@ namespace FluentData
 		}
 	}
 
+	internal partial class DbCommand
+	{
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
+		{
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			{
+				while(Data.Reader.Read())
+					customMapper(list, Data.Reader);
+			});
+		}
+
+		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
+		{
+			var item = default(TEntity);
+
+			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
+			{
+				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(Data, customMapper);
+			});
+
+			return item;
+		}
+	}
+
 	internal class QueryComplexSingleHandler<TEntity>
 	{
 		internal TEntity ExecuteSingleComplex(DbCommandData data,
@@ -1652,37 +1581,6 @@ namespace FluentData
 
 			if (data.Reader.Read())
 				item = customMapperReader(data.Reader);
-
-			return item;
-		}
-	}
-
-	internal class DynamicQueryHandler
-	{
-		public List<dynamic> ExecuteList(DbCommandData data)
-		{
-			var items = new List<dynamic>();
-
-			var autoMapper = new DynamicTypAutoMapper(data);
-
-			while (data.Reader.Read())
-			{
-				var item = autoMapper.AutoMap();
-
-				items.Add(item);
-			}
-
-			return items;
-		}
-
-		public dynamic ExecuteSingle(DbCommandData data)
-		{
-			var autoMapper = new DynamicTypAutoMapper(data);
-
-			ExpandoObject item = null;
-
-			if (data.Reader.Read())
-				item = autoMapper.AutoMap();
 
 			return item;
 		}
@@ -1706,75 +1604,111 @@ namespace FluentData
 					)
 			where TList : IList<TEntity>
 		{
-			var items = (TList) data.Context.Data.EntityFactory.Create(typeof(TList));
 
-			if(ReflectionHelper.IsCustomEntity<TEntity>())
+			if (typeof (TEntity) == typeof (object))
 			{
-				var autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+				var items = (TList)data.Context.Data.EntityFactory.Create(typeof(TList));
+
+				var autoMapper = new DynamicTypAutoMapper(data);
 
 				while (data.Reader.Read())
 				{
-					var item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
-
-					if (customMapperReader == null)
-						autoMapper.AutoMap(item);
-					else
-						customMapperReader(item, data.Reader);
+					dynamic item = autoMapper.AutoMap();
 
 					items.Add(item);
 				}
+
+				return (TList) items;
 			}
 			else
 			{
-				while(data.Reader.Read())
+				var items = (TList) data.Context.Data.EntityFactory.Create(typeof (TList));
+
+				if (ReflectionHelper.IsCustomEntity<TEntity>())
 				{
-					TEntity value;
+					var autoMapper = new AutoMapper(data, typeof (TEntity));
 
-					if(data.Reader.GetFieldType(0) == typeof(TEntity))
-						value = (TEntity)data.Reader.GetValue(0);
-					else
-						value = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
+					while (data.Reader.Read())
+					{
+						var item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
 
-					items.Add(value);
+						if (customMapperReader == null)
+							autoMapper.AutoMap(item);
+						else
+							customMapperReader(item, data.Reader);
+
+						items.Add(item);
+					}
 				}
-			}
+				else
+				{
+					while (data.Reader.Read())
+					{
+						TEntity value;
 
-			return items;
+						if (data.Reader.GetFieldType(0) == typeof (TEntity))
+							value = (TEntity) data.Reader.GetValue(0);
+						else
+							value = (TEntity) Convert.ChangeType(data.Reader.GetValue(0), typeof (TEntity));
+
+						items.Add(value);
+					}
+				}
+
+				return items;
+			}
 		}
 
 		internal TEntity ExecuteSingle(DbCommandData data,
 										Action<TEntity, IDataReader> customMapper)
 		{
-			var item = default(TEntity);
-
-			if(ReflectionHelper.IsCustomEntity<TEntity>())
+			if (typeof (TEntity) == typeof (object))
 			{
-				AutoMapper<TEntity> autoMapper = null;
+				var autoMapper = new DynamicTypAutoMapper(data);
 
-				autoMapper = new AutoMapper<TEntity>(data, typeof (TEntity));
+				ExpandoObject item = null;
 
 				if (data.Reader.Read())
-				{
-					item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
+					item = autoMapper.AutoMap();
 
-					if (customMapper == null)
-						autoMapper.AutoMap(item);
-					else
-						customMapper(item, data.Reader);
-				}
+				return (dynamic) item;
 			}
 			else
 			{
-				if(data.Reader.Read())
-				{
-					if(data.Reader.GetFieldType(0) == typeof(TEntity))
-						item = (TEntity)data.Reader.GetValue(0);
-					else
-						item = (TEntity)Convert.ChangeType(data.Reader.GetValue(0), typeof(TEntity));
-				}
-			}
+				var item = default(TEntity);
 
-			return item;
+				if (ReflectionHelper.IsCustomEntity<TEntity>())
+				{
+					AutoMapper autoMapper = null;
+
+					autoMapper = new AutoMapper(data, typeof (TEntity));
+
+					if (data.Reader.Read())
+					{
+						item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
+
+						if (customMapper == null)
+							autoMapper.AutoMap(item);
+						else
+							customMapper(item, data.Reader);
+					}
+				}
+				else
+				{
+					if (data.Reader.Read())
+					{
+						if (data.Reader.IsDBNull(0))
+							return item;
+
+						if (data.Reader.GetFieldType(0) == typeof (TEntity))
+							item = (TEntity) data.Reader.GetValue(0);
+						else
+							item = (TEntity) Convert.ChangeType(data.Reader.GetValue(0), typeof (TEntity));
+					}
+				}
+
+				return item;
+			}
 		}
 	}
 
@@ -1799,9 +1733,9 @@ namespace FluentData
 				if (_command.Data.Context.Data.OnExecuted != null)
 					_command.Data.Context.Data.OnExecuted(new OnExecutedEventArgs(_command.Data.InnerCommand));
 			}
-			catch (Exception exception)
+			catch(Exception exception)
 			{
-			    HandleQueryException(exception);
+				HandleQueryException(exception);
 			}
 			finally
 			{
@@ -1949,52 +1883,52 @@ namespace FluentData
 
 		public bool GetBoolean(int i)
 		{
-			return InnerReader.GetBoolean(i);
+			return IsDBNull(i) ? false : InnerReader.GetBoolean(i);
 		}
 
 		public bool GetBoolean(string name)
 		{
-			return InnerReader.GetBoolean(GetOrdinal(name));
+			return GetBoolean(GetOrdinal(name));
 		}
 
 		public byte GetByte(int i)
 		{
-			return InnerReader.GetByte(i);
+			return IsDBNull(i) ? (byte) 0 : InnerReader.GetByte(i);
 		}
 
 		public byte GetByte(string name)
 		{
-			return InnerReader.GetByte(GetOrdinal(name));
+			return GetByte(GetOrdinal(name));
 		}
 
 		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+			return IsDBNull(i) ? 0 : InnerReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
+			return GetBytes(GetOrdinal(name), fieldOffset, buffer, bufferoffset, length);
 		}
 
 		public char GetChar(int i)
 		{
-			return InnerReader.GetChar(i);
+			return IsDBNull(i) ? char.MinValue : InnerReader.GetChar(i);
 		}
 
 		public char GetChar(string name)
 		{
-			return InnerReader.GetChar(GetOrdinal(name));
+			return GetChar(GetOrdinal(name));
 		}
 
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+			return IsDBNull(i) ? 0 : InnerReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public long GetChars(string name, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			return InnerReader.GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
+			return GetChars(GetOrdinal(name), fieldoffset, buffer, bufferoffset, length);
 		}
 
 		public System.Data.IDataReader GetData(int i)
@@ -2004,7 +1938,7 @@ namespace FluentData
 
 		public System.Data.IDataReader GetData(string name)
 		{
-			return InnerReader.GetData(GetOrdinal(name));
+			return GetData(GetOrdinal(name));
 		}
 
 		public string GetDataTypeName(int i)
@@ -2014,37 +1948,37 @@ namespace FluentData
 
 		public string GetDataTypeName(string name)
 		{
-			return InnerReader.GetDataTypeName(GetOrdinal(name));
+			return GetDataTypeName(GetOrdinal(name));
 		}
 
 		public DateTime GetDateTime(int i)
 		{
-			return InnerReader.GetDateTime(i);
+			return IsDBNull(i) ? DateTime.MinValue : InnerReader.GetDateTime(i);
 		}
 
 		public DateTime GetDateTime(string name)
 		{
-			return InnerReader.GetDateTime(GetOrdinal(name));
+			return GetDateTime(GetOrdinal(name));
 		}
 
 		public decimal GetDecimal(int i)
 		{
-			return InnerReader.GetDecimal(i);
+			return IsDBNull(i) ? 0.0M : InnerReader.GetDecimal(i);
 		}
 
 		public decimal GetDecimal(string name)
 		{
-			return InnerReader.GetDecimal(GetOrdinal(name));
+			return GetDecimal(GetOrdinal(name));
 		}
 
 		public double GetDouble(int i)
 		{
-			return InnerReader.GetDouble(i);
+			return IsDBNull(i) ? 0.0D : InnerReader.GetDouble(i);
 		}
 
 		public double GetDouble(string name)
 		{
-			return InnerReader.GetDouble(GetOrdinal(name));
+			return GetDouble(GetOrdinal(name));
 		}
 
 		public Type GetFieldType(int i)
@@ -2054,57 +1988,57 @@ namespace FluentData
 
 		public Type GetFieldType(string name)
 		{
-			return InnerReader.GetFieldType(GetOrdinal(name));
+			return GetFieldType(GetOrdinal(name));
 		}
 
 		public float GetFloat(int i)
 		{
-			return InnerReader.GetFloat(i);
+			return IsDBNull(i) ? 0.0F : InnerReader.GetFloat(i);
 		}
 
 		public float GetFloat(string name)
 		{
-			return InnerReader.GetFloat(GetOrdinal(name));
+			return GetFloat(GetOrdinal(name));
 		}
 
 		public Guid GetGuid(int i)
 		{
-			return InnerReader.GetGuid(i);
+			return IsDBNull(i) ? Guid.Empty : InnerReader.GetGuid(i);
 		}
 
 		public Guid GetGuid(string name)
 		{
-			return InnerReader.GetGuid(GetOrdinal(name));
+			return GetGuid(GetOrdinal(name));
 		}
 
 		public short GetInt16(int i)
 		{
-			return InnerReader.GetInt16(i);
+			return IsDBNull(i) ? (short) 0 : InnerReader.GetInt16(i);
 		}
 
 		public short GetInt16(string name)
 		{
-			return InnerReader.GetInt16(GetOrdinal(name));
+			return GetInt16(GetOrdinal(name));
 		}
 
 		public int GetInt32(int i)
 		{
-			return InnerReader.GetInt32(i);
+			return IsDBNull(i) ? 0 : InnerReader.GetInt32(i);
 		}
 
 		public int GetInt32(string name)
 		{
-			return InnerReader.GetInt32(GetOrdinal(name));
+			return GetInt32(GetOrdinal(name));
 		}
 
 		public long GetInt64(int i)
 		{
-			return InnerReader.GetInt64(i);
+			return IsDBNull(i) ? 0 : InnerReader.GetInt64(i);
 		}
 
 		public long GetInt64(string name)
 		{
-			return InnerReader.GetInt64(GetOrdinal(name));
+			return GetInt64(GetOrdinal(name));
 		}
 
 		public string GetName(int i)
@@ -2124,17 +2058,17 @@ namespace FluentData
 
 		public string GetString(int i)
 		{
-			return InnerReader.GetString(i);
+			return IsDBNull(i) ? null : InnerReader.GetString(i);
 		}
 
 		public string GetString(string name)
 		{
-			return InnerReader.GetString(GetOrdinal(name));
+			return GetString(GetOrdinal(name));
 		}
 
 		public object GetValue(int i)
 		{
-			return InnerReader.GetValue(i);
+			return IsDBNull(i) ? null : InnerReader.GetValue(i);
 		}
 
 		public object GetValue(string name)
@@ -2154,17 +2088,20 @@ namespace FluentData
 
 		public bool IsDBNull(string name)
 		{
-			return InnerReader.IsDBNull(GetOrdinal(name));
+			return IsDBNull(GetOrdinal(name));
 		}
 
 		public object this[string name]
 		{
-			get { return InnerReader[name]; }
+			get { return this[GetOrdinal(name)]; }
 		}
 
 		public object this[int i]
 		{
-			get { return GetValue(i); }
+			get
+			{
+				return IsDBNull(i) ? null : InnerReader[i];
+			}
 		}
 	}
 
@@ -2342,7 +2279,6 @@ namespace FluentData
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql(string sql = "", params object[] parameters);
 		ISelectBuilder<TEntity> Select<TEntity>(string sql);
-		ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
 		IInsertBuilderDynamic Insert(string tableName, ExpandoObject item);
@@ -2399,7 +2335,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext IgnoreIfAutoMapFails
 		{
@@ -2411,16 +2347,11 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
 		{
 			return new SelectBuilder<TEntity>(CreateCommand).Select(sql);
-		}
-
-		public ISelectBuilder<TEntity> Select<TEntity>(string sql, Expression<Func<TEntity, object>> mapToProperty)
-		{
-			return new SelectBuilder<TEntity>(CreateCommand).Select(sql, mapToProperty);
 		}
 
 		public IInsertBuilder Insert(string tableName)
@@ -2506,7 +2437,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext CommandTimeout(int timeout)
 		{
@@ -2515,7 +2446,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		private void ConnectionStringInternal(string connectionString, DbProviderTypes dbProviderType, IDbProvider dbProvider)
 		{
@@ -2557,7 +2488,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext EntityFactory(IEntityFactory entityFactory)
 		{
@@ -2566,7 +2497,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action)
 		{
@@ -2605,7 +2536,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		private DbCommand CreateCommand
 		{
@@ -2653,7 +2584,7 @@ namespace FluentData
 		}
 	}
 
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext UseTransaction(bool useTransaction)
 		{
@@ -2698,7 +2629,7 @@ namespace FluentData
 
 	internal class DataReaderHelper
 	{
-		internal static List<DataReaderField> GetDataReaderFields(IDataReader reader)
+		internal static List<DataReaderField> GetDataReaderFields(System.Data.IDataReader reader)
 		{
 			var columns = new List<DataReaderField>();
 
@@ -2711,23 +2642,6 @@ namespace FluentData
 			}
 
 			return columns;
-		}
-
-		internal static object GetDataReaderValue(IDataReader reader, int index, bool isNullable)
-		{
-			var value = reader[index];
-			var type = value.GetType();
-
-			if (value == DBNull.Value)
-			{
-				if (isNullable)
-					return null;
-
-				if (type == typeof(DateTime))
-					return DateTime.MinValue;
-			}
-
-			return value;
 		}
 	}
 
@@ -3026,7 +2940,7 @@ namespace FluentData
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
 			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
@@ -4039,7 +3953,7 @@ namespace FluentData
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
 			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 

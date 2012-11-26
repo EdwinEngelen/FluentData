@@ -97,7 +97,6 @@
     <Compile Include="Command\PartialClasses\Query.cs" />
     <Compile Include="Command\PartialClasses\QueryComplex.cs" />
     <Compile Include="Command\Queries\QueryComplexSingleHandler.cs" />
-    <Compile Include="Command\Queries\DynamicQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteHandler.cs" />
     <Compile Include="Command\Queries\GenericQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteQueryHandler.cs" />

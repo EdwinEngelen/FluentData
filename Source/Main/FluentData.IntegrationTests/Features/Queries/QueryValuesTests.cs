@@ -1,5 +1,6 @@
 ﻿using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace FluentData.Features.Queries
 {
@@ -32,6 +33,13 @@ namespace FluentData.Features.Queries
 			var categoryId = TestHelper.Context().Sql("select null").QuerySingle<int>();
 
 			Assert.AreEqual(0, categoryId);
+		}
+
+		[TestMethod]
+		public void Test_datatypes()
+		{
+			var datetime = TestHelper.Context().Sql("select getdate()").QuerySingle<DateTime>();
+			Assert.IsTrue(datetime > DateTime.MinValue);
 		}
 	}
 }

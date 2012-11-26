@@ -1,10 +1,8 @@
-﻿using System;
-using System.Dynamic;
-using System.Linq.Expressions;
+﻿using System.Dynamic;
 
 namespace FluentData
 {
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
 		{

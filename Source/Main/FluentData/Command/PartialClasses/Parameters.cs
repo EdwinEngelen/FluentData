@@ -82,13 +82,10 @@ namespace FluentData
 
 			var value = (Data.InnerCommand.Parameters[outputParameterName] as System.Data.IDataParameter).Value;
 
-			if (value == null)
+			if (value == DBNull.Value)
 				return default(TParameterType);
 
-			if (value.GetType() == typeof(TParameterType))
-				return (TParameterType) value;
-
-			return (TParameterType) Convert.ChangeType(value, typeof(TParameterType));
+			return (TParameterType)value;
 		}
 	}
 }

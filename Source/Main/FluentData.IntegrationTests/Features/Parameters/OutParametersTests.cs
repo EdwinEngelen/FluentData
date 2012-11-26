@@ -17,5 +17,17 @@ namespace FluentData.Features.Parameters
 
 			Assert.IsFalse(string.IsNullOrEmpty(categoryName));
 		}
+
+		[TestMethod]
+		public void Test_null()
+		{
+			var command = TestHelper.Context().Sql("select @CategoryName = null")
+												.ParameterOut("CategoryName", DataTypes.String, 50);
+			command.Execute();
+
+			var categoryName = command.ParameterValue<string>("CategoryName");
+
+			Assert.IsNull(categoryName);
+		}
 	}
 }

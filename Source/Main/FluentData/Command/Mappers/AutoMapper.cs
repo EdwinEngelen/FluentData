@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace FluentData
 {
-	internal class AutoMapper<T>
+	internal class AutoMapper
 	{
 		private readonly DbCommandData _dbCommandData;
 		private readonly Dictionary<string, PropertyInfo> _properties;

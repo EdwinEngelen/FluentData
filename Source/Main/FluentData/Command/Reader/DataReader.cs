@@ -245,7 +245,7 @@ namespace FluentData
 
 		public string GetString(int i)
 		{
-			return IsDBNull(i) ? string.Empty : InnerReader.GetString(i);
+			return IsDBNull(i) ? null : InnerReader.GetString(i);
 		}
 
 		public string GetString(string name)

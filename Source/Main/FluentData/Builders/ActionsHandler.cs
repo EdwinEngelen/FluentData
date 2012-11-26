@@ -29,7 +29,7 @@ namespace FluentData
 			if(parameterType == DataTypes.Object)
 				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
 
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, false, size);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, size);
 		}
 
 		internal void ColumnValueAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
@@ -91,20 +91,20 @@ namespace FluentData
 			}
 		}
 
-		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, bool isId, int size)
+		private void ParameterAction(string name, object value, DataTypes dataType, ParameterDirection direction, int size)
 		{
 			_data.Command.Parameter(name, value, dataType, direction, size);
 		}
 
 		internal void ParameterOutputAction(string name, DataTypes dataTypes, int size)
 		{
-			ParameterAction(name, null, dataTypes, ParameterDirection.Output, false, size);
+			ParameterAction(name, null, dataTypes, ParameterDirection.Output, size);
 		}
 
 		internal void WhereAction(string columnName, object value, DataTypes parameterType, int size)
 		{
 			var parameterName = columnName;
-			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, true, 0);
+			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, 0);
 
 			_data.Where.Add(new TableColumn(columnName, value, parameterName));
 		}

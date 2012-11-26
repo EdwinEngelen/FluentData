@@ -1,6 +1,4 @@
-﻿using FluentData.Providers;
-
-namespace FluentData
+﻿namespace FluentData
 {
 	internal class InsertBuilder : BaseInsertBuilder, IInsertBuilder, IInsertUpdateBuilder
 	{

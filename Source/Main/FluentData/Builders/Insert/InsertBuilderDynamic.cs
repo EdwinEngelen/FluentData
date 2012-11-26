@@ -8,7 +8,7 @@ namespace FluentData
 		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
-			Data.Item = (IDictionary<string, object>) item;
+			Data.Item = item;
 		}
 
 		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)

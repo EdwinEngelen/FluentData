@@ -11,7 +11,7 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = TestHelper.Context();
 
-			var products = context.Select<Product>("ProductId, p.Name, c.Category as Category_CategoryId, c.Name as Category_Name")
+			var products = context.Select<Product>("p.ProductId, p.Name, c.CategoryId as Category_CategoryId, c.Name as Category_Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name")
@@ -69,7 +69,7 @@ namespace FluentData.Features.Builders.Select
 			var context = TestHelper.Context();
 
 			var products = context
-				.Select<Category>("CategoryId, Name")
+				.Select<Category>("c.CategoryId, c.Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name").QueryMany();

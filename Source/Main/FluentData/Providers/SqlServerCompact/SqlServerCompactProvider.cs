@@ -125,7 +125,7 @@ namespace FluentData.Providers.SqlServerCompact
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
 			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 

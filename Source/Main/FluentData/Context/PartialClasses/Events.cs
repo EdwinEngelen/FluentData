@@ -2,7 +2,7 @@
 
 namespace FluentData
 {
-	public partial class DbContext : IDbContext
+	public partial class DbContext
 	{
 		public IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action)
 		{
