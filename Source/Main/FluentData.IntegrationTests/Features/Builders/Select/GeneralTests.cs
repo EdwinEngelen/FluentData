@@ -85,7 +85,26 @@ namespace FluentData.Features.Builders.Select
 				.Select("count(*) as Products").QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
-			
+		}
+		
+		[TestMethod]
+		public void Test_WhereOr()
+		{
+			var categories = TestHelper.Context().Select<Category>("CategoryId, Name")
+			          .From("Category")
+			          .Where("CategoryId = 1")
+			          .OrWhere("CategoryId = 2").QueryMany();
+			Assert.IsTrue(categories.Count == 2);
+		}
+
+		[TestMethod]
+		public void Test_WhereAnd()
+		{
+			var categories = TestHelper.Context().Select<Category>("CategoryId, Name")
+					  .From("Category")
+					  .Where("CategoryId = 1")
+					  .AndWhere("CategoryId = 1").QueryMany();
+			Assert.IsTrue(categories.Count == 1);
 		}
 	}
 }

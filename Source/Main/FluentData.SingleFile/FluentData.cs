@@ -416,20 +416,26 @@ namespace FluentData
 		IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
+	public enum Operators
+	{
+		None = 0,
+		And = 1,
+		Or = 2
+	}
+
 	public interface ISelectBuilder<TEntity>
 	{
+		BuilderData Data { get; set; }
 		ISelectBuilder<TEntity> Select(string sql);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
-		ISelectBuilder<TEntity> WhereAnd(string sql);
-		ISelectBuilder<TEntity> WhereOr(string sql);
+		ISelectBuilder<TEntity> AndWhere(string sql);
+		ISelectBuilder<TEntity> OrWhere(string sql);
 		ISelectBuilder<TEntity> GroupBy(string sql);
 		ISelectBuilder<TEntity> OrderBy(string sql);
 		ISelectBuilder<TEntity> Having(string sql);
 		ISelectBuilder<TEntity> Paging(int currentPage, int itemsPerPage);
-
 		ISelectBuilder<TEntity> Parameter(string name, object value);
-
 		TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null);
 		void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
@@ -439,7 +445,7 @@ namespace FluentData
 
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		private IDbCommand Command
@@ -450,7 +456,7 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 					throw new FluentDataException("Order by must defined when using Paging.");
 
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+				Data.Command.Data.InnerCommand.CommandText = Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data);
 				return Data.Command;
 			}
 		}
@@ -479,19 +485,32 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> WhereAnd(string sql)
+		public ISelectBuilder<TEntity> AndWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
-				Where(" and ");
-			Where(sql);
+				Data.WhereSql += " and ";
+			Data.WhereSql += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> WhereOr(string sql)
+		public ISelectBuilder<TEntity> OrWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
-				Where(" or ");
-			Where(sql);
+				Data.WhereSql += " or ";
+			Data.WhereSql += sql;
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> Where(Operators operators, string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+			{
+				if(operators == Operators.And)
+					Data.WhereSql += " and ";
+				else if(operators == Operators.Or)
+					Data.WhereSql += " or ";
+			}
+			Data.WhereSql += sql;
 			return this;
 		}
 

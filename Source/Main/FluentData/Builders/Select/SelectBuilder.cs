@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace FluentData
 {
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		private IDbCommand Command
@@ -17,7 +16,7 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 					throw new FluentDataException("Order by must defined when using Paging.");
 
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+				Data.Command.Data.InnerCommand.CommandText = Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data);
 				return Data.Command;
 			}
 		}
@@ -46,19 +45,32 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> WhereAnd(string sql)
+		public ISelectBuilder<TEntity> AndWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
-				Where(" and ");
-			Where(sql);
+				Data.WhereSql += " and ";
+			Data.WhereSql += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> WhereOr(string sql)
+		public ISelectBuilder<TEntity> OrWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
-				Where(" or ");
-			Where(sql);
+				Data.WhereSql += " or ";
+			Data.WhereSql += sql;
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> Where(Operators operators, string sql)
+		{
+			if(Data.WhereSql.Length > 0)
+			{
+				if(operators == Operators.And)
+					Data.WhereSql += " and ";
+				else if(operators == Operators.Or)
+					Data.WhereSql += " or ";
+			}
+			Data.WhereSql += sql;
 			return this;
 		}
 
