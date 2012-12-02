@@ -12,7 +12,7 @@ namespace FluentData.Providers.Access
 		{
 			get
 			{
-				return "System.command.Data.OleDb";
+				return "System.Data.OleDb";
 			}
 		}
 
@@ -110,9 +110,9 @@ namespace FluentData.Providers.Access
 
 		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
-			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			if (recordsAffected > 0)
 			{

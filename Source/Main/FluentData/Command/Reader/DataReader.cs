@@ -28,6 +28,14 @@ namespace FluentData
 			InnerReader.Close();
 		}
 
+		private T GetValue<T>(int i)
+		{
+			var value = InnerReader.GetValue(i);
+			if(value == DBNull.Value)
+				return default(T);
+			return (T)value;
+		}
+
 		public int Depth
 		{
 			get { return InnerReader.Depth; }
@@ -70,7 +78,7 @@ namespace FluentData
 
 		public bool GetBoolean(int i)
 		{
-			return IsDBNull(i) ? false : InnerReader.GetBoolean(i);
+			return GetValue<bool>(i);
 		}
 
 		public bool GetBoolean(string name)
@@ -80,7 +88,7 @@ namespace FluentData
 
 		public byte GetByte(int i)
 		{
-			return IsDBNull(i) ? (byte) 0 : InnerReader.GetByte(i);
+			return GetValue<byte>(i);
 		}
 
 		public byte GetByte(string name)
@@ -100,7 +108,7 @@ namespace FluentData
 
 		public char GetChar(int i)
 		{
-			return IsDBNull(i) ? char.MinValue : InnerReader.GetChar(i);
+			return GetValue<char>(i);
 		}
 
 		public char GetChar(string name)
@@ -140,7 +148,7 @@ namespace FluentData
 
 		public DateTime GetDateTime(int i)
 		{
-			return IsDBNull(i) ? DateTime.MinValue : InnerReader.GetDateTime(i);
+			return GetValue<DateTime>(i);
 		}
 
 		public DateTime GetDateTime(string name)
@@ -150,7 +158,7 @@ namespace FluentData
 
 		public decimal GetDecimal(int i)
 		{
-			return IsDBNull(i) ? 0.0M : InnerReader.GetDecimal(i);
+			return GetValue<decimal>(i);
 		}
 
 		public decimal GetDecimal(string name)
@@ -160,7 +168,7 @@ namespace FluentData
 
 		public double GetDouble(int i)
 		{
-			return IsDBNull(i) ? 0.0D : InnerReader.GetDouble(i);
+			return GetValue<double>(i);
 		}
 
 		public double GetDouble(string name)
@@ -180,7 +188,7 @@ namespace FluentData
 
 		public float GetFloat(int i)
 		{
-			return IsDBNull(i) ? 0.0F : InnerReader.GetFloat(i);
+			return GetValue<float>(i);
 		}
 
 		public float GetFloat(string name)
@@ -190,7 +198,7 @@ namespace FluentData
 
 		public Guid GetGuid(int i)
 		{
-			return IsDBNull(i) ? Guid.Empty : InnerReader.GetGuid(i);
+			return GetValue<Guid>(i);
 		}
 
 		public Guid GetGuid(string name)
@@ -200,7 +208,7 @@ namespace FluentData
 
 		public short GetInt16(int i)
 		{
-			return IsDBNull(i) ? (short) 0 : InnerReader.GetInt16(i);
+			return GetValue<Int16>(i);
 		}
 
 		public short GetInt16(string name)
@@ -210,7 +218,7 @@ namespace FluentData
 
 		public int GetInt32(int i)
 		{
-			return IsDBNull(i) ? 0 : InnerReader.GetInt32(i);
+			return GetValue<int>(i);
 		}
 
 		public int GetInt32(string name)
@@ -220,7 +228,7 @@ namespace FluentData
 
 		public long GetInt64(int i)
 		{
-			return IsDBNull(i) ? 0 : InnerReader.GetInt64(i);
+			return GetValue<long>(i);
 		}
 
 		public long GetInt64(string name)
@@ -245,7 +253,7 @@ namespace FluentData
 
 		public string GetString(int i)
 		{
-			return IsDBNull(i) ? null : InnerReader.GetString(i);
+			return GetValue<string>(i);
 		}
 
 		public string GetString(string name)
@@ -255,7 +263,7 @@ namespace FluentData
 
 		public object GetValue(int i)
 		{
-			return IsDBNull(i) ? null : InnerReader.GetValue(i);
+			return GetValue<object>(i);
 		}
 
 		public object GetValue(string name)

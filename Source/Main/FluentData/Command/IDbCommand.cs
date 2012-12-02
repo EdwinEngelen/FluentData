@@ -20,6 +20,7 @@ namespace FluentData
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
+		IDbCommand ClearSql { get; }
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 }

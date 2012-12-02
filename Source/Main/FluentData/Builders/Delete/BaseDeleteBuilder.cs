@@ -9,7 +9,7 @@
 		{
 			get
 			{
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
 				return Data.Command;
 			}
 		}

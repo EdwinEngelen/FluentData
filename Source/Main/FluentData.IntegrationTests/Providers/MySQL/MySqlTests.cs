@@ -218,7 +218,7 @@ namespace FluentData.Providers.MySql
 		public void Insert_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId<int>();
+							.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -229,7 +229,7 @@ namespace FluentData.Providers.MySql
 			var productId = Context().Insert("Product")
 								.Column("CategoryId", 1)
 								.Column("Name", "The Warren Buffet Way")
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -243,7 +243,7 @@ namespace FluentData.Providers.MySql
 
 			var productId = Context().Insert<Product>("Product", product)
 								.AutoMap(x => x.ProductId, x => x.Category)
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -288,7 +288,7 @@ namespace FluentData.Providers.MySql
 		public void Delete_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId<int>();
+							.ExecuteReturnLastId<long>();
 
 			var rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId)
 									.Execute();
@@ -300,7 +300,7 @@ namespace FluentData.Providers.MySql
 		public void Delete_data_builder()
 		{
 			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1)", "The Warren Buffet Way", 1)
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			var rowsAffected = Context().Delete("Product")
 									.Where("ProductId", productId)

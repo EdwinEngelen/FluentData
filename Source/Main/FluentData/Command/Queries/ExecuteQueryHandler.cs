@@ -45,6 +45,8 @@ namespace FluentData
 			}
 			else
 			{
+				_command.Data.InnerCommand.CommandText = _command.Data.Sql.ToString();
+
 				if(_command.Data.Context.Data.CommandTimeout != Int32.MinValue)
 					_command.Data.InnerCommand.CommandTimeout = _command.Data.Context.Data.CommandTimeout;
 

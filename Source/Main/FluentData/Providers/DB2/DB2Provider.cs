@@ -12,7 +12,7 @@ namespace FluentData.Providers.DB2Provider
 		{
 			get
 			{
-				return "IBM.data.DB2";
+				return "IBM.Data.DB2";
 			}
 		}
 		public bool SupportsOutputParameters
@@ -104,10 +104,10 @@ namespace FluentData.Providers.DB2Provider
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;";
+			command.Sql("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
 
 			var lastId = default(T);
 
@@ -115,10 +115,7 @@ namespace FluentData.Providers.DB2Provider
 			{
 				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T)value;
 			});
 
 			return lastId;

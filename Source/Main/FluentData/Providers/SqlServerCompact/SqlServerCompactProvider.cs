@@ -11,7 +11,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			get
 			{
-				return "System.command.Data.SqlServerCe.4.0";
+				return "System.Data.SqlServerCe.4.0";
 			}
 		}
 
@@ -127,9 +127,9 @@ namespace FluentData.Providers.SqlServerCompact
 
 		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
-			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			if (recordsAffected > 0)
 			{

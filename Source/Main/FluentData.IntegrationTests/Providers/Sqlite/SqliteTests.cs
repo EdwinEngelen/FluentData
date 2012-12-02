@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -112,7 +113,7 @@ namespace FluentData.Providers.Sqlite
 
 		public void Custom_mapper_using_datareader(Product product, IDataReader row)
 		{
-			product.ProductId = row.GetInt32("ProductId");
+			product.ProductId = (int) Convert.ChangeType(row.GetInt64("ProductId"), TypeCode.Int32);
 			product.Name = row.GetString("Name");
 		}
 
@@ -212,7 +213,7 @@ namespace FluentData.Providers.Sqlite
 		public void Insert_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId<int>();
+							.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -223,7 +224,7 @@ namespace FluentData.Providers.Sqlite
 			var productId = Context().Insert("Product")
 								.Column("CategoryId", 1)
 								.Column("Name", "The Warren Buffet Way")
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -237,7 +238,7 @@ namespace FluentData.Providers.Sqlite
 
 			var productId = Context().Insert<Product>("Product", product)
 								.AutoMap(x => x.ProductId, x => x.Category)
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			Assert.IsTrue(productId > 0);
 		}
@@ -282,7 +283,7 @@ namespace FluentData.Providers.Sqlite
 		public void Delete_data_sql()
 		{
 			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
-							.ExecuteReturnLastId<int>();
+							.ExecuteReturnLastId<long>();
 
 			var rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId)
 									.Execute();
@@ -294,7 +295,7 @@ namespace FluentData.Providers.Sqlite
 		public void Delete_data_builder()
 		{
 			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1)", "The Warren Buffet Way", 1)
-								.ExecuteReturnLastId<int>();
+								.ExecuteReturnLastId<long>();
 
 			var rowsAffected = Context().Delete("Product")
 									.Where("ProductId", productId)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -11,7 +12,7 @@ namespace FluentData.Providers.SqlServer
 		{ 
 			get
 			{
-				return "System.data.SqlClient";
+				return "System.Data.SqlClient";
 			} 
 		}
 
@@ -57,46 +58,50 @@ namespace FluentData.Providers.SqlServer
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			var sql = "";
-			if (data.PagingItemsPerPage == 0)
+			var sql = new StringBuilder();
+			if (data.PagingCurrentPage == 1)
 			{
-				sql = "select " + data.Select;
-				sql += " from " + data.From;
+				if (data.PagingItemsPerPage == 0)
+					sql.Append("select");
+				else
+					sql.Append("select top " + data.PagingItemsPerPage.ToString());
+				sql.Append(" " + data.Select);
+				sql.Append(" from " + data.From);
 				if (data.WhereSql.Length > 0)
-					sql += " where " + data.WhereSql;
+					sql.Append(" where " + data.WhereSql);
 				if (data.GroupBy.Length > 0)
-					sql += " group by " + data.GroupBy;
+					sql.Append(" group by " + data.GroupBy);
 				if (data.Having.Length > 0)
-					sql += " having " + data.Having;
+					sql.Append(" having " + data.Having);
 				if (data.OrderBy.Length > 0)
-					sql += " order by " + data.OrderBy;
+					sql.Append(" order by " + data.OrderBy);
+				return sql.ToString();
 			}
-			else if (data.PagingItemsPerPage > 0)
+			else
 			{
-				sql += " from " + data.From;
-				if (data.WhereSql.Length > 0)
-					sql += " where " + data.WhereSql;
-				if (data.GroupBy.Length > 0)
-					sql += " group by " + data.GroupBy;
-				if (data.Having.Length > 0)
-					sql += " having " + data.Having;
+				sql.Append(" from " + data.From);
+				if(data.WhereSql.Length > 0)
+					sql.Append(" where " + data.WhereSql);
+				if(data.GroupBy.Length > 0)
+					sql.Append(" group by " + data.GroupBy);
+				if(data.Having.Length > 0)
+					sql.Append(" having " + data.Having);
 
-				sql = string.Format(@"with PagedPersons as
-										(
-											select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
-											{2}
-										)
-										select *
-										from PagedPersons
-										where fluentdata_RowNumber between {3} and {4}",
-											data.Select,
-											data.OrderBy,
-											sql,
-											data.GetFromItems(),
-											data.GetToItems());
+				var pagedSql = string.Format(@"with PagedPersons as
+								(
+									select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
+									{2}
+								)
+								select *
+								from PagedPersons
+								where fluentdata_RowNumber between {3} and {4}",
+				                             data.Select,
+				                             data.OrderBy,
+				                             sql,
+				                             data.GetFromItems(),
+				                             data.GetToItems());
+				return pagedSql;
 			}
-
-			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -126,10 +131,10 @@ namespace FluentData.Providers.SqlServer
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select SCOPE_IDENTITY()";
+			command.Sql("select SCOPE_IDENTITY()");
 
 			var lastId = default(T);
 

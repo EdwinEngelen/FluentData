@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -12,7 +11,7 @@ namespace FluentData.Providers.MySql
 		{ 
 			get
 			{
-				return "MySql.command.Data.MySqlClient";
+				return "MySql.Data.MySqlClient";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -104,21 +103,18 @@ namespace FluentData.Providers.MySql
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select LAST_INSERT_ID() as `LastInsertedId`";
+			command.Sql("select LAST_INSERT_ID() as `LastInsertedId`");
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = command.Data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T)value;
 			});
 
 			return lastId;

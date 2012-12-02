@@ -106,21 +106,17 @@ namespace FluentData.Providers.PostgreSql
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
-
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 			command.Data.InnerCommand.CommandText += "select lastval();";
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = command.Data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T) value;
 			});
 
 			return lastId;

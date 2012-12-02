@@ -13,7 +13,7 @@
 					|| Data.Where.Count == 0)
 					throw new FluentDataException("Columns or where filter have not yet been added.");
 
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
 				return Data.Command;
 			}
 		}

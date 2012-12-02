@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

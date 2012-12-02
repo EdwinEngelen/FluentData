@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 

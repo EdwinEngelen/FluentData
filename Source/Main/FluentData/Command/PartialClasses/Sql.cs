@@ -4,8 +4,17 @@
 	{
 		public IDbCommand Sql(string sql)
 		{
-			Data.InnerCommand.CommandText += sql;
+			Data.Sql.Append(sql);
 			return this;
+		}
+
+		public IDbCommand ClearSql
+		{
+			get
+			{
+				Data.Sql.Clear();
+				return this;
+			}
 		}
 	}
 }
