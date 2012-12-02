@@ -99,9 +99,15 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Parameter(string name, object value)
+		public ISelectBuilder<TEntity> Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size)
 		{
-			Data.Command.Parameter(name, value);
+			Data.Command.Parameter(name, value, parameterType, direction, size);
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> Parameters(params object[] parameters)
+		{
+			Data.Command.Parameters(parameters);
 			return this;
 		}
 

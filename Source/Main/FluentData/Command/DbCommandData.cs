@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace FluentData
+﻿namespace FluentData
 {
 	public class DbCommandData
 	{

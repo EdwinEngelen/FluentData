@@ -2,6 +2,7 @@
 using System.Data;
 using System;
 using System.Text;
+using System.Linq;
 
 namespace FluentData
 {
@@ -14,6 +15,20 @@ namespace FluentData
 			else
 				AddParameterToInnerCommand(name, value, parameterType, direction, size);
 
+			return this;
+		}
+
+		private int _currentIndex = 0;
+		public IDbCommand Parameters(params object[] parameters)
+		{
+			if(parameters != null)
+			{
+				for (var i = 0; i < parameters.Count(); i++)
+				{
+					Parameter(_currentIndex.ToString(), parameters[_currentIndex]);
+					_currentIndex++;
+				}
+			}
 			return this;
 		}
 
