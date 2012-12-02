@@ -181,7 +181,7 @@ namespace FluentData
 		{
 			get
 			{
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
 				return Data.Command;
 			}
 		}
@@ -271,7 +271,7 @@ namespace FluentData
 		{
 			get
 			{
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
 				return Data.Command;
 			}
 		}
@@ -435,7 +435,8 @@ namespace FluentData
 		ISelectBuilder<TEntity> OrderBy(string sql);
 		ISelectBuilder<TEntity> Having(string sql);
 		ISelectBuilder<TEntity> Paging(int currentPage, int itemsPerPage);
-		ISelectBuilder<TEntity> Parameter(string name, object value);
+		ISelectBuilder<TEntity> Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
+		ISelectBuilder<TEntity> Parameters(params object[] parameters);
 		TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null);
 		void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
@@ -456,7 +457,7 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 					throw new FluentDataException("Order by must defined when using Paging.");
 
-				Data.Command.Data.InnerCommand.CommandText = Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data);
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
 				return Data.Command;
 			}
 		}
@@ -539,9 +540,15 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Parameter(string name, object value)
+		public ISelectBuilder<TEntity> Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size)
 		{
-			Data.Command.Parameter(name, value);
+			Data.Command.Parameter(name, value, parameterType, direction, size);
+			return this;
+		}
+
+		public ISelectBuilder<TEntity> Parameters(params object[] parameters)
+		{
+			Data.Command.Parameters(parameters);
 			return this;
 		}
 
@@ -581,7 +588,7 @@ namespace FluentData
 			get
 			{
 				Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
 				return Data.Command;
 			}
 		}
@@ -779,7 +786,7 @@ namespace FluentData
 					|| Data.Where.Count == 0)
 					throw new FluentDataException("Columns or where filter have not yet been added.");
 
-				Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
+				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
 				return Data.Command;
 			}
 		}
@@ -1141,12 +1148,14 @@ namespace FluentData
 		public bool UseMultipleResultsets { get; set; }
 		public IDataReader Reader { get; set; }
 		internal ExecuteQueryHandler ExecuteQueryHandler;
+		public StringBuilder Sql { get; private set; }
 
 		public DbCommandData(DbContext context, System.Data.IDbCommand innerCommand)
 		{
 			Context = context;
 			InnerCommand = innerCommand;
 			InnerCommand.CommandType = (System.Data.CommandType)DbCommandTypes.Text;
+			Sql = new StringBuilder();
 		}
 	}
 
@@ -1170,6 +1179,7 @@ namespace FluentData
 		DbCommandData Data { get; }
 		IDbCommand ParameterOut(string name, DataTypes parameterType, int size = 0);
 		IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0);
+		IDbCommand Parameters(params object[] parameters);
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
@@ -1180,6 +1190,7 @@ namespace FluentData
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
 		DataTable QueryDataTable();
 		IDbCommand Sql(string sql);
+		IDbCommand ClearSql { get; }
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
 	}
 
@@ -1430,8 +1441,17 @@ namespace FluentData
 	{
 		public IDbCommand Sql(string sql)
 		{
-			Data.InnerCommand.CommandText += sql;
+			Data.Sql.Append(sql);
 			return this;
+		}
+
+		public IDbCommand ClearSql
+		{
+			get
+			{
+				Data.Sql.Clear();
+				return this;
+			}
 		}
 	}
 
@@ -1462,6 +1482,20 @@ namespace FluentData
 			return this;
 		}
 
+		private int _currentIndex = 0;
+		public IDbCommand Parameters(params object[] parameters)
+		{
+			if(parameters != null)
+			{
+				for (var i = 0; i < parameters.Count(); i++)
+				{
+					Parameter(_currentIndex.ToString(), parameters[_currentIndex]);
+					_currentIndex++;
+				}
+			}
+			return this;
+		}
+
 		private void AddListParameterToInnerCommand(string name, object value)
 		{
 			var list = (IEnumerable) value;
@@ -1484,7 +1518,7 @@ namespace FluentData
 			newInStatement.Append(")");
 
 			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
-			Data.InnerCommand.CommandText = Data.InnerCommand.CommandText.Replace(oldInStatement, newInStatement.ToString());
+			Data.Sql.Replace(oldInStatement, newInStatement.ToString());
 		}
 
 		private IDbDataParameter AddParameterToInnerCommand(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
@@ -1773,6 +1807,8 @@ namespace FluentData
 			}
 			else
 			{
+				_command.Data.InnerCommand.CommandText = _command.Data.Sql.ToString();
+
 				if(_command.Data.Context.Data.CommandTimeout != Int32.MinValue)
 					_command.Data.InnerCommand.CommandTimeout = _command.Data.Context.Data.CommandTimeout;
 
@@ -1860,6 +1896,14 @@ namespace FluentData
 			InnerReader.Close();
 		}
 
+		private T GetValue<T>(int i)
+		{
+			var value = InnerReader.GetValue(i);
+			if(value == DBNull.Value)
+				return default(T);
+			return (T)value;
+		}
+
 		public int Depth
 		{
 			get { return InnerReader.Depth; }
@@ -1902,7 +1946,7 @@ namespace FluentData
 
 		public bool GetBoolean(int i)
 		{
-			return IsDBNull(i) ? false : InnerReader.GetBoolean(i);
+			return GetValue<bool>(i);
 		}
 
 		public bool GetBoolean(string name)
@@ -1912,7 +1956,7 @@ namespace FluentData
 
 		public byte GetByte(int i)
 		{
-			return IsDBNull(i) ? (byte) 0 : InnerReader.GetByte(i);
+			return GetValue<byte>(i);
 		}
 
 		public byte GetByte(string name)
@@ -1932,7 +1976,7 @@ namespace FluentData
 
 		public char GetChar(int i)
 		{
-			return IsDBNull(i) ? char.MinValue : InnerReader.GetChar(i);
+			return GetValue<char>(i);
 		}
 
 		public char GetChar(string name)
@@ -1972,7 +2016,7 @@ namespace FluentData
 
 		public DateTime GetDateTime(int i)
 		{
-			return IsDBNull(i) ? DateTime.MinValue : InnerReader.GetDateTime(i);
+			return GetValue<DateTime>(i);
 		}
 
 		public DateTime GetDateTime(string name)
@@ -1982,7 +2026,7 @@ namespace FluentData
 
 		public decimal GetDecimal(int i)
 		{
-			return IsDBNull(i) ? 0.0M : InnerReader.GetDecimal(i);
+			return GetValue<decimal>(i);
 		}
 
 		public decimal GetDecimal(string name)
@@ -1992,7 +2036,7 @@ namespace FluentData
 
 		public double GetDouble(int i)
 		{
-			return IsDBNull(i) ? 0.0D : InnerReader.GetDouble(i);
+			return GetValue<double>(i);
 		}
 
 		public double GetDouble(string name)
@@ -2012,7 +2056,7 @@ namespace FluentData
 
 		public float GetFloat(int i)
 		{
-			return IsDBNull(i) ? 0.0F : InnerReader.GetFloat(i);
+			return GetValue<float>(i);
 		}
 
 		public float GetFloat(string name)
@@ -2022,7 +2066,7 @@ namespace FluentData
 
 		public Guid GetGuid(int i)
 		{
-			return IsDBNull(i) ? Guid.Empty : InnerReader.GetGuid(i);
+			return GetValue<Guid>(i);
 		}
 
 		public Guid GetGuid(string name)
@@ -2032,7 +2076,7 @@ namespace FluentData
 
 		public short GetInt16(int i)
 		{
-			return IsDBNull(i) ? (short) 0 : InnerReader.GetInt16(i);
+			return GetValue<Int16>(i);
 		}
 
 		public short GetInt16(string name)
@@ -2042,7 +2086,7 @@ namespace FluentData
 
 		public int GetInt32(int i)
 		{
-			return IsDBNull(i) ? 0 : InnerReader.GetInt32(i);
+			return GetValue<int>(i);
 		}
 
 		public int GetInt32(string name)
@@ -2052,7 +2096,7 @@ namespace FluentData
 
 		public long GetInt64(int i)
 		{
-			return IsDBNull(i) ? 0 : InnerReader.GetInt64(i);
+			return GetValue<long>(i);
 		}
 
 		public long GetInt64(string name)
@@ -2077,7 +2121,7 @@ namespace FluentData
 
 		public string GetString(int i)
 		{
-			return IsDBNull(i) ? null : InnerReader.GetString(i);
+			return GetValue<string>(i);
 		}
 
 		public string GetString(string name)
@@ -2087,7 +2131,7 @@ namespace FluentData
 
 		public object GetValue(int i)
 		{
-			return IsDBNull(i) ? null : InnerReader.GetValue(i);
+			return GetValue<object>(i);
 		}
 
 		public object GetValue(string name)
@@ -2582,23 +2626,13 @@ namespace FluentData
 
 		public IDbCommand Sql(string sql, params object[] parameters)
 		{
-			var command = CreateCommand.Sql(sql);
-			if(parameters != null)
-			{
-				for(var i = 0; i < parameters.Count(); i++)
-					command.Parameter(i.ToString(), parameters[i]);
-			}
+			var command = CreateCommand.Sql(sql).Parameters(parameters);
 			return command;
 		}
 
 		public IDbCommand MultiResultSql(string sql = "", params object[] parameters)
 		{
-			var command = CreateCommand.UseMultipleResultset.Sql(sql);
-			if(parameters != null)
-			{
-				for(var i = 0; i < parameters.Count(); i++)
-					command.Parameter(i.ToString(), parameters[i]);
-			}
+			var command = CreateCommand.UseMultipleResultset.Sql(sql).Parameters(parameters);
 			return command;
 		}
 	}
@@ -2863,7 +2897,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "System.command.Data.OleDb";
+				return "System.Data.OleDb";
 			}
 		}
 
@@ -2961,9 +2995,9 @@ namespace FluentData
 
 		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
-			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
@@ -3119,7 +3153,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "IBM.data.DB2";
+				return "IBM.Data.DB2";
 			}
 		}
 		public bool SupportsOutputParameters
@@ -3211,10 +3245,10 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;";
+			command.Sql("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
 
 			var lastId = default(T);
 
@@ -3222,10 +3256,7 @@ namespace FluentData
 			{
 				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T)value;
 			});
 
 			return lastId;
@@ -3341,21 +3372,17 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
-
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 			command.Data.InnerCommand.CommandText += "select lastval();";
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = command.Data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T) value;
 			});
 
 			return lastId;
@@ -3377,7 +3404,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "MySql.command.Data.MySqlClient";
+				return "MySql.Data.MySqlClient";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -3469,21 +3496,18 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select LAST_INSERT_ID() as `LastInsertedId`";
+			command.Sql("select LAST_INSERT_ID() as `LastInsertedId`");
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				object value = command.Data.InnerCommand.ExecuteScalar();
+				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T)value;
 			});
 
 			return lastId;
@@ -3730,7 +3754,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "System.command.Data.SQLite";
+				return "System.Data.SQLite";
 			} 
 		}
 		public bool SupportsOutputParameters
@@ -3822,21 +3846,17 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select last_insert_rowid();";
+			command.Sql("select last_insert_rowid();");
 
 			var lastId = default(T);
-
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				var value = command.Data.InnerCommand.ExecuteScalar();
 
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = (T) value;
 			});
 
 			return lastId;
@@ -3858,7 +3878,7 @@ namespace FluentData
 		{
 			get
 			{
-				return "System.command.Data.SqlServerCe.4.0";
+				return "System.Data.SqlServerCe.4.0";
 			}
 		}
 
@@ -3974,9 +3994,9 @@ namespace FluentData
 
 		private T HandleExecuteReturnLastId<T>(IDbCommand command)
 		{
-			int recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
 
-			T lastId = default(T);
+			var lastId = default(T);
 
 			if (recordsAffected > 0)
 			{
@@ -3997,7 +4017,7 @@ namespace FluentData
 		{ 
 			get
 			{
-				return "System.data.SqlClient";
+				return "System.Data.SqlClient";
 			} 
 		}
 
@@ -4043,46 +4063,50 @@ namespace FluentData
 
 		public string GetSqlForSelectBuilder(BuilderData data)
 		{
-			var sql = "";
-			if (data.PagingItemsPerPage == 0)
+			var sql = new StringBuilder();
+			if (data.PagingCurrentPage == 1)
 			{
-				sql = "select " + data.Select;
-				sql += " from " + data.From;
+				if (data.PagingItemsPerPage == 0)
+					sql.Append("select");
+				else
+					sql.Append("select top " + data.PagingItemsPerPage.ToString());
+				sql.Append(" " + data.Select);
+				sql.Append(" from " + data.From);
 				if (data.WhereSql.Length > 0)
-					sql += " where " + data.WhereSql;
+					sql.Append(" where " + data.WhereSql);
 				if (data.GroupBy.Length > 0)
-					sql += " group by " + data.GroupBy;
+					sql.Append(" group by " + data.GroupBy);
 				if (data.Having.Length > 0)
-					sql += " having " + data.Having;
+					sql.Append(" having " + data.Having);
 				if (data.OrderBy.Length > 0)
-					sql += " order by " + data.OrderBy;
+					sql.Append(" order by " + data.OrderBy);
+				return sql.ToString();
 			}
-			else if (data.PagingItemsPerPage > 0)
+			else
 			{
-				sql += " from " + data.From;
-				if (data.WhereSql.Length > 0)
-					sql += " where " + data.WhereSql;
-				if (data.GroupBy.Length > 0)
-					sql += " group by " + data.GroupBy;
-				if (data.Having.Length > 0)
-					sql += " having " + data.Having;
+				sql.Append(" from " + data.From);
+				if(data.WhereSql.Length > 0)
+					sql.Append(" where " + data.WhereSql);
+				if(data.GroupBy.Length > 0)
+					sql.Append(" group by " + data.GroupBy);
+				if(data.Having.Length > 0)
+					sql.Append(" having " + data.Having);
 
-				sql = string.Format(@"with PagedPersons as
-										(
-											select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
-											{2}
-										)
-										select *
-										from PagedPersons
-										where fluentdata_RowNumber between {3} and {4}",
-											data.Select,
-											data.OrderBy,
-											sql,
-											data.GetFromItems(),
-											data.GetToItems());
+				var pagedSql = string.Format(@"with PagedPersons as
+								(
+									select top 100 percent {0}, row_number() over (order by {1}) as FLUENTDATA_ROWNUMBER
+									{2}
+								)
+								select *
+								from PagedPersons
+								where fluentdata_RowNumber between {3} and {4}",
+				                             data.Select,
+				                             data.OrderBy,
+				                             sql,
+				                             data.GetFromItems(),
+				                             data.GetToItems());
+				return pagedSql;
 			}
-
-			return sql;
 		}
 
 		public string GetSqlForInsertBuilder(BuilderData data)
@@ -4112,10 +4136,10 @@ namespace FluentData
 
 		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			if(command.Data.InnerCommand.CommandText[command.Data.InnerCommand.CommandText.Length - 1] != ';')
-				command.Data.InnerCommand.CommandText += ';';
+			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
+				command.Sql(";");
 
-			command.Data.InnerCommand.CommandText += "select SCOPE_IDENTITY()";
+			command.Sql("select SCOPE_IDENTITY()");
 
 			var lastId = default(T);
 
