@@ -41,7 +41,7 @@ namespace FluentData.Providers.MySql
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("MySql"), DbProviderTypes.MySql);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("MySql"), new MySqlProvider());
 		}
 
 		[TestMethod]
@@ -203,7 +203,7 @@ namespace FluentData.Providers.MySql
 		[TestMethod]
 		public void MultipleResultset()
 		{
-				using (var command = Context().MultiResultSql())
+				using (var command = Context().MultiResultSql)
 				{
 					var categories = command.Sql(@"select * from Category;
 													select * from Product;").QueryMany<dynamic>();

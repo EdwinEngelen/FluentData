@@ -10,7 +10,7 @@ namespace FluentData._Helpers
 		private static readonly object Locker = new object();
 		public static IDbContext Context()
 		{
-			var context = new DbContext().ConnectionString(GetConnectionStringValue("SqlServer"), DbProviderTypes.SqlServer);
+			var context = new DbContext().ConnectionString(GetConnectionStringValue("SqlServer"), new SqlServerProvider());
 
 			if (!_isInitialized)
 			{

@@ -4,9 +4,9 @@ using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.PostgreSql
+namespace FluentData
 {
-	internal class PostgreSqlProvider : IDbProvider
+	public class PostgreSqlProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -20,7 +20,7 @@ namespace FluentData.Providers.PostgreSql
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}

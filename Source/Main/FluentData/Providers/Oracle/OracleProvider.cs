@@ -3,9 +3,9 @@ using System.Data;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.Oracle
+namespace FluentData
 {
-	internal class OracleProvider : IDbProvider
+	public class OracleProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -20,7 +20,7 @@ namespace FluentData.Providers.Oracle
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}

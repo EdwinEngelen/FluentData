@@ -4,9 +4,9 @@ using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.Access
+namespace FluentData
 {
-	internal class AccessProvider : IDbProvider
+	public class AccessProvider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -26,7 +26,7 @@ namespace FluentData.Providers.Access
 			get { return false; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}

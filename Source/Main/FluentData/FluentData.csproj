@@ -89,10 +89,8 @@
     <Compile Include="Builders\StoredProcedure\BaseStoredProcedureBuilder.cs" />
     <Compile Include="Builders\StoredProcedure\Interfaces\IBaseStoredProcedureBuilder.cs" />
     <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilder.cs" />
-    <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilderDynamic.cs" />
     <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilderGeneric.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilder.cs" />
-    <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderDynamic.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderGeneric.cs" />
     <Compile Include="Builders\TableColumn.cs" />
     <Compile Include="Builders\Update\BaseUpdateBuilder.cs" />
@@ -159,10 +157,9 @@
     <Compile Include="Providers\DB2\DB2Provider.cs" />
     <Compile Include="Providers\PostgreSql\PostgreSqlProvider.cs" />
     <Compile Include="Providers\MySql\MySqlProvider.cs" />
-    <Compile Include="Providers\DbProviderFactory.cs" />
-    <Compile Include="Providers\DbProviderTypes.cs" />
     <Compile Include="Providers\IDbProvider.cs" />
     <Compile Include="Providers\Oracle\OracleProvider.cs" />
+    <Compile Include="Providers\SqlAzure\SqlAzureProvider.cs" />
     <Compile Include="Providers\Sqlite\SqliteProvider.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />

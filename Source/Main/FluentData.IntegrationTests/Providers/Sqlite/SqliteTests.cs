@@ -36,7 +36,7 @@ namespace FluentData.Providers.Sqlite
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Sqlite"), DbProviderTypes.Sqlite);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Sqlite"), new SqliteProvider());
 		}
 
 		[TestMethod]
@@ -198,7 +198,7 @@ namespace FluentData.Providers.Sqlite
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql())
+			using (var command = Context().MultiResultSql)
 			{
 				var categories = command.Sql(@"select * from Category;
 												select * from Product;").QueryMany<dynamic>();

@@ -2,13 +2,10 @@
 {
 	public partial class DbContext
 	{
-		public IDbContext IgnoreIfAutoMapFails
+		public IDbContext IgnoreIfAutoMapFails(bool ignoreIfAutoMapFails)
 		{
-			get
-			{
-				Data.IgnoreIfAutoMapFails = true;
-				return this;
-			}
+			Data.IgnoreIfAutoMapFails = true;
+			return this;
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace FluentData.Providers.SqlServerCompact
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlServerCompact40"), DbProviderTypes.SqlServerCompact40);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlServerCompact40"), new SqlServerCompactProvider());
 		}
 
 		[TestMethod]
@@ -179,7 +179,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			try
 			{
-				var command = Context().MultiResultSql();
+				var command = Context().MultiResultSql;
 				Assert.Fail();
 			}
 			catch (FluentDataException ex)

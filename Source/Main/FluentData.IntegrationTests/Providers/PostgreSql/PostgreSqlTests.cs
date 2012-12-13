@@ -43,7 +43,7 @@ namespace FluentData.Providers.PostgreSql
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("PostgreSql"), DbProviderTypes.PostgreSql);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("PostgreSql"), new PostgreSqlProvider());
 		}
 
 		[TestMethod]
@@ -205,7 +205,7 @@ namespace FluentData.Providers.PostgreSql
 		[TestMethod]
 		public void MultipleResultset()
 		{
-				using (var command = Context().MultiResultSql())
+				using (var command = Context().MultiResultSql)
 				{
 					var categories = command.Sql(@"select * from Category;
 													select * from Product;").QueryMany<dynamic>();

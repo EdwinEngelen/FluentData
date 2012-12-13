@@ -4,9 +4,9 @@ using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.DB2Provider
+namespace FluentData
 {
-	internal class DB2Provider : IDbProvider
+	public class DB2Provider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -20,7 +20,7 @@ namespace FluentData.Providers.DB2Provider
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}

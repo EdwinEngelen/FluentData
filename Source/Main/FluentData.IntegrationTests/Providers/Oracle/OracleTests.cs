@@ -9,7 +9,7 @@ namespace FluentData.Providers.Oracle
 	{
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Oracle"), DbProviderTypes.Oracle);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Oracle"), new OracleProvider());
 		}
 
 		[TestMethod]
@@ -178,7 +178,7 @@ namespace FluentData.Providers.Oracle
 		{
 			try
 			{
-				var command = Context().MultiResultSql();
+				var command = Context().MultiResultSql;
 				Assert.Fail();
 			}
 			catch (FluentDataException ex)

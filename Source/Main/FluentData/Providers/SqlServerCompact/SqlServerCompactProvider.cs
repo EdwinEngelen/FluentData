@@ -3,9 +3,9 @@ using System.Data;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.SqlServerCompact
+namespace FluentData
 {
-	internal class SqlServerCompactProvider : IDbProvider
+	public class SqlServerCompactProvider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -25,7 +25,7 @@ namespace FluentData.Providers.SqlServerCompact
 			get { return false; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}

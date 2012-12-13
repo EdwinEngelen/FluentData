@@ -44,7 +44,7 @@ namespace FluentData.Providers.SqlAzure
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlAzure"), DbProviderTypes.SqlAzure);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlAzure"), new SqlAzureProvider());
 		}
 
 		[TestMethod]
@@ -197,7 +197,7 @@ namespace FluentData.Providers.SqlAzure
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql())
+			using (var command = Context().MultiResultSql)
 			{
 				var categories = command.Sql(@"select * from Category;
 									select * from Product;").QueryMany<dynamic>();

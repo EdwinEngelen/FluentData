@@ -48,7 +48,7 @@ namespace FluentData.Providers.DB2
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("DB2"), DbProviderTypes.DB2);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("DB2"), new DB2Provider());
 		}
 
 		[TestMethod]
@@ -210,7 +210,7 @@ namespace FluentData.Providers.DB2
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql())
+			using (var command = Context().MultiResultSql)
 			{
 				var categories = command.Sql(@"select * from Category;
 													select * from Product;").QueryMany<dynamic>();

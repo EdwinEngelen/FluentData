@@ -25,7 +25,7 @@ namespace FluentData.Features.AutoMapping
 		[TestMethod]
 		public void Test_ignoreIfAutoMapFails_different_columns_and_properties_automap_must_not_fail()
 		{
-			var result = TestHelper.Context().IgnoreIfAutoMapFails
+			var result = TestHelper.Context().IgnoreIfAutoMapFails(true)
 												.Sql(@"select CategoryId as CategoryIdNotExist, Name
 														from Category").QueryMany<Category>();
 		}

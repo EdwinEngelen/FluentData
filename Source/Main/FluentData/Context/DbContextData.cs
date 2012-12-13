@@ -12,7 +12,6 @@ namespace FluentData
 		public IDbProvider Provider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
-		public DbProviderTypes ProviderType { get; set; }
 		public bool IgnoreIfAutoMapFails { get; set; }
 		public int CommandTimeout { get; set; }
 		public Action<OnConnectionOpeningEventArgs> OnConnectionOpening { get; set; }

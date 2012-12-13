@@ -4,9 +4,9 @@ using System.Text;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.Sqlite
+namespace FluentData
 {
-	internal class Sqlite : IDbProvider
+	public class SqliteProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -20,7 +20,7 @@ namespace FluentData.Providers.Sqlite
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}

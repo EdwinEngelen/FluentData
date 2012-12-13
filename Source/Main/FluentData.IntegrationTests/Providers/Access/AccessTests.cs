@@ -14,7 +14,7 @@ namespace FluentData.Providers.Access
 
 		protected IDbContext Context()
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Access"), DbProviderTypes.Access);
+			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("Access"), new AccessProvider());
 		}
 
 		[TestMethod]
@@ -169,7 +169,7 @@ namespace FluentData.Providers.Access
 		{
 			try
 			{
-				var command = Context().MultiResultSql();
+				var command = Context().MultiResultSql;
 				Assert.Fail();
 			}
 			catch (FluentDataException ex)

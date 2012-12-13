@@ -3,9 +3,9 @@ using System.Data;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
-namespace FluentData.Providers.MySql
+namespace FluentData
 {
-	internal class MySqlProvider : IDbProvider
+	public class MySqlProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -19,7 +19,7 @@ namespace FluentData.Providers.MySql
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}
