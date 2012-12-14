@@ -34,10 +34,13 @@ namespace FluentData
 			return command;
 		}
 
-		public IDbCommand MultiResultSql(string sql = "", params object[] parameters)
+		public IDbCommand MultiResultSql
 		{
-			var command = CreateCommand.UseMultipleResultset.Sql(sql).Parameters(parameters);
-			return command;
-		}
+            get
+	        {
+	            var command = CreateCommand.UseMultipleResultset(true);
+	            return command;
+	        }
+	    }
 	}
 }

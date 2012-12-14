@@ -171,7 +171,7 @@ namespace FluentData.Providers.SqlServer
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql())
+			using (var command = Context().MultiResultSql)
 			{
 				var categories = command.Sql(@"select * from Category;
 												select * from Product;").QueryMany<dynamic>();

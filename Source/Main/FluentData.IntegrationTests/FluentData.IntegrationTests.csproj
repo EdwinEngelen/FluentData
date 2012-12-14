@@ -86,7 +86,6 @@
     <Compile Include="Builders\Insert\InsertBuilderDynamicTests.cs" />
     <Compile Include="Builders\Insert\InsertBuilderGenericTests.cs" />
     <Compile Include="Builders\Insert\InsertBuilderTests.cs" />
-    <Compile Include="Builders\StoredProcedure\StoredProcedureDynamicTests.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderGenericTests.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureTests.cs" />
     <Compile Include="Builders\Update\UpdateBuilderDynamicTests.cs" />

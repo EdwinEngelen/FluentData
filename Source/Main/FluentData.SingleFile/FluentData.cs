@@ -416,13 +416,6 @@ namespace FluentData
 		IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
-	public enum Operators
-	{
-		None = 0,
-		And = 1,
-		Or = 2
-	}
-
 	public interface ISelectBuilder<TEntity>
 	{
 		BuilderData Data { get; set; }
@@ -498,19 +491,6 @@ namespace FluentData
 		{
 			if(Data.WhereSql.Length > 0)
 				Data.WhereSql += " or ";
-			Data.WhereSql += sql;
-			return this;
-		}
-
-		public ISelectBuilder<TEntity> Where(Operators operators, string sql)
-		{
-			if(Data.WhereSql.Length > 0)
-			{
-				if(operators == Operators.And)
-					Data.WhereSql += " and ";
-				else if(operators == Operators.Or)
-					Data.WhereSql += " or ";
-			}
 			Data.WhereSql += sql;
 			return this;
 		}
@@ -663,13 +643,6 @@ namespace FluentData
 		IStoredProcedureBuilder ParameterOut(string name, DataTypes parameterType, int size = 0);
 	}
 
-	public interface IStoredProcedureBuilderDynamic : IBaseStoredProcedureBuilder, IDisposable
-	{
-		IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties);
-		IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
-		IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0);
-	}
-
 	public interface IStoredProcedureBuilder<T> : IBaseStoredProcedureBuilder, IDisposable
 	{
 		IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
@@ -697,33 +670,6 @@ namespace FluentData
 			return this;
 		}
 	}	
-
-	internal class StoredProcedureBuilderDynamic : BaseStoredProcedureBuilder, IStoredProcedureBuilderDynamic
-	{
-		internal StoredProcedureBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
-			: base(command, name)
-		{
-			Data.Item = (IDictionary<string, object>) item;
-		}
-
-		public IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType, int size)
-		{
-			Actions.ColumnValueAction(name, value, parameterType, size);
-			return this;
-		}
-
-		public IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties)
-		{
-			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
-			return this;
-		}
-
-		public IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0)
-		{
-			Actions.ParameterOutputAction(name, parameterType, size);
-			return this;
-		}
-	}
 
 	internal class StoredProcedureBuilder<T> : BaseStoredProcedureBuilder, IStoredProcedureBuilder<T>
 	{
@@ -1102,16 +1048,13 @@ namespace FluentData
 			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		public IDbCommand UseMultipleResultset
+		public IDbCommand UseMultipleResultset(bool useMultipleResultset)
 		{
-			get
-			{
-				if (!Data.Context.Data.Provider.SupportsMultipleResultset)
-					throw new FluentDataException("The selected database does not support multiple resultset");
+			if (useMultipleResultset && !Data.Context.Data.Provider.SupportsMultipleResultsets)
+				throw new FluentDataException("The selected database does not support multiple resultset");
 
-				Data.UseMultipleResultsets = true;
-				return this;
-			}
+			Data.UseMultipleResultsets = useMultipleResultset;
+			return this;
 		}
 
 		public IDbCommand CommandType(DbCommandTypes dbCommandType)
@@ -2304,7 +2247,6 @@ namespace FluentData
 		public IDbProvider Provider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
-		public DbProviderTypes ProviderType { get; set; }
 		public bool IgnoreIfAutoMapFails { get; set; }
 		public int CommandTimeout { get; set; }
 		public Action<OnConnectionOpeningEventArgs> OnConnectionOpening { get; set; }
@@ -2335,12 +2277,12 @@ namespace FluentData
 	public interface IDbContext : IDisposable
 	{
 		DbContextData Data { get; }
-		IDbContext IgnoreIfAutoMapFails { get; }
+		IDbContext IgnoreIfAutoMapFails(bool ignoreIfAutoMapFails);
 		IDbContext UseTransaction(bool useTransaction);
 		IDbContext UseSharedConnection(bool useSharedConnection);
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
-		IDbCommand MultiResultSql(string sql = "", params object[] parameters);
+		IDbCommand MultiResultSql { get; }
 		ISelectBuilder<TEntity> Select<TEntity>(string sql);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
@@ -2351,15 +2293,9 @@ namespace FluentData
 		IDeleteBuilder Delete(string tableName);
 		IDeleteBuilder<T> Delete<T>(string tableName, T item);
 		IStoredProcedureBuilder StoredProcedure(string storedProcedureName);
-		IStoredProcedureBuilder MultiResultStoredProcedure(string storedProcedureName);
 		IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item);
-		IStoredProcedureBuilder<T> MultiResultStoredProcedure<T>(string storedProcedureName, T item);
-		IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item);
-		IStoredProcedureBuilderDynamic MultiResultStoredProcedure(string storedProcedureName, ExpandoObject item);
 		IDbContext EntityFactory(IEntityFactory entityFactory);
-		IDbContext ConnectionString(string connectionString, DbProviderTypes dbProviderType);
 		IDbContext ConnectionString(string connectionString, IDbProvider dbProvider);
-		IDbContext ConnectionStringName(string connectionstringName, DbProviderTypes dbProviderType);
 		IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider);
 		IDbContext IsolationLevel(IsolationLevel isolationLevel);
 		IDbContext Commit();
@@ -2400,13 +2336,10 @@ namespace FluentData
 
 	public partial class DbContext
 	{
-		public IDbContext IgnoreIfAutoMapFails
+		public IDbContext IgnoreIfAutoMapFails(bool ignoreIfAutoMapFails)
 		{
-			get
-			{
-				Data.IgnoreIfAutoMapFails = true;
-				return this;
-			}
+			Data.IgnoreIfAutoMapFails = true;
+			return this;
 		}
 	}
 
@@ -2469,34 +2402,10 @@ namespace FluentData
 			return new StoredProcedureBuilder(CreateCommand, storedProcedureName);
 		}
 
-		public IStoredProcedureBuilder MultiResultStoredProcedure(string storedProcedureName)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(CreateCommand.UseMultipleResultset, storedProcedureName);
-		}
-
 		public IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
 			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilder<T> MultiResultStoredProcedure<T>(string storedProcedureName, T item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(CreateCommand.UseMultipleResultset, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilderDynamic MultiResultStoredProcedure(string storedProcedureName, ExpandoObject item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
 		}
 	}
 
@@ -2511,34 +2420,16 @@ namespace FluentData
 
 	public partial class DbContext
 	{
-		private void ConnectionStringInternal(string connectionString, DbProviderTypes dbProviderType, IDbProvider dbProvider)
-		{
-			Data.ConnectionString = connectionString;
-			Data.ProviderType = dbProviderType;
-			Data.Provider = dbProvider;
-		}
-
-		public IDbContext ConnectionString(string connectionString, DbProviderTypes dbProviderType)
-		{
-			ConnectionStringInternal(connectionString, dbProviderType, new DbProviderFactory().GetDbProvider(dbProviderType));
-			return this;
-		}
-
 		public IDbContext ConnectionString(string connectionString, IDbProvider dbProvider)
 		{
-			ConnectionStringInternal(connectionString, DbProviderTypes.Custom, dbProvider);
-			return this;
-		}
-
-		public IDbContext ConnectionStringName(string connectionstringName, DbProviderTypes dbProviderType)
-		{
-			ConnectionStringInternal(GetConnectionStringFromConfig(connectionstringName), dbProviderType, new DbProviderFactory().GetDbProvider(dbProviderType));
+			Data.ConnectionString = connectionString;
+			Data.Provider = dbProvider;
 			return this;
 		}
 
 		public IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider)
 		{
-			ConnectionStringInternal(GetConnectionStringFromConfig(connectionstringName), DbProviderTypes.Custom, dbProvider);
+			ConnectionString(GetConnectionStringFromConfig(connectionstringName), dbProvider);
 			return this;
 		}
 
@@ -2630,11 +2521,14 @@ namespace FluentData
 			return command;
 		}
 
-		public IDbCommand MultiResultSql(string sql = "", params object[] parameters)
+		public IDbCommand MultiResultSql
 		{
-			var command = CreateCommand.UseMultipleResultset.Sql(sql).Parameters(parameters);
-			return command;
-		}
+            get
+	        {
+	            var command = CreateCommand.UseMultipleResultset(true);
+	            return command;
+	        }
+	    }
 	}
 
 	public partial class DbContext
@@ -2891,7 +2785,7 @@ namespace FluentData
 		}
 	}
 
-	internal class AccessProvider : IDbProvider
+	public class AccessProvider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -2911,7 +2805,7 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}
@@ -3147,7 +3041,7 @@ namespace FluentData
 		}
 	}
 
-	internal class DB2Provider : IDbProvider
+	public class DB2Provider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -3161,7 +3055,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}
@@ -3272,7 +3166,7 @@ namespace FluentData
 		}
 	}
 
-	internal class PostgreSqlProvider : IDbProvider
+	public class PostgreSqlProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -3286,7 +3180,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}
@@ -3398,7 +3292,7 @@ namespace FluentData
 		}
 	}
 
-	internal class MySqlProvider : IDbProvider
+	public class MySqlProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -3412,7 +3306,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}
@@ -3523,62 +3417,10 @@ namespace FluentData
 		}
 	}
 
-	internal class DbProviderFactory
-	{
-		public virtual IDbProvider GetDbProvider(DbProviderTypes dbProvider)
-		{
-			IDbProvider provider = null;
-			switch (dbProvider)
-			{
-				case DbProviderTypes.SqlServer:
-				case DbProviderTypes.SqlAzure:
-					provider = new SqlServerProvider();
-					break;
-				case DbProviderTypes.SqlServerCompact40:
-					provider = new SqlServerCompactProvider();
-					break;
-				case DbProviderTypes.Oracle:
-					provider = new OracleProvider();
-					break;
-				case DbProviderTypes.MySql:
-					provider = new MySqlProvider();
-					break;
-				case DbProviderTypes.Access:
-					provider = new AccessProvider();
-					break;
-				case DbProviderTypes.Sqlite:
-					provider = new Sqlite();
-					break;
-				case DbProviderTypes.PostgreSql:
-					provider = new PostgreSqlProvider();
-					break;
-				case DbProviderTypes.DB2:
-					provider = new DB2Provider();
-					break;
-			}
-
-			return provider;
-		}
-	}
-
-	public enum DbProviderTypes
-	{
-		Custom = 0,
-		SqlServer = 1,
-		SqlServerCompact40 = 2,
-		SqlAzure = 3,
-		Oracle = 4,
-		MySql = 5,
-		Access = 6,
-		Sqlite = 7,
-		PostgreSql = 8,
-		DB2 = 9
-	}
-
 	public interface IDbProvider
 	{
 		string ProviderName { get; }
-		bool SupportsMultipleResultset { get; }
+		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
@@ -3597,7 +3439,7 @@ namespace FluentData
 		string EscapeColumnName(string name);
 	}
 
-	internal class OracleProvider : IDbProvider
+	public class OracleProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -3612,7 +3454,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}
@@ -3748,7 +3590,11 @@ namespace FluentData
 		}
 	}
 
-	internal class Sqlite : IDbProvider
+	public class SqlAzureProvider : SqlServerProvider
+	{
+	}
+
+	public class SqliteProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -3762,7 +3608,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}
@@ -3872,7 +3718,7 @@ namespace FluentData
 		}
 	}
 
-	internal class SqlServerCompactProvider : IDbProvider
+	public class SqlServerCompactProvider : IDbProvider
 	{
 		public string ProviderName
 		{
@@ -3892,7 +3738,7 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return false; }
 		}
@@ -4011,7 +3857,7 @@ namespace FluentData
 		}
 	}
 
-	internal class SqlServerProvider : IDbProvider
+	public class SqlServerProvider : IDbProvider
 	{
 		public string ProviderName
 		{ 
@@ -4026,7 +3872,7 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsMultipleResultset
+		public bool SupportsMultipleResultsets
 		{
 			get { return true; }
 		}

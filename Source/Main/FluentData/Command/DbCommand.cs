@@ -14,16 +14,13 @@ namespace FluentData
 			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		public IDbCommand UseMultipleResultset
+		public IDbCommand UseMultipleResultset(bool useMultipleResultset)
 		{
-			get
-			{
-				if (!Data.Context.Data.Provider.SupportsMultipleResultset)
-					throw new FluentDataException("The selected database does not support multiple resultset");
+			if (useMultipleResultset && !Data.Context.Data.Provider.SupportsMultipleResultsets)
+				throw new FluentDataException("The selected database does not support multiple resultset");
 
-				Data.UseMultipleResultsets = true;
-				return this;
-			}
+			Data.UseMultipleResultsets = useMultipleResultset;
+			return this;
 		}
 
 		public IDbCommand CommandType(DbCommandTypes dbCommandType)

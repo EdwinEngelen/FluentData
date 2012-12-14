@@ -30,7 +30,7 @@ namespace FluentData.Features.Events
 			var connectionState = ConnectionState.Open;
 
 			var context = TestHelper.Context().OnConnectionClosed(args => { eventFired = true; connectionState = args.Connection.State; });
-			using (var cmd = context.MultiResultSql("select top 1 * from product;select top 1 * from Product"))
+			using (var cmd = context.MultiResultSql.Sql("select top 1 * from product;select top 1 * from Product"))
 			{
 				cmd.QueryMany<dynamic>();
 				cmd.QueryMany<dynamic>();

@@ -61,34 +61,10 @@ namespace FluentData
 			return new StoredProcedureBuilder(CreateCommand, storedProcedureName);
 		}
 
-		public IStoredProcedureBuilder MultiResultStoredProcedure(string storedProcedureName)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder(CreateCommand.UseMultipleResultset, storedProcedureName);
-		}
-
 		public IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item)
 		{
 			VerifyStoredProcedureSupport();
 			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilder<T> MultiResultStoredProcedure<T>(string storedProcedureName, T item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilder<T>(CreateCommand.UseMultipleResultset, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand, storedProcedureName, item);
-		}
-
-		public IStoredProcedureBuilderDynamic MultiResultStoredProcedure(string storedProcedureName, ExpandoObject item)
-		{
-			VerifyStoredProcedureSupport();
-			return new StoredProcedureBuilderDynamic(Data.Provider, CreateCommand.UseMultipleResultset, storedProcedureName, item);
 		}
 	}
 }

@@ -61,19 +61,6 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Where(Operators operators, string sql)
-		{
-			if(Data.WhereSql.Length > 0)
-			{
-				if(operators == Operators.And)
-					Data.WhereSql += " and ";
-				else if(operators == Operators.Or)
-					Data.WhereSql += " or ";
-			}
-			Data.WhereSql += sql;
-			return this;
-		}
-
 		public ISelectBuilder<TEntity> OrderBy(string sql)
 		{
 			Data.OrderBy += sql;

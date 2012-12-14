@@ -83,7 +83,6 @@
     <Compile Include="Builders\Insert\Interfaces\IInsertBuilder.cs" />
     <Compile Include="Builders\Insert\Interfaces\IInsertBuilderGeneric.cs" />
     <Compile Include="Builders\Insert\Interfaces\IInsertDynamic.cs" />
-    <Compile Include="Builders\Operators.cs" />
     <Compile Include="Builders\Select\ISelectBuilder.cs" />
     <Compile Include="Builders\Select\SelectBuilder.cs" />
     <Compile Include="Builders\StoredProcedure\BaseStoredProcedureBuilder.cs" />

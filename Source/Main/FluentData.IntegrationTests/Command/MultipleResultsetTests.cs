@@ -9,7 +9,7 @@ namespace FluentData.Command
 		[TestMethod]
 		public void Command_with_multiple_resultset()
 		{
-			using (var cmd = TestHelper.Context().MultiResultSql())
+			using (var cmd = TestHelper.Context().MultiResultSql)
 			{
 				var category1 = cmd.Sql(@"select * from Category where CategoryId = 1;
 						select * from Category where CategoryId = 2;").QuerySingle<dynamic>();

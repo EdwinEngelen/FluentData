@@ -6,7 +6,7 @@ namespace FluentData
 	public interface IDbProvider
 	{
 		string ProviderName { get; }
-		bool SupportsMultipleResultset { get; }
+		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
