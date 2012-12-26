@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.AutoMapping
 {
 	[TestClass]
-	public class NestedPropertyTests
+	public class NestedPropertyTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_multiple_property_levels()
 		{
-			var report = TestHelper.Context().Sql(@"select o.*,
+			var report = Context.Sql(@"select o.*,
 												l.OrderLineId as OrderLine_OrderLineId,
 												p.ProductId as OrderLine_Product_ProductId,
 												p.Name as OrderLine_Product_Name,

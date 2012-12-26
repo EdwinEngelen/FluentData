@@ -1126,8 +1126,8 @@ namespace FluentData
 		TParameterType ParameterValue<TParameterType>(string outputParameterName);
 		int Execute();
 		T ExecuteReturnLastId<T>(string identityColumnName = null);
-		List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null);
-		TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
+		List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null);		
+        TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>;
 		void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper);
 		TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null);
 		TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
@@ -1530,6 +1530,11 @@ namespace FluentData
 		{
 			return QueryMany<TEntity, List<TEntity>>(customMapper);
 		}
+
+        public List<TEntity> QueryMany<TEntity>(Action<TEntity, dynamic> customMapper)
+        {
+            return null;
+        }
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper)
 		{

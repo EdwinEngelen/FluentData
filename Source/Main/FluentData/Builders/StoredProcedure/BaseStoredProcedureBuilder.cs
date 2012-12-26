@@ -4,7 +4,7 @@ using System.Data;
 
 namespace FluentData
 {
-	internal abstract class BaseStoredProcedureBuilder
+	internal abstract class BaseStoredProcedureBuilder : IQuery
 	{
 		protected BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
@@ -21,7 +21,7 @@ namespace FluentData
 
 		public BaseStoredProcedureBuilder(IDbCommand command, string name)
 		{
-			Data =  new BuilderData(command, name);
+			Data = new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
@@ -41,17 +41,32 @@ namespace FluentData
 			return Command.Execute();
 		}
 
-		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
-		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
-		}
-
 		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
 			return Command.QueryMany<TEntity>(customMapper);
 		}
 
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, dynamic> customMapper)
+		{
+			return Command.QueryMany<TEntity>(customMapper);
+		}
+
+		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
+		{
+			return Command.QueryMany<TEntity, TList>(customMapper);
+		}
+
+		public TList QueryMany<TEntity, TList>(Action<TEntity, dynamic> customMapper) where TList : IList<TEntity>
+		{
+			return Command.QueryMany<TEntity, TList>(customMapper);
+		}
+
 		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
+		{
+			Command.QueryComplexMany<TEntity>(list, customMapper);
+		}
+
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
 			Command.QueryComplexMany<TEntity>(list, customMapper);
 		}
@@ -61,14 +76,24 @@ namespace FluentData
 			return Command.QuerySingle<TEntity>(customMapper);
 		}
 
+		public TEntity QuerySingle<TEntity>(Action<TEntity, dynamic> customMapper)
+		{
+			return Command.QuerySingle<TEntity>(customMapper);
+		}
+
 		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
 			return Command.QueryComplexSingle(customMapper);
 		}
 
-		public DataTable QueryDataTable()
+		public TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper)
 		{
-			return Command.QueryDataTable();
+			return Command.QueryComplexSingle(customMapper);
+		}
+
+		public DataTable QueryManyDataTable()
+		{
+			return Command.QueryManyDataTable();
 		}
 	}
 }

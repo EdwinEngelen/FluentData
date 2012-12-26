@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Settings
 {
 	[TestClass]
-	public class CommandTimeoutTests
+    public class CommandTimeoutTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			TestHelper.Context().OnExecuting(args => Assert.AreEqual(330, args.Command.CommandTimeout)).CommandTimeout(330).Sql("select top 1 * from product").QueryMany<dynamic>();
+			Context.OnExecuting(args => Assert.AreEqual(330, args.Command.CommandTimeout)).CommandTimeout(330).Sql("select top 1 * from product").QueryMany<dynamic>();
 		}
 	}
 }

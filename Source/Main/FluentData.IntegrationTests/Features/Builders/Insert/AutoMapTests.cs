@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Builders.Insert
 {
 	[TestClass]
-	public class AutoMapTests
+    public class AutoMapTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Enum_test()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var product = new ProductWithCategoryEnum();
 				product.Name = "Test";

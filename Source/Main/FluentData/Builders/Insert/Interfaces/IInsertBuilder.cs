@@ -1,9 +1,7 @@
 namespace FluentData
 {
-	public interface IInsertBuilder
+	public interface IInsertBuilder : IExecute, IExecuteReturnLastId
 	{
-		int Execute();
-		T ExecuteReturnLastId<T>(string identityColumnName = null);
 		IInsertBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 }

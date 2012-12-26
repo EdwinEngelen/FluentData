@@ -14,16 +14,13 @@ namespace FluentData
 			});
 		}
 
-		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
-			var item = default(TEntity);
-
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QueryComplexSingleHandler<TEntity>().ExecuteSingleComplex(Data, customMapper);
+				while (Data.Reader.Read())
+					customMapper(list, Data.Reader);
 			});
-
-			return item;
 		}
 	}
 }

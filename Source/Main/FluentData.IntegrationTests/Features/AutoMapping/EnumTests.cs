@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.AutoMapping
 {
 	[TestClass]
-	public class AutoMapEnumTests
+	public class AutoMapEnumTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Int_to_Enum()
 		{
-			var product = TestHelper.Context().Sql(@"
+			var product = Context.Sql(@"
 											select top 1 CategoryId as Category, ProductId, Name, CategoryId
 											from Product
 											where CategoryId in(1,2)").QuerySingle<ProductWithEnem>();
@@ -21,7 +21,7 @@ namespace FluentData.Features.AutoMapping
 		[TestMethod]
 		public void String_to_Enum()
 		{
-			var product = TestHelper.Context().Sql(@"
+			var product = Context.Sql(@"
 											select top 1 c.Name as Category, p.ProductId, p.Name, p.CategoryId, c.Name as CategoryName
 											from Product p
 											inner join Category c on p.CategoryId = c.CategoryId

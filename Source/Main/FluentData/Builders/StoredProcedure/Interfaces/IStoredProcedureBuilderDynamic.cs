@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 
 namespace FluentData
 {
-	public interface IStoredProcedureBuilderDynamic : IBaseStoredProcedureBuilder, IDisposable
+    public interface IStoredProcedureBuilderDynamic : IExecute, IQuery, IParameterValue, IDisposable
 	{
 		IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);

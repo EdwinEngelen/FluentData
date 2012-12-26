@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Events
 {
 	[TestClass]
-	public class OnErrorTests
+    public class OnErrorTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
@@ -13,7 +13,7 @@ namespace FluentData.Features.Events
 
 			try
 			{
-				TestHelper.Context().OnError(args => eventFired = true).Sql("sql with error").QueryMany<dynamic>();
+				Context.OnError(args => eventFired = true).Sql("sql with error").QueryMany<dynamic>();
 			}
 			catch
 			{

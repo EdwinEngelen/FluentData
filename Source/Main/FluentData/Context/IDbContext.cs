@@ -12,7 +12,7 @@ namespace FluentData
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql { get; }
-		ISelectBuilder<TEntity> Select<TEntity>(string sql);
+		ISelectBuilder Select(string sql);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
 		IInsertBuilderDynamic Insert(string tableName, ExpandoObject item);
@@ -29,11 +29,11 @@ namespace FluentData
 		IDbContext IsolationLevel(IsolationLevel isolationLevel);
 		IDbContext Commit();
 		IDbContext Rollback();
-		IDbContext OnConnectionOpening(Action<OnConnectionOpeningEventArgs> action);
-		IDbContext OnConnectionOpened(Action<OnConnectionOpenedEventArgs> action);
-		IDbContext OnConnectionClosed(Action<OnConnectionClosedEventArgs> action);
-		IDbContext OnExecuting(Action<OnExecutingEventArgs> action);
-		IDbContext OnExecuted(Action<OnExecutedEventArgs> action);
-		IDbContext OnError(Action<OnErrorEventArgs> action);
+        IDbContext OnConnectionOpening(Action<ConnectionEventArgs> action);
+        IDbContext OnConnectionOpened(Action<ConnectionEventArgs> action);
+		IDbContext OnConnectionClosed(Action<ConnectionEventArgs> action);
+        IDbContext OnExecuting(Action<CommandEventArgs> action);
+		IDbContext OnExecuted(Action<CommandEventArgs> action);
+		IDbContext OnError(Action<ErrorEventArgs> action);
 	}
 }

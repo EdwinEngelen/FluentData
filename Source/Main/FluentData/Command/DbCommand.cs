@@ -37,7 +37,7 @@ namespace FluentData
 				Data.InnerCommand.Connection.Close();
 
 				if (Data.Context.Data.OnConnectionClosed != null)
-					Data.Context.Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.InnerCommand.Connection));
+					Data.Context.Data.OnConnectionClosed(new ConnectionEventArgs(Data.InnerCommand.Connection));
 			}
 		}
 

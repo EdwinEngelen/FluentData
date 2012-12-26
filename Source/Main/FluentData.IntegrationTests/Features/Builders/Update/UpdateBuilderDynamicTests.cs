@@ -5,12 +5,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData
 {
 	[TestClass]
-	public class UpdateBuilderDynamicTests
+    public class UpdateBuilderDynamicTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_No_Automap()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var productId = TestHelper.InsertProduct(context, "OldTestProduct", 1);
 
@@ -37,7 +37,7 @@ namespace FluentData
 		[TestMethod]
 		public void Test_Automap()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var productId = TestHelper.InsertProduct(context, "OldTestProduct", 1);
 

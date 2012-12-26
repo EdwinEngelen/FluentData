@@ -5,12 +5,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class MapperDocumentCode : BaseDocumentation
+    public class MapperDocumentCode : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Query_auto_mapping_match()
 		{
-			List<Product> products = Context().Sql(@"select *
+			List<Product> products = Context.Sql(@"select *
 													from Product")
 									.QueryMany<Product>();
 
@@ -20,7 +20,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_auto_mapping_custom_collection()
 		{
-			List<Product> products = Context().Sql(@"select *
+			List<Product> products = Context.Sql(@"select *
 													from Product")
 									.QueryMany<Product, ProductionCollection>();
 
@@ -30,7 +30,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_auto_mapping_alias_manual()
 		{
-			List<Product> products = Context().Sql(@"select p.*,
+			List<Product> products = Context.Sql(@"select p.*,
 											c.CategoryId as Category_CategoryId,
 											c.Name as Category_Name
 											from Product p
@@ -45,7 +45,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_custom_mapping_dynamic()
 		{
-			List<Product> products = Context().Sql(@"select * from Product")
+			List<Product> products = Context.Sql(@"select * from Product")
 									.QueryMany<Product>(Custom_mapper_using_dynamic);
 
 			Assert.IsNotNull(products[0].Name);
@@ -60,7 +60,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Query_custom_mapping_datareader()
 		{
-			List<Product> products = Context().Sql(@"select * from Product")
+			List<Product> products = Context.Sql(@"select * from Product")
 									.QueryMany<Product>(Custom_mapper_using_datareader);
 
 			Assert.IsNotNull(products[0].Name);

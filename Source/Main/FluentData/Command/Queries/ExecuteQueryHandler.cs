@@ -22,7 +22,7 @@ namespace FluentData
 				action();
 
 				if (_command.Data.Context.Data.OnExecuted != null)
-					_command.Data.Context.Data.OnExecuted(new OnExecutedEventArgs(_command.Data.InnerCommand));
+					_command.Data.Context.Data.OnExecuted(new CommandEventArgs(_command.Data.InnerCommand));
 			}
 			catch(Exception exception)
 			{
@@ -62,7 +62,7 @@ namespace FluentData
 				}
 
 				if(_command.Data.Context.Data.OnExecuting != null)
-					_command.Data.Context.Data.OnExecuting(new OnExecutingEventArgs(_command.Data.InnerCommand));
+					_command.Data.Context.Data.OnExecuting(new CommandEventArgs(_command.Data.InnerCommand));
 
 				if (useReader)
 					_command.Data.Reader = new DataReader(_command.Data.InnerCommand.ExecuteReader());
@@ -74,12 +74,12 @@ namespace FluentData
 		private void OpenConnection()
 		{
 			if(_command.Data.Context.Data.OnConnectionOpening != null)
-				_command.Data.Context.Data.OnConnectionOpening(new OnConnectionOpeningEventArgs(_command.Data.InnerCommand.Connection));
+				_command.Data.Context.Data.OnConnectionOpening(new ConnectionEventArgs(_command.Data.InnerCommand.Connection));
 
 			_command.Data.InnerCommand.Connection.Open();
 
 			if(_command.Data.Context.Data.OnConnectionOpened != null)
-				_command.Data.Context.Data.OnConnectionOpened(new OnConnectionOpenedEventArgs(_command.Data.InnerCommand.Connection));
+				_command.Data.Context.Data.OnConnectionOpened(new ConnectionEventArgs(_command.Data.InnerCommand.Connection));
 		}
 
 		private void HandleQueryFinally()
@@ -103,7 +103,7 @@ namespace FluentData
 				_command.Data.Context.CloseSharedConnection();
 
 			if(_command.Data.Context.Data.OnError != null)
-				_command.Data.Context.Data.OnError(new OnErrorEventArgs(_command.Data.InnerCommand, exception));
+				_command.Data.Context.Data.OnError(new ErrorEventArgs(_command.Data.InnerCommand, exception));
 			
 			throw exception;
 		}

@@ -4,14 +4,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Events
 {
 	[TestClass]
-	public class OnConnectionOpeningTests
+    public class OnConnectionOpeningTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
 			var eventFired = false;
 
-			TestHelper.Context().OnExecuted(args => eventFired = true).Sql("select top 1 * from product").QueryMany<dynamic>();
+			Context.OnExecuted(args => eventFired = true).Sql("select top 1 * from product").QueryMany<dynamic>();
 
 			Assert.IsTrue(eventFired);
 		}

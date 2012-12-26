@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Command
 {
 	[TestClass]
-	public class MultipleResultsetTests
+    public class MultipleResultsetTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Command_with_multiple_resultset()
 		{
-			using (var cmd = TestHelper.Context().MultiResultSql)
+			using (var cmd = Context.MultiResultSql)
 			{
 				var category1 = cmd.Sql(@"select * from Category where CategoryId = 1;
 						select * from Category where CategoryId = 2;").QuerySingle<dynamic>();

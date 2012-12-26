@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace FluentData
 {
-	public interface IStoredProcedureBuilder<T> : IBaseStoredProcedureBuilder, IDisposable
+    public interface IStoredProcedureBuilder<T> : IExecute, IQuery, IParameterValue, IDisposable
 	{
 		IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);

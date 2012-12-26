@@ -14,12 +14,12 @@ namespace FluentData
 		public IEntityFactory EntityFactory { get; set; }
 		public bool IgnoreIfAutoMapFails { get; set; }
 		public int CommandTimeout { get; set; }
-		public Action<OnConnectionOpeningEventArgs> OnConnectionOpening { get; set; }
-		public Action<OnConnectionOpenedEventArgs> OnConnectionOpened { get; set; }
-		public Action<OnConnectionClosedEventArgs> OnConnectionClosed { get; set; }
-		public Action<OnExecutingEventArgs> OnExecuting { get; set; }
-		public Action<OnExecutedEventArgs> OnExecuted { get; set; }
-		public Action<OnErrorEventArgs> OnError { get; set; }
+        public Action<ConnectionEventArgs> OnConnectionOpening { get; set; }
+        public Action<ConnectionEventArgs> OnConnectionOpened { get; set; }
+		public Action<ConnectionEventArgs> OnConnectionClosed { get; set; }
+		public Action<CommandEventArgs> OnExecuting { get; set; }
+		public Action<CommandEventArgs> OnExecuted { get; set; }
+		public Action<ErrorEventArgs> OnError { get; set; }
 
 		public DbContextData()
 		{

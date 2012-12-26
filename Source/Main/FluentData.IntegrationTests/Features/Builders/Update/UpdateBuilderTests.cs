@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData
 {
 	[TestClass]
-	public class UpdateBuilderTests
+    public class UpdateBuilderTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var productId = TestHelper.InsertProduct(context, "OldTestProduct", 1);
 

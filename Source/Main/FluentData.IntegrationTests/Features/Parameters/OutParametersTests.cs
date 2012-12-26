@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Parameters
 {
 	[TestClass]
-	public class OutParametersTests
+	public class OutParametersTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			var command = TestHelper.Context().Sql("select top 1 @CategoryName = Name from Category")
+			var command = Context.Sql("select top 1 @CategoryName = Name from Category")
 												.ParameterOut("CategoryName", DataTypes.String, 50);
 			command.Execute();
 
@@ -21,7 +21,7 @@ namespace FluentData.Features.Parameters
 		[TestMethod]
 		public void Test_null()
 		{
-			var command = TestHelper.Context().Sql("select @CategoryName = null")
+			var command = Context.Sql("select @CategoryName = null")
 												.ParameterOut("CategoryName", DataTypes.String, 50);
 			command.Execute();
 

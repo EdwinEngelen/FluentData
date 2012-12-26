@@ -5,12 +5,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class MultipleResultsetsTests : BaseDocumentation
+    public class MultipleResultsetsTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void MultipleResultset()
 		{
-			using (var command = Context().MultiResultSql)
+			using (var command = Context.MultiResultSql)
 			{
 				List<Category> categories = command.Sql(@"select * from Category;
 												select * from Product;").QueryMany<Category>();

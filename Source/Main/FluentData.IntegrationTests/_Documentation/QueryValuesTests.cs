@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class QueryValuesTests : BaseDocumentation
+    public class QueryValuesTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			List<int> productIds = Context().Sql(@"select ProductId
+			List<int> productIds = Context.Sql(@"select ProductId
 												from Product").QueryMany<int>();
 
 			Assert.IsTrue(productIds.Count > 0);

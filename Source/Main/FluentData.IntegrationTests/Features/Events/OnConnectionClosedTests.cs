@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.Events
 {
 	[TestClass]
-	public class OnConnectionClosedTests
+    public class OnConnectionClosedTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_non_transaction()
@@ -13,7 +13,7 @@ namespace FluentData.Features.Events
 			var eventFiredCounter = 0;
 			var connectionState = ConnectionState.Open;
 
-			using (var context = TestHelper.Context().OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
+			using (var context = Context.OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
 			{
 				context.Sql("select top 1 * from product").QueryMany<dynamic>();
 				context.Sql("select top 1 * from product").QueryMany<dynamic>();
@@ -29,7 +29,7 @@ namespace FluentData.Features.Events
 			var eventFired = false;
 			var connectionState = ConnectionState.Open;
 
-			var context = TestHelper.Context().OnConnectionClosed(args => { eventFired = true; connectionState = args.Connection.State; });
+			var context = Context.OnConnectionClosed(args => { eventFired = true; connectionState = args.Connection.State; });
 			using (var cmd = context.MultiResultSql.Sql("select top 1 * from product;select top 1 * from Product"))
 			{
 				cmd.QueryMany<dynamic>();
@@ -46,7 +46,7 @@ namespace FluentData.Features.Events
 			var eventFiredCounter = 0;
 			var connectionState = ConnectionState.Open;
 
-			using (var context = TestHelper.Context().UseTransaction(true).OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
+			using (var context = Context.UseTransaction(true).OnConnectionClosed(args => { eventFiredCounter++; connectionState = args.Connection.State; }))
 			{
 				context.Sql("select top 1 * from product").QueryMany<dynamic>();
 				context.Sql("select top 1 * from product").QueryMany<dynamic>();

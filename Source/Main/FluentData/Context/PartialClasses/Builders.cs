@@ -4,9 +4,9 @@ namespace FluentData
 {
 	public partial class DbContext
 	{
-		public ISelectBuilder<TEntity> Select<TEntity>(string sql)
+		public ISelectBuilder Select(string sql)
 		{
-			return new SelectBuilder<TEntity>(CreateCommand).Select(sql);
+			return new SelectBuilder(CreateCommand).Select(sql);
 		}
 
 		public IInsertBuilder Insert(string tableName)

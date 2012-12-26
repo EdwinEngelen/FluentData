@@ -3,12 +3,12 @@
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class TransactionsTests : BaseDocumentation
+	public class TransactionsTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_transactions()
 		{
-			using (var db = Context().UseTransaction(true))
+			using (var db = Context.UseTransaction(true))
 			{
 				db.Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
 							.Execute();

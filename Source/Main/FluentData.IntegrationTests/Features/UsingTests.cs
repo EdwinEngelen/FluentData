@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features
 {
 	[TestClass]
-	public class UsingTests
+	public class UsingTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Context_uneeded_using_statement_must_not_throw_an_exception()
 		{
-			using (var context = TestHelper.Context())
+			using (var context = Context)
 			{
 				var categories = context.Sql(@"select *
 											from Category").QueryMany<Category>();
@@ -21,7 +21,7 @@ namespace FluentData.Features
 		[TestMethod]
 		public void Command_uneeded_using_statement_must_not_throw_an_exception()
 		{
-			using (var command = TestHelper.Context().Sql(@"select *
+			using (var command = Context.Sql(@"select *
 											from Category"))
 			{
 				var categories = command.QueryMany<Category>();

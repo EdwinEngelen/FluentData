@@ -1,16 +1,16 @@
-﻿using System.Data;
+﻿//using System.Data;
 
-namespace FluentData
-{
-	internal partial class DbCommand
-	{
-		public DataTable QueryDataTable()
-		{
-			var dataTable = new DataTable();
+//namespace FluentData
+//{
+//	internal partial class DbCommand
+//	{
+//		public DataTable QueryManyDataTable()
+//		{
+//			var dataTable = new DataTable();
 
-			Data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(Data.Reader.InnerReader, LoadOption.OverwriteChanges));
+//			Data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(Data.Reader.InnerReader, LoadOption.OverwriteChanges));
 
-			return dataTable;
-		}
-	}
-}
+//			return dataTable;
+//		}
+//	}
+//}

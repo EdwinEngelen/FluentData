@@ -5,12 +5,12 @@ using FluentData._Helpers;
 namespace FluentData.Features.Builders
 {
 	[TestClass]
-	public class DataTypesTests
+    public class DataTypesTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Update_values()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = 5;
@@ -42,7 +42,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_values_not_nullable()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValueNotNullable();
 				value.DecimalValue = 5;
@@ -74,7 +74,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_values_expression()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = 5;
@@ -106,7 +106,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_values_automap()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = 5;
@@ -132,7 +132,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_null_values()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = null;
@@ -162,7 +162,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_null_expression()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = null;
@@ -192,7 +192,7 @@ namespace FluentData.Features.Builders
 		[TestMethod]
 		public void Update_null_automap()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var value = new DataTypeValue();
 				value.DecimalValue = null;

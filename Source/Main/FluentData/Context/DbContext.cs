@@ -21,7 +21,7 @@
 			Data.Connection.Close();
 
 			if (Data.OnConnectionClosed != null)
-				Data.OnConnectionClosed(new OnConnectionClosedEventArgs(Data.Connection));
+				Data.OnConnectionClosed(new ConnectionEventArgs(Data.Connection));
 		}
 
 		public void Dispose()

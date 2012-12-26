@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData
 {
 	[TestClass]
-	public class StoredProcedureBuilderTests
+    public class StoredProcedureBuilderTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				var storedProcedure = context.StoredProcedure("ProductInsert")
 							.ParameterOut("ProductId", DataTypes.Int32)

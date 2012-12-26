@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace FluentData
 {
-	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
+	internal class SelectBuilder : ISelectBuilder
 	{
 		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
@@ -27,25 +28,25 @@ namespace FluentData
 			Actions = new ActionsHandler(Data);
 		}
 
-		public ISelectBuilder<TEntity> Select(string sql)
+		public ISelectBuilder Select(string sql)
 		{
 			Data.Select += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> From(string sql)
+		public ISelectBuilder From(string sql)
 		{
 			Data.From += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Where(string sql)
+		public ISelectBuilder Where(string sql)
 		{
 			Data.WhereSql += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> AndWhere(string sql)
+		public ISelectBuilder AndWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Data.WhereSql += " and ";
@@ -53,7 +54,7 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> OrWhere(string sql)
+		public ISelectBuilder OrWhere(string sql)
 		{
 			if(Data.WhereSql.Length > 0)
 				Data.WhereSql += " or ";
@@ -61,66 +62,95 @@ namespace FluentData
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> OrderBy(string sql)
+		public ISelectBuilder OrderBy(string sql)
 		{
 			Data.OrderBy += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> GroupBy(string sql)
+		public ISelectBuilder GroupBy(string sql)
 		{
 			Data.GroupBy += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Having(string sql)
+		public ISelectBuilder Having(string sql)
 		{
 			Data.Having += sql;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Paging(int currentPage, int itemsPerPage)
+		public ISelectBuilder Paging(int currentPage, int itemsPerPage)
 		{
 			Data.PagingCurrentPage = currentPage;
 			Data.PagingItemsPerPage = itemsPerPage;
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size)
+		public ISelectBuilder Parameter(string name, object value, DataTypes parameterType, ParameterDirection direction, int size)
 		{
 			Data.Command.Parameter(name, value, parameterType, direction, size);
 			return this;
 		}
 
-		public ISelectBuilder<TEntity> Parameters(params object[] parameters)
+		public ISelectBuilder Parameters(params object[] parameters)
 		{
 			Data.Command.Parameters(parameters);
 			return this;
 		}
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null)
+		{
+			return Command.QueryMany<TEntity>(customMapper);
+		}
 
-		public TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
+		public List<TEntity> QueryMany<TEntity>(Action<TEntity, dynamic> customMapper)
+		{
+			return Command.QueryMany<TEntity>(customMapper);
+		}
+
+		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
 			return Command.QueryMany<TEntity, TList>(customMapper);
 		}
 
-		public List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null)
+		public TList QueryMany<TEntity, TList>(Action<TEntity, dynamic> customMapper) where TList : IList<TEntity>
 		{
-			return Command.QueryMany(customMapper);
+			return Command.QueryMany<TEntity, TList>(customMapper);
 		}
 
-		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
 			Command.QueryComplexMany<TEntity>(list, customMapper);
 		}
 
-		public TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null)
+		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
-			return Command.QuerySingle(customMapper);
+			Command.QueryComplexMany<TEntity>(list, customMapper);
 		}
 
-		public TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper)
+		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)
+		{
+			return Command.QuerySingle<TEntity>(customMapper);
+		}
+
+		public TEntity QuerySingle<TEntity>(Action<TEntity, dynamic> customMapper)
+		{
+			return Command.QuerySingle<TEntity>(customMapper);
+		}
+
+		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
 			return Command.QueryComplexSingle(customMapper);
+		}
+
+		public TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper)
+		{
+			return Command.QueryComplexSingle(customMapper);
+		}
+
+		public DataTable QueryManyDataTable()
+		{
+			return Command.QueryManyDataTable();
 		}
 	}
 }

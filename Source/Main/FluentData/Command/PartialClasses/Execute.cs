@@ -9,7 +9,8 @@
 
 			Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				recordsAffected = new ExecuteHandler().Execute<int>(Data);
+				recordsAffected = Data.InnerCommand.ExecuteNonQuery();
+
 			});
 			return recordsAffected;
 		}

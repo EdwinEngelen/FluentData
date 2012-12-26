@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class UpdateDataTests : BaseDocumentation
+    public class UpdateDataTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Update_data_sql()
 		{
-			int rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
+			int rowsAffected = Context.Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
 								.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -18,7 +18,7 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_builder()
 		{
-			int rowsAffected = Context().Update("Product")
+			int rowsAffected = Context.Update("Product")
 								.Column("Name", "The Warren Buffet Way")
 								.Where("ProductId", 1)
 								.Execute();
@@ -29,11 +29,11 @@ namespace FluentData._Documentation
 		[TestMethod]
 		public void Update_data_builder_automapping()
 		{
-			Product product = Context().Sql("select * from Product where ProductId = 1")
+			Product product = Context.Sql("select * from Product where ProductId = 1")
 								.QuerySingle<Product>();
 			product.Name = "The Warren Buffet Way";
 
-			int rowsAffected = Context().Update<Product>("Product", product)
+			int rowsAffected = Context.Update<Product>("Product", product)
 										.Where(x => x.ProductId)
 										.AutoMap(x => x.ProductId, x => x.Category)
 										.Execute();

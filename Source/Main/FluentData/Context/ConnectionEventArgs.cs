@@ -3,11 +3,11 @@ using System.Data;
 
 namespace FluentData
 {
-	public class OnConnectionClosedEventArgs : EventArgs
+	public class ConnectionEventArgs : EventArgs
 	{
 		public IDbConnection Connection { get; private set; }
 
-		public OnConnectionClosedEventArgs(System.Data.IDbConnection connection)
+		public ConnectionEventArgs(System.Data.IDbConnection connection)
 		{
 			Connection = connection;
 		}

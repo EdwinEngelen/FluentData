@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData
 {
 	[TestClass]
-	public class InsertBuilderDynamicTests
+    public class InsertBuilderDynamicTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_No_Automap()
@@ -14,7 +14,7 @@ namespace FluentData
 			product.CategoryId = 1;
 			product.Name = "TestProduct";
 
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				product.ProductId = context.Insert("Product", (ExpandoObject) product)
 									.Column("Name", (string) product.Name)
@@ -35,7 +35,7 @@ namespace FluentData
 			product.CategoryId = 1;
 			product.Name = "TestProduct";
 
-			using (var context = TestHelper.Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				product.ProductId = context.Insert("Product", (ExpandoObject) product)
 									.AutoMap("ProductId")

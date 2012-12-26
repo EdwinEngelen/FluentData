@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData._Documentation
 {
 	[TestClass]
-	public class InsertUpdateDataTests : BaseDocumentation
+    public class InsertUpdateDataTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
@@ -13,13 +13,13 @@ namespace FluentData._Documentation
 			product.Name = "The Warren Buffet Way";
 			product.CategoryId = 1;
 
-			var insertBuilder = Context().Insert<Product>("Product", product);
+			var insertBuilder = Context.Insert<Product>("Product", product);
 			FillBuilder((IInsertUpdateBuilder<Product>) insertBuilder);
 			product.ProductId = insertBuilder.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(product.ProductId > 0);
 
-			var updateBuilder = Context().Update<Product>("Product", product);
+			var updateBuilder = Context.Update<Product>("Product", product);
 			FillBuilder((IInsertUpdateBuilder<Product>) updateBuilder);
 
 			int rowsAffected = updateBuilder.Where(x => x.ProductId).Execute();

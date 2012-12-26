@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData.Features.AutoMapping
 {
 	[TestClass]
-	public class PropertyWithUnderscoreTests
+    public class PropertyWithUnderscoreTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test_fieldname_propertyname_with_underscore()
 		{
-			var product = TestHelper.Context()
+			var product = Context
 										.Sql(@"select top 1
 													p.ProductId as product_Id,
 													p.Name,
@@ -24,7 +24,7 @@ namespace FluentData.Features.AutoMapping
 		[TestMethod]
 		public void Test_nested_fieldname_propertyname_with_underscore()
 		{
-			var product = TestHelper.Context()
+			var product = Context
 										.Sql(@"select top 1
 													p.ProductId as productId,
 													c.CategoryId as T_Category_Category_Id,

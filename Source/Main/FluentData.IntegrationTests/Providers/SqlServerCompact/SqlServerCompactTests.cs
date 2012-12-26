@@ -8,15 +8,19 @@ namespace FluentData.Providers.SqlServerCompact
 	[TestClass]
 	public class SqlServerCompactTests : IDbProviderTests
 	{
-		protected IDbContext Context()
+		protected IDbContext Context
 		{
-			return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlServerCompact40"), new SqlServerCompactProvider());
+		    get
+		    {
+		        return new DbContext().ConnectionString(TestHelper.GetConnectionStringValue("SqlServerCompact40"),
+		                                              new SqlServerCompactProvider());
+		    }
 		}
 
 		[TestMethod]
 		public void Query_many_dynamic()
 		{
-			var products = Context().Sql("select * from Product")
+			var products = Context.Sql("select * from Product")
 									.QueryMany<dynamic>();
 
 			Assert.IsTrue(products.Count > 0);
@@ -25,7 +29,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_single_dynamic()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
+			var product = Context.Sql("select * from Product where ProductId = 1")
 									.QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
@@ -34,7 +38,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_many_strongly_typed()
 		{
-			var products = Context().Sql("select * from Product")
+			var products = Context.Sql("select * from Product")
 									.QueryMany<Product>();
 
 			Assert.IsTrue(products.Count > 0);
@@ -43,7 +47,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_single_strongly_typed()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
+			var product = Context.Sql("select * from Product where ProductId = 1")
 									.QuerySingle<Product>();
 
 			Assert.IsNotNull(product);
@@ -52,7 +56,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_auto_mapping_alias()
 		{
-			var product = Context().Sql(@"select p.*,
+			var product = Context.Sql(@"select p.*,
 											c.CategoryId as Category_CategoryId,
 											c.Name as Category_Name
 											from Product p
@@ -68,7 +72,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_custom_mapping_dynamic()
 		{
-			var products = Context().Sql(@"select * from Product")
+			var products = Context.Sql(@"select * from Product")
 									.QueryMany<Product>(Custom_mapper_using_dynamic);
 
 			Assert.IsNotNull(products[0].Name);
@@ -83,7 +87,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Query_custom_mapping_datareader()
 		{
-			var products = Context().Sql(@"select * from Product")
+			var products = Context.Sql(@"select * from Product")
 									.QueryMany<Product>(Custom_mapper_using_datareader);
 
 			Assert.IsNotNull(products[0].Name);
@@ -98,7 +102,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void QueryValue()
 		{
-			int categoryId = Context().Sql("select CategoryId from Product where ProductId = 1")
+			int categoryId = Context.Sql("select CategoryId from Product where ProductId = 1")
 										.QuerySingle<int>();
 
 			Assert.AreEqual(1, categoryId);
@@ -107,7 +111,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void QueryValues()
 		{
-			var categories = Context().Sql("select CategoryId from Category order by CategoryId").QueryMany<int>();
+			var categories = Context.Sql("select CategoryId from Category order by CategoryId").QueryMany<int>();
 
 			Assert.AreEqual(2, categories.Count);
 			Assert.AreEqual(1, categories[0]);
@@ -117,7 +121,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Unnamed_parameters_one()
 		{
-			var product = Context().Sql("select * from Product where ProductId = @0", 1)
+			var product = Context.Sql("select * from Product where ProductId = @0", 1)
 									.QuerySingle<dynamic>();
 
 			Assert.IsNotNull(product);
@@ -126,7 +130,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Unnamed_parameters_many()
 		{
-			var products = Context().Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2)
+			var products = Context.Sql("select * from Product where ProductId = @0 or ProductId = @1", 1, 2)
 									.QueryMany<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
@@ -135,7 +139,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Named_parameters()
 		{
-			var products = Context().Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
+			var products = Context.Sql("select * from Product where ProductId = @ProductId1 or ProductId = @ProductId2")
 									.Parameter("ProductId1", 1)
 									.Parameter("ProductId2", 2)
 									.QueryMany<dynamic>();
@@ -148,7 +152,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			var ids = new List<int>() { 1, 2, 3, 4 };
 
-			var products = Context().Sql("select * from Product where ProductId in(@0)", ids)
+			var products = Context.Sql("select * from Product where ProductId in(@0)", ids)
 									.QueryMany<dynamic>();
 
 			Assert.AreEqual(4, products.Count);
@@ -157,20 +161,18 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void SelectBuilder_Paging()
 		{
-			var context = Context();
-
-			var category = context
-				.Select<Category>("CategoryId, Name")
+			var category = Context
+				.Select("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-				.Paging(1, 1).QuerySingle();
+				.Paging(1, 1).QuerySingle<Category>();
 			Assert.AreEqual("Books", category.Name);
 
-			category = context
-				.Select<Category>("CategoryId, Name")
+			category = Context
+				.Select("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-				.Paging(2, 1).QuerySingle();
+				.Paging(2, 1).QuerySingle<Category>();
 			Assert.AreEqual("Movies", category.Name);
 		}
 
@@ -179,7 +181,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			try
 			{
-				var command = Context().MultiResultSql;
+				var command = Context.MultiResultSql;
 				Assert.Fail();
 			}
 			catch (FluentDataException ex)
@@ -196,7 +198,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Insert_data_sql()
 		{
-			var productId = Context().Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
+			var productId = Context.Sql("insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(productId > 0);
@@ -205,7 +207,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Insert_data_builder_no_automapping()
 		{
-			var productId = Context().Insert("Product")
+			var productId = Context.Insert("Product")
 								.Column("CategoryId", 1)
 								.Column("Name", "The Warren Buffet Way")
 								.ExecuteReturnLastId<int>();
@@ -220,7 +222,7 @@ namespace FluentData.Providers.SqlServerCompact
 			product.CategoryId = 1;
 			product.Name = "The Warren Buffet Way";
 
-			var productId = Context().Insert<Product>("Product", product)
+			var productId = Context.Insert<Product>("Product", product)
 								.AutoMap(x => x.ProductId, x=> x.Category)
 								.ExecuteReturnLastId<int>();
 
@@ -230,7 +232,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Update_data_sql()
 		{
-			var rowsAffected = Context().Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
+			var rowsAffected = Context.Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
 								.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -239,7 +241,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Update_data_builder()
 		{
-			var rowsAffected = Context().Update("Product")
+			var rowsAffected = Context.Update("Product")
 								.Column("Name", "The Warren Buffet Way")
 								.Where("ProductId", 1)
 								.Execute();
@@ -250,12 +252,12 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Update_data_builder_automapping()
 		{
-			var product = Context().Sql("select * from Product where ProductId = 1")
+			var product = Context.Sql("select * from Product where ProductId = 1")
 								.QuerySingle<Product>();
 
 			product.Name = "The Warren Buffet Way";
 
-			var rowsAffected = Context().Update<Product>("Product", product)
+			var rowsAffected = Context.Update<Product>("Product", product)
 										.AutoMap(x => x.ProductId, x => x.Category)
 										.Where(x => x.ProductId)
 										.Execute();
@@ -266,10 +268,10 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Delete_data_sql()
 		{
-			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
+			var productId = Context.Sql(@"insert into Product(Name, CategoryId) values(@0, @1);", "The Warren Buffet Way", 1)
 							.ExecuteReturnLastId<int>();
 
-			var rowsAffected = Context().Sql("delete from Product where ProductId = @0", productId)
+			var rowsAffected = Context.Sql("delete from Product where ProductId = @0", productId)
 									.Execute();
 
 			Assert.AreEqual(1, rowsAffected);
@@ -278,10 +280,10 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Delete_data_builder()
 		{
-			var productId = Context().Sql(@"insert into Product(Name, CategoryId) values(@0, @1)", "The Warren Buffet Way", 1)
+			var productId = Context.Sql(@"insert into Product(Name, CategoryId) values(@0, @1)", "The Warren Buffet Way", 1)
 								.ExecuteReturnLastId<int>();
 
-			var rowsAffected = Context().Delete("Product")
+			var rowsAffected = Context.Delete("Product")
 									.Where("ProductId", productId)
 									.Execute();
 
@@ -291,7 +293,7 @@ namespace FluentData.Providers.SqlServerCompact
 		[TestMethod]
 		public void Transactions()
 		{
-			using (var context = Context().UseTransaction(true))
+			using (var context = Context.UseTransaction(true))
 			{
 				context.Sql("update Product set Name = @0 where ProductId = @1", "The Warren Buffet Way", 1)
 							.Execute();
@@ -313,7 +315,7 @@ namespace FluentData.Providers.SqlServerCompact
 		{
 			try
 			{
-				var rowsAffected = Context().StoredProcedure("").Execute();
+				var rowsAffected = Context.StoredProcedure("").Execute();
 			}
 			catch (FluentDataException ex)
 			{

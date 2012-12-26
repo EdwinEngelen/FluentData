@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FluentData
 {
 	[TestClass]
-	public class DeleteBuilderGenericTests
+    public class DeleteBuilderGenericTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
 		{
-			using (var db = TestHelper.Context().UseTransaction(true))
+			using (var db = Context.UseTransaction(true))
 			{
 				var productId = db.Insert("Product")
 									.Column("Name", "Test")

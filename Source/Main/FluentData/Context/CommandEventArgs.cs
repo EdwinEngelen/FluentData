@@ -2,11 +2,11 @@
 
 namespace FluentData
 {
-	public class OnExecutingEventArgs : EventArgs
+	public class CommandEventArgs : EventArgs
 	{
 		public System.Data.IDbCommand Command { get; private set; }
 
-		public OnExecutingEventArgs(System.Data.IDbCommand command)
+		public CommandEventArgs(System.Data.IDbCommand command)
 		{
 			Command = command;
 		}
