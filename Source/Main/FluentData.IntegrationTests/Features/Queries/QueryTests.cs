@@ -47,10 +47,10 @@ namespace FluentData.Features.Queries
 			Assert.IsTrue(categories[0].CategoryId > 0);
 		}
 
-		private void MapCategoryDynamic(Category category, IDataReader reader)
+		private void MapCategoryDynamic(Category category, dynamic reader)
 		{
-			category.CategoryId = (Categories) reader.Value.CategoryId;
-			category.Name = reader.Value.Name;
+			category.CategoryId = (Categories)reader.CategoryId;
+			category.Name = reader.Name;
 		}
 	}
 }

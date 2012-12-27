@@ -5,7 +5,6 @@ namespace FluentData
 	public interface IDataReader : System.Data.IDataReader
 	{
 		System.Data.IDataReader InnerReader { get; }
-		dynamic Value { get;  }
 		bool GetBoolean(string name);
 		byte GetByte(string name);
 		long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length);

@@ -96,10 +96,10 @@ namespace FluentData.Providers.Sqlite
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_dynamic(Product product, IDataReader row)
+		public void Custom_mapper_using_dynamic(Product product, dynamic row)
 		{
-			product.ProductId = (int) row.Value.ProductId;
-			product.Name = row.Value.Name;
+			product.ProductId = row.ProductId;
+			product.Name = row.Name;
 		}
 
 		[TestMethod]
@@ -179,17 +179,17 @@ namespace FluentData.Providers.Sqlite
 		public void SelectBuilder_Paging()
 		{
 			var category = Context
-				.Select("CategoryId, Name")
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-				.Paging(1, 1).QuerySingle<Category>();
+				.Paging(1, 1).QuerySingle();
 			Assert.AreEqual("Books", category.Name);
 
 			category = Context
-				.Select("CategoryId, Name")
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-                .Paging(2, 1).QuerySingle<Category>();
+                .Paging(2, 1).QuerySingle();
 			Assert.AreEqual("Movies", category.Name);
 		}
 

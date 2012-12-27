@@ -11,12 +11,11 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = Context;
 
-			var products = context.Select("p.ProductId, p.Name, c.CategoryId as Category_CategoryId, c.Name as Category_Name")
+			var products = context.Select<Product>("p.ProductId, p.Name, c.CategoryId as Category_CategoryId, c.Name as Category_Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
 				.OrderBy("c.Name")
-
-                .Paging(1, 30).QueryMany<Product>();
+                .Paging(1, 30).QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -26,8 +25,8 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = Context;
 			var categories = context
-								.Select("CategoryId, Name")
-                                .From("Category").QueryMany<Category>();
+								.Select<Category>("CategoryId, Name")
+                                .From("Category").QueryMany();
 
 			Assert.IsTrue(categories.Count > 0);
 		}
@@ -36,9 +35,9 @@ namespace FluentData.Features.Builders.Select
 		public void Test3()
 		{
 			var context = Context;
-			var category = context.Select("CategoryId, Name")
+			var category = context.Select<Category>("CategoryId, Name")
 				.From("Category")
-				.Where("CategoryId = @CategoryId").Parameter("CategoryId", 1).QuerySingle<Category>();
+				.Where("CategoryId = @CategoryId").Parameter("CategoryId", 1).QuerySingle();
 
 			Assert.IsNotNull(category);
 		}
@@ -49,17 +48,17 @@ namespace FluentData.Features.Builders.Select
 			var context = Context;
 
 			var category = context
-				.Select("CategoryId, Name")
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-                .Paging(1, 1).QuerySingle<Category>();
+                .Paging(1, 1).QuerySingle();
 			Assert.AreEqual("Books", category.Name);
 
 			category = context
-				.Select("CategoryId, Name")
+				.Select<Category>("CategoryId, Name")
 				.From("Category")
 				.OrderBy("Name asc")
-                .Paging(2, 1).QuerySingle<Category>();
+                .Paging(2, 1).QuerySingle();
 			Assert.AreEqual("Movies", category.Name);
 		}
 
@@ -69,10 +68,10 @@ namespace FluentData.Features.Builders.Select
 			var context = Context;
 
 			var products = context
-				.Select("c.CategoryId, c.Name")
+				.Select<Category>("c.CategoryId, c.Name")
 				.From(@"Product p
 						inner join Category c on p.ProductId = c.CategoryId")
-                .OrderBy("c.Name").QueryMany<Category>();
+                .OrderBy("c.Name").QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -81,8 +80,8 @@ namespace FluentData.Features.Builders.Select
 		{
 			var context = Context;
 
-			var products = context.Select("c.Name")
-                .Select("count(*) as Products").QueryMany<Product>();
+			var products = context.Select<Product>("c.Name")
+                .Select("count(*) as Products").QueryMany();
 
 			Assert.IsTrue(products.Count > 0);
 		}
@@ -90,21 +89,28 @@ namespace FluentData.Features.Builders.Select
 		[TestMethod]
 		public void Test_WhereOr()
 		{
-			var categories = Context.Select("CategoryId, Name")
+			var categories = Context.Select<Category>("CategoryId, Name")
 			          .From("Category")
 			          .Where("CategoryId = 1")
-			          .OrWhere("CategoryId = 2").QueryMany<Category>();
+			          .OrWhere("CategoryId = 2").QueryMany();
 			Assert.IsTrue(categories.Count == 2);
 		}
 
 		[TestMethod]
 		public void Test_WhereAnd()
 		{
-			var categories = Context.Select("CategoryId, Name")
+			var categories = Context.Select<Category>("CategoryId, Name")
 					  .From("Category")
 					  .Where("CategoryId = 1")
-					  .AndWhere("CategoryId = 1").QueryMany<Category>();
+					  .AndWhere("CategoryId = 1").QueryMany();
 			Assert.IsTrue(categories.Count == 1);
+		}
+
+		[TestMethod]
+		public void Test_dynamic()
+		{
+			var categories = Context.Select<dynamic>("CategoryId, Name").From("Category").QueryMany();
+			Assert.IsTrue(categories.Count > 0);
 		}
 	}
 }

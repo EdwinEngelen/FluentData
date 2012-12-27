@@ -105,6 +105,7 @@
     <Compile Include="Features\Builders\DataTypesTests.cs" />
     <Compile Include="Features\Connection\SharedConnectionTests.cs" />
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
+    <Compile Include="Features\Queries\QueryDynamic.cs" />
     <Compile Include="Features\Queries\QueryDataTableTests.cs" />
     <Compile Include="Features\Queries\QueryTests.cs" />
     <Compile Include="Features\Queries\QueryComplexTests.cs">

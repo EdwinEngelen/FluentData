@@ -6,21 +6,10 @@ namespace FluentData
 	internal class DataReader : IDataReader
 	{
 		public System.Data.IDataReader InnerReader { get; private set; }
-		private DynamicDataReader _dynamicReader;
 
 		public DataReader(System.Data.IDataReader reader)
 		{
 			InnerReader = reader;
-		}
-
-		public dynamic Value
-		{
-			get
-			{
-				if(_dynamicReader == null)
-					_dynamicReader = new DynamicDataReader(InnerReader);
-				return _dynamicReader;
-			}
 		}
 
 		public void Close()

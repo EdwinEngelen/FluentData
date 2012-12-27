@@ -12,7 +12,7 @@ namespace FluentData
 		IDbContext CommandTimeout(int timeout);
 		IDbCommand Sql(string sql, params object[] parameters);
 		IDbCommand MultiResultSql { get; }
-		ISelectBuilder Select(string sql);
+		ISelectBuilder<TEntity> Select<TEntity>(string sql);
 		IInsertBuilder Insert(string tableName);
 		IInsertBuilder<T> Insert<T>(string tableName, T item);
 		IInsertBuilderDynamic Insert(string tableName, ExpandoObject item);

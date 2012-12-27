@@ -112,10 +112,10 @@ namespace FluentData.Providers.SqlAzure
 			Assert.IsNotNull(products[0].Name);
 		}
 
-		public void Custom_mapper_using_dynamic(Product product, IDataReader row)
+		public void Custom_mapper_using_dynamic(Product product, dynamic row)
 		{
-			product.ProductId = row.Value.ProductId;
-			product.Name = row.Value.Name;
+			product.ProductId = row.ProductId;
+			product.Name = row.Name;
 		}
 
 		[TestMethod]
