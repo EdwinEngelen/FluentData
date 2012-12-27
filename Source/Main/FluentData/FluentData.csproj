@@ -122,9 +122,6 @@
     <Compile Include="Command\PartialClasses\Parameters.cs" />
     <Compile Include="Command\PartialClasses\QueryMany.cs" />
     <Compile Include="Command\PartialClasses\QueryComplexMany.cs" />
-    <Compile Include="Command\Queries\QueryComplexSingleHandler.cs" />
-    <Compile Include="Command\Queries\ExecuteHandler.cs" />
-    <Compile Include="Command\Queries\GenericQueryHandler.cs" />
     <Compile Include="Command\Queries\ExecuteQueryHandler.cs" />
     <Compile Include="Command\Queries\QueryManyHandler.cs" />
     <Compile Include="Command\Queries\QuerySingleHandler.cs" />

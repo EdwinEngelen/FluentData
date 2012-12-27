@@ -1730,40 +1730,6 @@ namespace FluentData
 		}
 	}
 
-//	internal class QueryComplexSingleHandler<TEntity>
-//	{
-//		internal TEntity ExecuteSingleComplex(DbCommandData data,
-//			Func<IDataReader, TEntity> customMapperReader,
-//			Func<dynamic, TEntity> customMapperDynamic)
-//		{
-//			var item = default(TEntity);
-//			var reader = new DynamicDataReader(data.Reader);
-
-//			if (reader. data.Reader.Read())
-//			{
-//				if (customMapperReader != null)
-//					item = customMapperReader(reader);
-//				else
-//					item = customMapperDynamic(data.Reader);
-//			}
-//			return item;
-//		}
-//	}
-
-//	internal class ExecuteHandler
-//	{
-//		public T Execute<T>(DbCommandData data)
-//		{
-//			object recordsAffected = data.InnerCommand.ExecuteNonQuery();
-
-//			return (T) recordsAffected;
-//		}
-//	}
-
-//	internal class GenericQueryHandler<TEntity>
-//	{
-//	}
-
 	internal class ExecuteQueryHandler
 	{
 		private readonly DbCommand _command;
