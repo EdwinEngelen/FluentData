@@ -14,9 +14,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.UnitTests", "Flu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.IntegrationTests", "FluentData.IntegrationTests\FluentData.IntegrationTests.csproj", "{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentData.SingleSourceFile", "FluentData.SingleSourceFile\FluentData.SingleSourceFile.csproj", "{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs17
 		SccLocalPath0 = .
@@ -29,6 +31,9 @@ Global
 		SccProjectUniqueName3 = FluentData.IntegrationTests\\FluentData.IntegrationTests.csproj
 		SccProjectName3 = FluentData.IntegrationTests
 		SccLocalPath3 = FluentData.IntegrationTests
+		SccProjectUniqueName4 = FluentData.SingleSourceFile\\FluentData.SingleSourceFile.csproj
+		SccProjectName4 = FluentData.SingleSourceFile
+		SccLocalPath4 = FluentData.SingleSourceFile
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = FluentData.vsmdi
@@ -64,6 +69,12 @@ Global
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|x64.ActiveCfg = Release|x64
 		{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}.Release|x64.Build.0 = Release|x64
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CDA8F56-73D9-4C2A-9D0D-EB6D9C2D53FC}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
