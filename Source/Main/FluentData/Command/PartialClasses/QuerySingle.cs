@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace FluentData
 {
@@ -10,7 +11,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QueryManyHandler<TEntity>().ExecuteSingle(Data, customMapper, null);
+				item = new QueryHandler<TEntity>(Data).ExecuteSingle(customMapper, null);
 			});
 
 			return item;
@@ -22,7 +23,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QueryManyHandler<TEntity>().ExecuteSingle(Data, null, customMapper);
+				item = new QueryHandler<TEntity>(Data).ExecuteSingle(customMapper, null);
 			});
 
 			return item;

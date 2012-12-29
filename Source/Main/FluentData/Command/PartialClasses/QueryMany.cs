@@ -13,7 +13,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryManyHandler<TEntity>().Execute<TList>(Data, customMapper, null);
+				items = new QueryHandler<TEntity>(Data).ExecuteMany<TList>(customMapper, null);
 			});
 
 			return items;
@@ -25,7 +25,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryManyHandler<TEntity>().Execute<TList>(Data, null, customMapper);
+				items = new QueryHandler<TEntity>(Data).ExecuteMany<TList>(null, customMapper);
 			});
 
 			return items;

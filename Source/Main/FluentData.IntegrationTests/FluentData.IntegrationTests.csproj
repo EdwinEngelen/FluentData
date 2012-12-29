@@ -194,8 +194,6 @@
     <None Include="_Data\FluentDataDB" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\Builders\StoredProcedure\Dynamic\" />
-    <Folder Include="Features\Builders\StoredProcedure\Generic\" />
     <Folder Include="Providers\SqlServerCompact\Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

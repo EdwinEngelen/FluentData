@@ -3,14 +3,14 @@ using System.Dynamic;
 
 namespace FluentData
 {
-	internal class DynamicTypAutoMapper
+	internal class DynamicTypeAutoMapper
 	{
 		private readonly List<DataReaderField> _fields;
 		private readonly System.Data.IDataReader _reader;
 
-		public DynamicTypAutoMapper(DbCommandData dbCommandData)
+		public DynamicTypeAutoMapper(System.Data.IDataReader reader)
 		{
-			_reader = dbCommandData.Reader.InnerReader;
+			_reader = reader;
 			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 

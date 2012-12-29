@@ -105,6 +105,9 @@
     <Compile Include="Command\DbCommand.cs" />
     <Compile Include="Command\DbCommandData.cs" />
     <Compile Include="Command\DbCommandTypes.cs" />
+    <Compile Include="Command\Handlers\QueryCustomEntityHandler.cs" />
+    <Compile Include="Command\Handlers\QueryDynamicHandler.cs" />
+    <Compile Include="Command\Handlers\QueryScalarHandler.cs" />
     <Compile Include="Command\Interfaces\IDbCommand.cs" />
     <Compile Include="Command\Interfaces\IExecute.cs" />
     <Compile Include="Command\Interfaces\IExecuteReturnLastId.cs" />
@@ -123,8 +126,7 @@
     <Compile Include="Command\PartialClasses\QueryMany.cs" />
     <Compile Include="Command\PartialClasses\QueryComplexMany.cs" />
     <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
-    <Compile Include="Command\Handlers\QueryManyHandler.cs" />
-    <Compile Include="Command\Handlers\QuerySingleHandler.cs" />
+    <Compile Include="Command\Handlers\QueryHandler.cs" />
     <Compile Include="Command\Reader\DataReader.cs" />
     <Compile Include="Command\Reader\DynamicDataReader.cs" />
     <Compile Include="Command\Reader\IDataReader.cs" />

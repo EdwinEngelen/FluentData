@@ -98,7 +98,7 @@ namespace FluentData.Providers.Sqlite
 
 		public void Custom_mapper_using_dynamic(Product product, dynamic row)
 		{
-			product.ProductId = row.ProductId;
+			product.ProductId = (int) row.ProductId;
 			product.Name = row.Name;
 		}
 

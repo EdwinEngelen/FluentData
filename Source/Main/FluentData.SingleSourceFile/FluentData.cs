@@ -37,7 +37,7 @@ namespace FluentData
 		{
 			var parameterName = columnName;
 
-			_data.Columns.Add(new TableColumn(columnName, value, parameterName));
+			_data.Columns.Add(new BuilderTableColumn(columnName, value, parameterName));
 
 			if(parameterType == DataTypes.Object)
 				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
@@ -119,7 +119,7 @@ namespace FluentData
 			var parameterName = columnName;
 			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, 0);
 
-			_data.Where.Add(new TableColumn(columnName, value, parameterName));
+			_data.Where.Add(new BuilderTableColumn(columnName, value, parameterName));
 		}
 
 		internal void WhereAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
@@ -131,44 +131,18 @@ namespace FluentData
 
 	public class BuilderData
 	{
-		public int PagingCurrentPage { get; set; }
-		public int PagingItemsPerPage { get; set; }
-		public List<TableColumn> Columns { get; set; }
+		public List<BuilderTableColumn> Columns { get; set; }
 		public object Item { get; set; }
 		public string ObjectName { get; set; }
 		public IDbCommand Command { get; set; }
-		public List<TableColumn> Where { get; set; }
-		public string Having { get; set; }
-		public string GroupBy { get; set; }
-		public string OrderBy { get; set; }
-		public string From { get; set; }
-		public string Select { get; set; }
-		public string WhereSql { get; set; }
+		public List<BuilderTableColumn> Where { get; set; }
 
 		public BuilderData(IDbCommand command, string objectName)
 		{
 			ObjectName = objectName;
 			Command = command;
-			Columns = new List<TableColumn>();
-			Where = new List<TableColumn>();
-			Having = "";
-			GroupBy = "";
-			OrderBy = "";
-			From = "";
-			Select = "";
-			WhereSql = "";
-			PagingCurrentPage = 1;
-			PagingItemsPerPage = 0;
-		}
-
-		internal int GetFromItems()
-		{
-			return (GetToItems() - PagingItemsPerPage + 1);
-		}
-
-		internal int GetToItems()
-		{
-			return (PagingCurrentPage*PagingItemsPerPage);
+			Columns = new List<BuilderTableColumn>();
+			Where = new List<BuilderTableColumn>();
 		}
 	}
 
@@ -176,15 +150,6 @@ namespace FluentData
 	{
 		protected BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
-
-		private IDbCommand Command
-		{
-			get
-			{
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));
-				return Data.Command;
-			}
-		}
 
 		public BaseDeleteBuilder(IDbCommand command, string name)
 		{
@@ -194,7 +159,9 @@ namespace FluentData
 
 		public int Execute()
 		{
-			return Command.Execute();
+			Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));			
+
+			return Data.Command.Execute();
 		}
 	}
 
@@ -265,29 +232,26 @@ namespace FluentData
 		protected BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
-		private IDbCommand Command
-		{
-			get
-			{
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
-				return Data.Command;
-			}
-		}
-
 		public BaseInsertBuilder(IDbCommand command, string name)
 		{
 			Data =  new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
+		private IDbCommand GetPreparedCommand()
+		{
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
+			return Data.Command;
+		}
+
 		public int Execute()
 		{
-			return Command.Execute();
+			return GetPreparedCommand().Execute();
 		}
 
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			return Command.ExecuteReturnLastId<T>(identityColumnName);
+			return GetPreparedCommand().ExecuteReturnLastId<T>(identityColumnName);
 		}
 	}
 
@@ -410,7 +374,7 @@ namespace FluentData
 
 	public interface ISelectBuilder<TEntity>
 	{
-		BuilderData Data { get; set; }
+		SelectBuilderData Data { get; set; }
 		ISelectBuilder<TEntity> Select(string sql);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);
@@ -438,26 +402,23 @@ namespace FluentData
 
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
 	{
-		public BuilderData Data { get; set; }
+		public SelectBuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
-
-		private IDbCommand Command
-		{
-			get
-			{
-				if (Data.PagingItemsPerPage > 0
-					&& string.IsNullOrEmpty(Data.OrderBy))
-					throw new FluentDataException("Order by must defined when using Paging.");
-
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
-				return Data.Command;
-			}
-		}
 
 		public SelectBuilder(IDbCommand command)
 		{
-			Data =  new BuilderData(command, "");
+			Data =  new SelectBuilderData(command, "");
 			Actions = new ActionsHandler(Data);
+		}
+
+		private IDbCommand GetPreparedDbCommand()
+		{
+			if (Data.PagingItemsPerPage > 0
+					&& string.IsNullOrEmpty(Data.OrderBy))
+				throw new FluentDataException("Order by must defined when using Paging.");
+
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+			return Data.Command;
 		}
 
 		public ISelectBuilder<TEntity> Select(string sql)
@@ -532,57 +493,91 @@ namespace FluentData
 		}
 		public List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public List<TEntity> QueryMany(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public TList QueryMany<TList>(Action<TEntity, dynamic> customMapper) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QuerySingle(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public TEntity QueryComplexSingle(Func<dynamic, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public DataTable QueryManyDataTable()
 		{
-			return Command.QueryManyDataTable();
+			return GetPreparedDbCommand().QueryManyDataTable();
+		}
+	}
+
+	public class SelectBuilderData : BuilderData
+	{
+		public int PagingCurrentPage { get; set; }
+		public int PagingItemsPerPage { get; set; }
+		public string Having { get; set; }
+		public string GroupBy { get; set; }
+		public string OrderBy { get; set; }
+		public string From { get; set; }
+		public string Select { get; set; }
+		public string WhereSql { get; set; }
+
+		public SelectBuilderData(IDbCommand command, string objectName) : base(command, objectName)
+		{
+			Having = "";
+			GroupBy = "";
+			OrderBy = "";
+			From = "";
+			Select = "";
+			WhereSql = "";
+			PagingCurrentPage = 1;
+			PagingItemsPerPage = 0;
+		}
+
+		internal int GetFromItems()
+		{
+			return (GetToItems() - PagingItemsPerPage + 1);
+		}
+
+		internal int GetToItems()
+		{
+			return (PagingCurrentPage*PagingItemsPerPage);
 		}
 	}
 
@@ -591,91 +586,87 @@ namespace FluentData
 		protected BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
-		private IDbCommand Command
-		{
-			get
-			{
-				Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
-				return Data.Command;
-			}
-		}
-
 		public BaseStoredProcedureBuilder(IDbCommand command, string name)
 		{
 			Data = new BuilderData(command, name);
 			Actions = new ActionsHandler(Data);
 		}
 
+		private IDbCommand GetPreparedDbCommand()
+		{
+			Data.Command.CommandType(DbCommandTypes.StoredProcedure);
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+			return Data.Command;
+		}
 
 		public void Dispose()
 		{
-			Command.Dispose();
+			Data.Command.Dispose();
 		}
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			return Command.ParameterValue<TParameterType>(outputParameterName);
+			return Data.Command.ParameterValue<TParameterType>(outputParameterName);
 		}
 
 		public int Execute()
 		{
-			return Command.Execute();
+			return GetPreparedDbCommand().Execute();
 		}
 
 		public List<TEntity> QueryMany<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public List<TEntity> QueryMany<TEntity>(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public TList QueryMany<TEntity, TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public TList QueryMany<TEntity, TList>(Action<TEntity, dynamic> customMapper) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public void QueryComplexMany<TEntity>(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QuerySingle<TEntity>(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public DataTable QueryManyDataTable()
 		{
-			return Command.QueryManyDataTable();
+			return GetPreparedDbCommand().QueryManyDataTable();
 		}
 	}
 
@@ -781,13 +772,13 @@ namespace FluentData
 		}
 	}
 
-	public class TableColumn
+	public class BuilderTableColumn
 	{
 		public string ColumnName { get; set; }
 		public string ParameterName { get; set; }
 		public object Value { get; set; }
 
-		public TableColumn(string columnName, object value, string parameterName)
+		public BuilderTableColumn(string columnName, object value, string parameterName)
 		{
 			ColumnName = columnName;
 			Value = value;
@@ -800,19 +791,6 @@ namespace FluentData
 		protected BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
-		private IDbCommand Command
-		{
-			get
-			{
-				if (Data.Columns.Count == 0
-					|| Data.Where.Count == 0)
-					throw new FluentDataException("Columns or where filter have not yet been added.");
-
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
-				return Data.Command;
-			}
-		}
-
 		public BaseUpdateBuilder(IDbProvider provider, IDbCommand command, string name)
 		{
 			Data =  new BuilderData(command, name);
@@ -821,7 +799,13 @@ namespace FluentData
 
 		public int Execute()
 		{
-			return Command.Execute();
+			if (Data.Columns.Count == 0
+					   || Data.Where.Count == 0)
+				throw new FluentDataException("Columns or where filter have not yet been added.");
+
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
+		
+			return Data.Command.Execute();
 		}
 	}
 
@@ -1190,6 +1174,75 @@ namespace FluentData
 		TableDirect = 512,
 	}
 
+	public class QueryCustomEntityHandler<TEntity> : IQueryTypeHandler<TEntity>
+	{
+		private readonly AutoMapper _autoMapper;
+		private readonly DbCommandData _data;
+
+		public QueryCustomEntityHandler(DbCommandData data)
+		{
+			_data = data;
+			_autoMapper = new AutoMapper(_data, typeof(TEntity));
+		}
+
+		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		{
+			var item = (TEntity)_data.Context.Data.EntityFactory.Create(typeof(TEntity));
+
+			if (customMapperReader != null)
+				customMapperReader(item, _data.Reader);
+			else if (customMapperDynamic != null)
+				customMapperDynamic(item, new DynamicDataReader(_data.Reader.InnerReader));
+			else
+				_autoMapper.AutoMap(item);
+			return item;
+		}
+	}
+
+	public class QueryDynamicHandler<TEntity> : IQueryTypeHandler<TEntity>
+	{
+		private readonly DbCommandData _data;
+		private readonly DynamicTypeAutoMapper _autoMapper;
+
+		public QueryDynamicHandler(DbCommandData data)
+		{
+			_data = data;
+			_autoMapper = new DynamicTypeAutoMapper(_data.Reader.InnerReader);
+		}
+
+		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		{
+			dynamic item = _autoMapper.AutoMap();
+			return item;
+		}
+	}
+
+	public class QueryScalarHandler<TEntity> : IQueryTypeHandler<TEntity>
+	{
+		private readonly DbCommandData _data;
+
+		public QueryScalarHandler(DbCommandData data)
+		{
+			_data = data;
+		}
+
+		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		{
+			var value = _data.Reader.GetValue(0);
+
+			if (value == null)
+				value = default(TEntity);
+			else if (_data.Reader.GetFieldType(0) != typeof(TEntity))
+				value = (Convert.ChangeType(value, typeof(TEntity)));
+			return (TEntity)value;
+		}
+	}
+
+	public interface IQueryTypeHandler<TEntity>
+	{
+		TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
+	}
+
 	public interface IDbCommand : IExecute, IExecuteReturnLastId, IQuery, IParameterValue, IDisposable
 	{
 		DbCommandData Data { get; }
@@ -1404,14 +1457,14 @@ namespace FluentData
 		}
 	}
 
-	internal class DynamicTypAutoMapper
+	internal class DynamicTypeAutoMapper
 	{
 		private readonly List<DataReaderField> _fields;
 		private readonly System.Data.IDataReader _reader;
 
-		public DynamicTypAutoMapper(DbCommandData dbCommandData)
+		public DynamicTypeAutoMapper(System.Data.IDataReader reader)
 		{
-			_reader = dbCommandData.Reader.InnerReader;
+			_reader = reader;
 			_fields = DataReaderHelper.GetDataReaderFields(_reader);
 		}
 
@@ -1478,18 +1531,6 @@ namespace FluentData
 		}
 	}
 
-//	internal partial class DbCommand
-//	{
-//		public DataTable QueryManyDataTable()
-//		{
-//			var dataTable = new DataTable();
-
-//			Data.ExecuteQueryHandler.ExecuteQuery(true, () => dataTable.Load(Data.Reader.InnerReader, LoadOption.OverwriteChanges));
-
-//			return dataTable;
-//		}
-//	}
-
 	internal partial class DbCommand
 	{
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
@@ -1497,7 +1538,13 @@ namespace FluentData
 			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
 				throw new FluentDataException("The selected database does not support this method.");
 
-			var lastId = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
+			var value = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
+			T lastId;
+
+			if (value.GetType() == typeof(T))
+				lastId = (T)value;
+			else
+				lastId = (T)Convert.ChangeType(value, typeof(T));
 
 			return lastId;
 		}
@@ -1511,7 +1558,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleHandler<TEntity>().ExecuteSingle(Data, customMapper, null);
+				item = new QueryHandler<TEntity>(Data).ExecuteSingle(customMapper, null);
 			});
 
 			return item;
@@ -1523,7 +1570,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleHandler<TEntity>().ExecuteSingle(Data, null, customMapper);
+				item = new QueryHandler<TEntity>(Data).ExecuteSingle(customMapper, null);
 			});
 
 			return item;
@@ -1550,7 +1597,6 @@ namespace FluentData
 
 	internal partial class DbCommand
 	{
-		/// <returns>Numbers of records affected.</returns>
 		public int Execute()
 		{
 			var recordsAffected = 0;
@@ -1558,7 +1604,6 @@ namespace FluentData
 			Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				recordsAffected = Data.InnerCommand.ExecuteNonQuery();
-
 			});
 			return recordsAffected;
 		}
@@ -1671,7 +1716,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryManyHandler<TEntity>().Execute<TList>(Data, customMapper, null);
+				items = new QueryHandler<TEntity>(Data).ExecuteMany<TList>(customMapper, null);
 			});
 
 			return items;
@@ -1683,7 +1728,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				items = new QueryManyHandler<TEntity>().Execute<TList>(Data, null, customMapper);
+				items = new QueryHandler<TEntity>(Data).ExecuteMany<TList>(null, customMapper);
 			});
 
 			return items;
@@ -1745,7 +1790,6 @@ namespace FluentData
 			try
 			{
 				PrepareDbCommand(useReader);
-
 				action();
 
 				if (_command.Data.Context.Data.OnExecuted != null)
@@ -1836,117 +1880,47 @@ namespace FluentData
 		}
 	}
 
-    internal class QueryManyHandler<TEntity>
+    internal class QueryHandler<TEntity>
     {
-		internal TList Execute<TList>(
-									DbCommandData data,
-									Action<TEntity, IDataReader> customMapperReader,
+	    private readonly DbCommandData _data;
+	    private readonly IQueryTypeHandler<TEntity> _typeHandler;
+
+	    public QueryHandler(DbCommandData data)
+	    {
+		    _data = data;
+			if (typeof(TEntity) == typeof(object) || typeof(TEntity) == typeof(ExpandoObject))
+				_typeHandler = new QueryDynamicHandler<TEntity>(data);
+			else if (ReflectionHelper.IsCustomEntity<TEntity>())
+				_typeHandler = new QueryCustomEntityHandler<TEntity>(data);
+			else
+				_typeHandler = new QueryScalarHandler<TEntity>(data);
+		}
+
+	    internal TList ExecuteMany<TList>(Action<TEntity, IDataReader> customMapperReader,
 									Action<TEntity, dynamic> customMapperDynamic
 					)
 			where TList : IList<TEntity>
 		{
-			var items = (TList)data.Context.Data.EntityFactory.Create(typeof(TList));
-
-			if (typeof(TEntity) == typeof(object))
+			var items = (TList)_data.Context.Data.EntityFactory.Create(typeof(TList));
+		    var reader = _data.Reader.InnerReader;
+			while (reader.Read())
 			{
-				var autoMapper = new DynamicTypAutoMapper(data);
-
-				while (data.Reader.Read())
-				{
-					dynamic item = autoMapper.AutoMap();
-
-					items.Add(item);
-				}
-
-				return (TList)items;
-			}
-			else if (ReflectionHelper.IsCustomEntity<TEntity>())
-			{
-				var autoMapper = new AutoMapper(data, typeof(TEntity));
-
-				while (data.Reader.Read())
-				{
-					var item = (TEntity)data.Context.Data.EntityFactory.Create(typeof(TEntity));
-
-					if (customMapperReader != null)
-						customMapperReader(item, data.Reader);
-					else if (customMapperDynamic != null)
-						customMapperDynamic(item, new DynamicDataReader(data.Reader));
-					else
-						autoMapper.AutoMap(item);
-					items.Add(item);
-				}
-			}
-			else
-			{
-				while (data.Reader.Read())
-				{
-					var value = (TEntity)data.Reader.GetValue(0);
-
-					items.Add(value);
-				}
+				var item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+				items.Add(item);
 			}
 
 			return items;
 		}
-    }
 
-	internal class QuerySingleHandler<TEntity>
-    {
-	    internal TEntity ExecuteSingle(DbCommandData data,
-	                                            Action<TEntity, IDataReader> customMapperReader,
-	                                            Action<TEntity, dynamic> customMapperDynamic)
-	    {
-		    if (typeof (TEntity) == typeof (object))
-		    {
-			    var autoMapper = new DynamicTypAutoMapper(data);
-
-			    ExpandoObject item = null;
-
-			    if (data.Reader.Read())
-				    item = autoMapper.AutoMap();
-
-			    return (dynamic) item;
-		    }
-		    else
-		    {
-			    var item = default(TEntity);
-
-			    if (ReflectionHelper.IsCustomEntity<TEntity>())
-			    {
-				    AutoMapper autoMapper = null;
-
-				    autoMapper = new AutoMapper(data, typeof (TEntity));
-
-				    if (data.Reader.Read())
-				    {
-					    item = (TEntity) data.Context.Data.EntityFactory.Create(typeof (TEntity));
-
-					    if (customMapperReader != null)
-						    customMapperReader(item, data.Reader);
-					    else if (customMapperDynamic != null)
-						    customMapperDynamic(item, new DynamicDataReader(data.Reader));
-					    else
-						    autoMapper.AutoMap(item);
-				    }
-			    }
-			    else
-			    {
-				    if (data.Reader.Read())
-				    {
-					    if (data.Reader.IsDBNull(0))
-						    return item;
-
-					    if (data.Reader.GetFieldType(0) == typeof (TEntity))
-						    item = (TEntity) data.Reader.GetValue(0);
-					    else
-						    item = (TEntity) Convert.ChangeType(data.Reader.GetValue(0), typeof (TEntity));
-				    }
-			    }
-
-			    return item;
-		    }
-	    }
+		internal TEntity ExecuteSingle(Action<TEntity, IDataReader> customMapperReader,
+								   Action<TEntity, dynamic> customMapperDynamic)
+		{
+			var item = default(TEntity);
+			if (_data.Reader.InnerReader.Read())
+				item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+				
+			return item;
+		}
     }
 
 	internal class DataReader : IDataReader
@@ -2203,7 +2177,7 @@ namespace FluentData
 
 		public object GetValue(string name)
 		{
-			return InnerReader.GetValue(GetOrdinal(name));
+			return GetValue(GetOrdinal(name));
 		}
 
 		public int GetValues(object[] values)
@@ -2928,7 +2902,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			throw new NotImplementedException();
 		}
@@ -2958,13 +2932,20 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(command);
+				var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+
+				if (recordsAffected > 0)
+				{
+					command.Data.InnerCommand.CommandText = "select @@Identity";
+
+					lastId = command.Data.InnerCommand.ExecuteScalar();
+				}
 			});
 
 			return lastId;
@@ -2980,22 +2961,11 @@ namespace FluentData
 			return "[" + name + "]";
 		}
 
-		private T HandleExecuteReturnLastId<T>(IDbCommand command)
+		public bool IsColumnNameEscaped(string name)
 		{
-			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
-
-			var lastId = default(T);
-
-			if (recordsAffected > 0)
-			{
-				command.Data.InnerCommand.CommandText = "select @@Identity";
-
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
-			}
-
-			return lastId;
+			if (name.Contains("["))
+				return true;
+			return false;
 		}
 	}
 
@@ -3183,7 +3153,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -3230,20 +3200,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if (command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 
 			command.Sql("select IDENTITY_VAL_LOCAL() as LastId from sysibm.sysdummy1;");
 
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T)value;
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -3308,7 +3276,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -3357,19 +3325,17 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 			command.Data.InnerCommand.CommandText += "select lastval();";
 
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -3434,7 +3400,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -3481,20 +3447,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 
 			command.Sql("select LAST_INSERT_ID() as `LastInsertedId`");
 
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T)value;
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -3506,6 +3470,8 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("`"))
+				return name;
 			return "`" + name + "`";
 		}
 	}
@@ -3521,13 +3487,13 @@ namespace FluentData
 		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
 		string GetSelectBuilderAlias(string name, string alias);
-		string GetSqlForSelectBuilder(BuilderData data);
+		string GetSqlForSelectBuilder(SelectBuilderData data);
 		string GetSqlForInsertBuilder(BuilderData data);
 		string GetSqlForUpdateBuilder(BuilderData data);
 		string GetSqlForDeleteBuilder(BuilderData data);
 		string GetSqlForStoredProcedureBuilder(BuilderData data);
 		DataTypes GetDbTypeForClrType(Type clrType);
-		T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName);
+		object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName);
 		void OnCommandExecuting(IDbCommand command);
 		string EscapeColumnName(string name);
 	}
@@ -3582,7 +3548,7 @@ namespace FluentData
 			return name + " " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			if (data.PagingItemsPerPage == 0)
@@ -3651,18 +3617,19 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.Provider.GetDbTypeForClrType(typeof(T)));
 			command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
-			var lastId = default(T);
+
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				command.Data.InnerCommand.ExecuteNonQuery();
 
-				lastId = command.ParameterValue<T>("FluentDataLastId");
+				lastId = command.ParameterValue<object>("FluentDataLastId");
 			});
 
 			return lastId;
@@ -3736,7 +3703,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -3783,19 +3750,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 
 			command.Sql("select last_insert_rowid();");
 
-			var lastId = default(T);
+			object lastId = null;
+			
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -3807,6 +3773,8 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("["))
+				return name;
 			return "[" + name + "]";
 		}
 	}
@@ -3861,7 +3829,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -3909,13 +3877,20 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(command);
+				var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+
+				if (recordsAffected > 0)
+				{
+					command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
+
+					lastId = command.Data.InnerCommand.ExecuteScalar();
+				}
 			});
 
 			return lastId;
@@ -3928,25 +3903,9 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("["))
+				return name;
 			return "[" + name + "]";
-		}
-
-		private T HandleExecuteReturnLastId<T>(IDbCommand command)
-		{
-			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
-
-			var lastId = default(T);
-
-			if (recordsAffected > 0)
-			{
-				command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
-
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
-			}
-
-			return lastId;
 		}
 	}
 
@@ -4000,7 +3959,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = new StringBuilder();
 			if (data.PagingCurrentPage == 1)
@@ -4073,23 +4032,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 
 			command.Sql("select SCOPE_IDENTITY()");
 
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -4101,6 +4055,8 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("["))
+				return name;
 			return "[" + name + "]";
 		}
 	}
