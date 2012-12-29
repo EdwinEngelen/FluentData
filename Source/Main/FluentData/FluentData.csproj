@@ -169,17 +169,7 @@
     <Compile Include="Providers\SqlServerCompactProvider.cs" />
     <Compile Include="Providers\SqlServerProvider.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Providers\Access\" />
-    <Folder Include="Providers\DB2\" />
-    <Folder Include="Providers\MySql\" />
-    <Folder Include="Providers\Oracle\" />
-    <Folder Include="Providers\PostgreSql\" />
-    <Folder Include="Providers\SqlAzure\" />
-    <Folder Include="Providers\Sqlite\" />
-    <Folder Include="Providers\SqlServerCompact\" />
-    <Folder Include="Providers\SqlServer\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
