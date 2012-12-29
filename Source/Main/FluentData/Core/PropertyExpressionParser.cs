@@ -4,10 +4,10 @@ using System.Reflection;
 
 namespace FluentData
 {
-	public class PropertyExpressionParser<T>
+	internal class PropertyExpressionParser<T>
 	{
 		private readonly object _item;
-		private PropertyInfo _property;
+		private readonly PropertyInfo _property;
 
 		public PropertyExpressionParser(object item, Expression<Func<T, object>> propertyExpression)
 		{

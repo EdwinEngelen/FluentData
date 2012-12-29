@@ -4,9 +4,9 @@ using System.Data;
 
 namespace FluentData
 {
-	internal abstract class BaseStoredProcedureBuilder : IQuery
+	internal abstract class BaseStoredProcedureBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseStoredProcedureBuilder(IDbCommand command, string name)

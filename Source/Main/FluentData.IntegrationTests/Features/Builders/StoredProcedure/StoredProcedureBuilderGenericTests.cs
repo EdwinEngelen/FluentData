@@ -1,7 +1,8 @@
-﻿using FluentData._Helpers;
+﻿using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData
+namespace IntegrationTests.Features.Builders.StoredProcedure
 {
 	[TestClass]
     public class StoredProcedureGenericTests : BaseSqlServerIntegrationTest

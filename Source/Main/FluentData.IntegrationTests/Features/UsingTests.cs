@@ -1,7 +1,7 @@
-﻿using FluentData._Helpers;
+﻿using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features
+namespace IntegrationTests.Features
 {
 	[TestClass]
 	public class UsingTests : BaseSqlServerIntegrationTest

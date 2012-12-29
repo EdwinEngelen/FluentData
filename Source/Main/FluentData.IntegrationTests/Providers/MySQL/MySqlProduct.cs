@@ -1,6 +1,6 @@
-﻿using FluentData._Helpers;
+﻿using IntegrationTests._Helpers;
 
-namespace FluentData.Providers.MySql
+namespace IntegrationTests.Providers.MySql
 {
 	public class MySqlProduct
 	{

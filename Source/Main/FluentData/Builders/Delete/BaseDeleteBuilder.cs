@@ -2,7 +2,7 @@
 {
 	internal abstract class BaseDeleteBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseDeleteBuilder(IDbCommand command, string name)

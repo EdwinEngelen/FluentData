@@ -1,10 +1,7 @@
-﻿using FluentData._Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FluentData;
+using IntegrationTests._Helpers;
 
-namespace FluentData
+namespace IntegrationTests
 {
     public abstract class BaseSqlServerIntegrationTest
     {

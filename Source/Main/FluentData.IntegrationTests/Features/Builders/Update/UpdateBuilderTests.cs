@@ -1,7 +1,7 @@
-﻿using FluentData._Helpers;
+﻿using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData
+namespace IntegrationTests.Features.Builders.Update
 {
 	[TestClass]
     public class UpdateBuilderTests : BaseSqlServerIntegrationTest

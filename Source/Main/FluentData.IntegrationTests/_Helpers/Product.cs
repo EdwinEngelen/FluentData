@@ -1,4 +1,4 @@
-﻿namespace FluentData._Helpers
+﻿namespace IntegrationTests._Helpers
 {
 	public class Product
 	{

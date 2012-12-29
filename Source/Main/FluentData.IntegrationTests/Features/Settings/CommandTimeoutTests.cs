@@ -1,7 +1,6 @@
-﻿using FluentData._Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features.Settings
+namespace IntegrationTests.Features.Settings
 {
 	[TestClass]
     public class CommandTimeoutTests : BaseSqlServerIntegrationTest

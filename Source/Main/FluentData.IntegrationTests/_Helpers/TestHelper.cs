@@ -1,8 +1,9 @@
 ﻿using System.Dynamic;
 using System.Linq;
 using System.Xml.Linq;
+using FluentData;
 
-namespace FluentData._Helpers
+namespace IntegrationTests._Helpers
 {
 	public static class TestHelper
 	{

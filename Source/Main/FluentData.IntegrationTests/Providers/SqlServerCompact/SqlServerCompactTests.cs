@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentData._Helpers;
+﻿using System.Collections.Generic;
+using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers.SqlServerCompact
+namespace IntegrationTests.Providers.SqlServerCompact
 {
 	[TestClass]
 	public class SqlServerCompactTests : IDbProviderTests

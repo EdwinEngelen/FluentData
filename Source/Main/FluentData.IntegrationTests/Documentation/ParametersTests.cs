@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using FluentData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData._Documentation
+namespace IntegrationTests.Documentation
 {
 	[TestClass]
     public class ParametersTests : BaseSqlServerIntegrationTest

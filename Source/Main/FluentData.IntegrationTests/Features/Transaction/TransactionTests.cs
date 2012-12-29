@@ -1,8 +1,7 @@
-﻿using FluentData._Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace FluentData.Features.Transaction
+namespace IntegrationTests.Features.Transaction
 {
 	[TestClass]
     public class TransactionTests : BaseSqlServerIntegrationTest
@@ -73,7 +72,7 @@ namespace FluentData.Features.Transaction
 			var testInt = (int) Convert.ChangeType(test, TypeCode.Int32);
 			
 			Assert.IsTrue(true);
-			//FluentData.BuilderTableColumn	
+			//FluentData.BuilderColumn	
 		}
 	}
 }

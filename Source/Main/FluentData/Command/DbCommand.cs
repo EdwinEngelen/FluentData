@@ -14,7 +14,7 @@ namespace FluentData
 			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		public IDbCommand UseMultipleResultset(bool useMultipleResultset)
+		public IDbCommand UseMultiResult(bool useMultipleResultset)
 		{
 			if (useMultipleResultset && !Data.Context.Data.Provider.SupportsMultipleResultsets)
 				throw new FluentDataException("The selected database does not support multiple resultset");

@@ -1,7 +1,6 @@
-﻿using FluentData._Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features.Connection
+namespace IntegrationTests.Features.Connection
 {
 	[TestClass]
     public class SharedConnectionTests : BaseSqlServerIntegrationTest

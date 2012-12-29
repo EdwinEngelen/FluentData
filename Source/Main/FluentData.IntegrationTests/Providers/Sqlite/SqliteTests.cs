@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentData._Helpers;
+using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers.Sqlite
+namespace IntegrationTests.Providers.Sqlite
 {
 	[TestClass]
 	public class SqliteTests : IDbProviderTests

@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features.Events
+namespace IntegrationTests.Features.Events
 {
 	[TestClass]
     public class OnConnectionClosedTests : BaseSqlServerIntegrationTest

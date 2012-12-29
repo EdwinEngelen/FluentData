@@ -1,5 +1,5 @@
 ﻿
-// FluentData version 2.3.0.0.
+// FluentData version 2.4.0.0.
 // Copyright ©  2012 - The Fluent Data Project.
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
@@ -37,7 +37,7 @@ namespace FluentData
 		{
 			var parameterName = columnName;
 
-			_data.Columns.Add(new BuilderTableColumn(columnName, value, parameterName));
+			_data.Columns.Add(new BuilderColumn(columnName, value, parameterName));
 
 			if(parameterType == DataTypes.Object)
 				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
@@ -119,7 +119,7 @@ namespace FluentData
 			var parameterName = columnName;
 			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, 0);
 
-			_data.Where.Add(new BuilderTableColumn(columnName, value, parameterName));
+			_data.Where.Add(new BuilderColumn(columnName, value, parameterName));
 		}
 
 		internal void WhereAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
@@ -131,24 +131,24 @@ namespace FluentData
 
 	public class BuilderData
 	{
-		public List<BuilderTableColumn> Columns { get; set; }
+		public List<BuilderColumn> Columns { get; set; }
 		public object Item { get; set; }
 		public string ObjectName { get; set; }
 		public IDbCommand Command { get; set; }
-		public List<BuilderTableColumn> Where { get; set; }
+		public List<BuilderColumn> Where { get; set; }
 
 		public BuilderData(IDbCommand command, string objectName)
 		{
 			ObjectName = objectName;
 			Command = command;
-			Columns = new List<BuilderTableColumn>();
-			Where = new List<BuilderTableColumn>();
+			Columns = new List<BuilderColumn>();
+			Where = new List<BuilderColumn>();
 		}
 	}
 
 	internal abstract class BaseDeleteBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseDeleteBuilder(IDbCommand command, string name)
@@ -201,11 +201,13 @@ namespace FluentData
 
 	public interface IDeleteBuilder : IExecute
 	{
+		BuilderData Data { get; }
 		IDeleteBuilder Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IDeleteBuilder<T> : IExecute
 	{
+		BuilderData Data { get; }
 		IDeleteBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IDeleteBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
@@ -229,7 +231,7 @@ namespace FluentData
 
 	internal abstract class BaseInsertBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseInsertBuilder(IDbCommand command, string name)
@@ -355,11 +357,13 @@ namespace FluentData
 
 	public interface IInsertBuilder : IExecute, IExecuteReturnLastId
 	{
+		BuilderData Data { get; }
 		IInsertBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertBuilder<T> : IExecute, IExecuteReturnLastId
 	{
+		BuilderData Data { get; }
 		IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IInsertBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
@@ -367,6 +371,7 @@ namespace FluentData
 
 	public interface IInsertBuilderDynamic : IExecute, IExecuteReturnLastId
 	{
+		BuilderData Data { get; }
 		IInsertBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
@@ -581,9 +586,9 @@ namespace FluentData
 		}
 	}
 
-	internal abstract class BaseStoredProcedureBuilder : IQuery
+	internal abstract class BaseStoredProcedureBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseStoredProcedureBuilder(IDbCommand command, string name)
@@ -672,23 +677,29 @@ namespace FluentData
 
     public interface IStoredProcedureBuilder : IExecute, IQuery, IParameterValue, IDisposable
 	{
+		BuilderData Data { get; }
 		IStoredProcedureBuilder Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilder ParameterOut(string name, DataTypes parameterType, int size = 0);
+		IStoredProcedureBuilder UseMultiResult(bool useMultipleResultsets);
 	}
 
     public interface IStoredProcedureBuilderDynamic : IExecute, IQuery, IParameterValue, IDisposable
 	{
+		BuilderData Data { get; }
 		IStoredProcedureBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IStoredProcedureBuilderDynamic Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0);
+		IStoredProcedureBuilderDynamic UseMultiResult(bool useMultipleResultsets);	
 	}
 
     public interface IStoredProcedureBuilder<T> : IExecute, IQuery, IParameterValue, IDisposable
 	{
+		BuilderData Data { get; }
 		IStoredProcedureBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IStoredProcedureBuilder<T> Parameter(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilder<T> Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IStoredProcedureBuilder<T> ParameterOut(string name, DataTypes parameterType, int size = 0);
+		IStoredProcedureBuilder<T> UseMultiResult(bool useMultipleResultsets);	
 	}
 
 	internal class StoredProcedureBuilder : BaseStoredProcedureBuilder, IStoredProcedureBuilder
@@ -709,11 +720,17 @@ namespace FluentData
 			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
+
+		public IStoredProcedureBuilder UseMultiResult(bool useMultipleResultsets)
+		{
+			Data.Command.UseMultiResult(useMultipleResultsets);
+			return this;
+		}
 	}	
 
 	internal class StoredProcedureBuilderDynamic : BaseStoredProcedureBuilder, IStoredProcedureBuilderDynamic
 	{
-		internal StoredProcedureBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
+		internal StoredProcedureBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
@@ -734,6 +751,12 @@ namespace FluentData
 		public IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0)
 		{
 			Actions.ParameterOutputAction(name, parameterType, size);
+			return this;
+		}
+
+		public IStoredProcedureBuilderDynamic UseMultiResult(bool useMultipleResultsets)
+		{
+			Data.Command.UseMultiResult(useMultipleResultsets);
 			return this;
 		}
 	}
@@ -770,15 +793,21 @@ namespace FluentData
 			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
+
+		public IStoredProcedureBuilder<T> UseMultiResult(bool useMultipleResultsets)
+		{
+			Data.Command.UseMultiResult(useMultipleResultsets);
+			return this;
+		}
 	}
 
-	public class BuilderTableColumn
+	public class BuilderColumn
 	{
 		public string ColumnName { get; set; }
 		public string ParameterName { get; set; }
 		public object Value { get; set; }
 
-		public BuilderTableColumn(string columnName, object value, string parameterName)
+		public BuilderColumn(string columnName, object value, string parameterName)
 		{
 			ColumnName = columnName;
 			Value = value;
@@ -788,7 +817,7 @@ namespace FluentData
 
 	internal abstract class BaseUpdateBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseUpdateBuilder(IDbProvider provider, IDbCommand command, string name)
@@ -811,12 +840,14 @@ namespace FluentData
 
 	public interface IUpdateBuilder : IExecute
 	{
+		BuilderData Data { get; }
 		IUpdateBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IUpdateBuilderDynamic : IExecute
 	{
+		BuilderData Data { get; }
 		IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
@@ -826,6 +857,7 @@ namespace FluentData
 
 	public interface IUpdateBuilder<T> : IExecute
 	{
+		BuilderData Data { get; }
 		IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
@@ -1105,7 +1137,7 @@ namespace FluentData
 			Data.ExecuteQueryHandler = new ExecuteQueryHandler(this);
 		}
 
-		public IDbCommand UseMultipleResultset(bool useMultipleResultset)
+		public IDbCommand UseMultiResult(bool useMultipleResultset)
 		{
 			if (useMultipleResultset && !Data.Context.Data.Provider.SupportsMultipleResultsets)
 				throw new FluentDataException("The selected database does not support multiple resultset");
@@ -1174,7 +1206,12 @@ namespace FluentData
 		TableDirect = 512,
 	}
 
-	public class QueryCustomEntityHandler<TEntity> : IQueryTypeHandler<TEntity>
+	internal interface IQueryTypeHandler<TEntity>
+	{
+		TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
+	}
+
+	internal class QueryCustomEntityHandler<TEntity> : IQueryTypeHandler<TEntity>
 	{
 		private readonly AutoMapper _autoMapper;
 		private readonly DbCommandData _data;
@@ -1199,7 +1236,7 @@ namespace FluentData
 		}
 	}
 
-	public class QueryDynamicHandler<TEntity> : IQueryTypeHandler<TEntity>
+	internal class QueryDynamicHandler<TEntity> : IQueryTypeHandler<TEntity>
 	{
 		private readonly DbCommandData _data;
 		private readonly DynamicTypeAutoMapper _autoMapper;
@@ -1217,9 +1254,10 @@ namespace FluentData
 		}
 	}
 
-	public class QueryScalarHandler<TEntity> : IQueryTypeHandler<TEntity>
+	internal class QueryScalarHandler<TEntity> : IQueryTypeHandler<TEntity>
 	{
 		private readonly DbCommandData _data;
+		private Type _fieldType;
 
 		public QueryScalarHandler(DbCommandData data)
 		{
@@ -1229,18 +1267,15 @@ namespace FluentData
 		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var value = _data.Reader.GetValue(0);
+			if (_fieldType == null)
+				_fieldType = _data.Reader.GetFieldType(0);
 
 			if (value == null)
 				value = default(TEntity);
-			else if (_data.Reader.GetFieldType(0) != typeof(TEntity))
+			else if (_fieldType != typeof(TEntity))
 				value = (Convert.ChangeType(value, typeof(TEntity)));
 			return (TEntity)value;
 		}
-	}
-
-	public interface IQueryTypeHandler<TEntity>
-	{
-		TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
 	}
 
 	public interface IDbCommand : IExecute, IExecuteReturnLastId, IQuery, IParameterValue, IDisposable
@@ -1252,6 +1287,7 @@ namespace FluentData
 		IDbCommand Sql(string sql);
 		IDbCommand ClearSql { get; }
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
+		IDbCommand UseMultiResult(bool useMultipleResultsets);
 	}
 
     public interface IExecute
@@ -2371,6 +2407,7 @@ namespace FluentData
 		IDeleteBuilder<T> Delete<T>(string tableName, T item);
 		IStoredProcedureBuilder StoredProcedure(string storedProcedureName);
 		IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item);
+		IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item);
 		IDbContext EntityFactory(IEntityFactory entityFactory);
 		IDbContext ConnectionString(string connectionString, IDbProvider dbProvider);
 		IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider);
@@ -2473,6 +2510,12 @@ namespace FluentData
 		{
 			VerifyStoredProcedureSupport();
 			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
+		}
+
+		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)
+		{
+			VerifyStoredProcedureSupport();
+			return new StoredProcedureBuilderDynamic(CreateCommand, storedProcedureName, item);
 		}
 	}
 
@@ -2592,7 +2635,7 @@ namespace FluentData
 		{
             get
 	        {
-	            var command = CreateCommand.UseMultipleResultset(true);
+	            var command = CreateCommand.UseMultiResult(true);
 	            return command;
 	        }
 	    }
@@ -2659,10 +2702,10 @@ namespace FluentData
 		}
 	}
 
-	public class PropertyExpressionParser<T>
+	internal class PropertyExpressionParser<T>
 	{
 		private readonly object _item;
-		private PropertyInfo _property;
+		private readonly PropertyInfo _property;
 
 		public PropertyExpressionParser(object item, Expression<Func<T, object>> propertyExpression)
 		{

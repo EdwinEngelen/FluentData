@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentData._Helpers;
+using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData._Documentation
+namespace IntegrationTests.Documentation
 {
 	[TestClass]
     public class EntityFactoryTests : BaseSqlServerIntegrationTest

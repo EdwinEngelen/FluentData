@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
-using FluentData.Providers.MySql;
-using FluentData._Helpers;
+using FluentData;
+using IntegrationTests.Providers.MySql;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers.DB2
+namespace IntegrationTests.Providers.DB2
 {
 	[TestClass]
 	public class DB2ProviderTests : IDbProviderTests

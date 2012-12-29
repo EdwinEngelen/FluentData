@@ -11,5 +11,6 @@ namespace FluentData
 		IDbCommand Sql(string sql);
 		IDbCommand ClearSql { get; }
 		IDbCommand CommandType(DbCommandTypes dbCommandType);
+		IDbCommand UseMultiResult(bool useMultipleResultsets);
 	}
 }

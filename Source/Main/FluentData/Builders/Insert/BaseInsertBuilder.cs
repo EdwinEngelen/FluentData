@@ -2,7 +2,7 @@
 {
 	internal abstract class BaseInsertBuilder
 	{
-		protected BuilderData Data { get; set; }
+		public BuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
 
 		public BaseInsertBuilder(IDbCommand command, string name)

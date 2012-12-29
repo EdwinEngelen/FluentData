@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using FluentData._Helpers;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData._Samples
+namespace IntegrationTests.Documentation
 {
 	[TestClass]
 	public class SampleCode : BaseSqlServerIntegrationTest

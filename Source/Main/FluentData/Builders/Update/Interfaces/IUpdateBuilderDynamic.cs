@@ -2,6 +2,7 @@ namespace FluentData
 {
 	public interface IUpdateBuilderDynamic : IExecute
 	{
+		BuilderData Data { get; }
 		IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);

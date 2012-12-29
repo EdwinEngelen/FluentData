@@ -9,7 +9,7 @@
     <ProjectGuid>{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FluentData</RootNamespace>
+    <RootNamespace>IntegrationTests</RootNamespace>
     <AssemblyName>FluentData.IntegrationTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseSqlServerIntegrationTest.cs" />
+    <Compile Include="Experiements\Tests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderTests.cs" />
     <Compile Include="Features\Builders\Insert\InsertBuilderDynamicTests.cs" />
@@ -145,21 +146,21 @@
     <Compile Include="Providers\Sqlite\SqliteTests.cs" />
     <Compile Include="Providers\SqlServerCompact\SqlServerCompactTests.cs" />
     <Compile Include="Providers\SqlServer\SqlServerTests.cs" />
-    <Compile Include="_Documentation\QueryValueTests.cs" />
-    <Compile Include="_Documentation\DeleteDataTests.cs" />
-    <Compile Include="_Documentation\EntityFactoryTests.cs" />
-    <Compile Include="_Documentation\InsertDataTests.cs" />
-    <Compile Include="_Documentation\InsertUpdateDataTests.cs" />
-    <Compile Include="_Documentation\MappingTests.cs" />
-    <Compile Include="_Documentation\MultipleResultsetsTests.cs" />
-    <Compile Include="_Documentation\ParametersTests.cs" />
-    <Compile Include="_Documentation\QueryTests.cs" />
-    <Compile Include="_Documentation\QuerySingle.cs" />
-    <Compile Include="_Documentation\QueryValuesTests.cs" />
-    <Compile Include="_Documentation\StoredProcedureTests.cs" />
-    <Compile Include="_Documentation\SampleCodeTests.cs" />
-    <Compile Include="_Documentation\TransactionsTests.cs" />
-    <Compile Include="_Documentation\UpdateDataTests.cs" />
+    <Compile Include="Documentation\QueryValueTests.cs" />
+    <Compile Include="Documentation\DeleteDataTests.cs" />
+    <Compile Include="Documentation\EntityFactoryTests.cs" />
+    <Compile Include="Documentation\InsertDataTests.cs" />
+    <Compile Include="Documentation\InsertUpdateDataTests.cs" />
+    <Compile Include="Documentation\MappingTests.cs" />
+    <Compile Include="Documentation\MultipleResultsetsTests.cs" />
+    <Compile Include="Documentation\ParametersTests.cs" />
+    <Compile Include="Documentation\QueryTests.cs" />
+    <Compile Include="Documentation\QuerySingle.cs" />
+    <Compile Include="Documentation\QueryValuesTests.cs" />
+    <Compile Include="Documentation\StoredProcedureTests.cs" />
+    <Compile Include="Documentation\SampleCodeTests.cs" />
+    <Compile Include="Documentation\TransactionsTests.cs" />
+    <Compile Include="Documentation\UpdateDataTests.cs" />
     <Compile Include="_Helpers\Categories.cs" />
     <Compile Include="_Helpers\Category.cs" />
     <Compile Include="_Helpers\DataTypeValue.cs" />

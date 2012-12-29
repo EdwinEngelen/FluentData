@@ -1,6 +1,7 @@
-﻿using FluentData._Helpers;
+﻿using FluentData;
+using IntegrationTests._Helpers;
 
-namespace FluentData.Providers
+namespace IntegrationTests.Providers
 {
 	public interface IDbProviderTests
 	{

@@ -23,6 +23,7 @@ namespace FluentData
 		IDeleteBuilder<T> Delete<T>(string tableName, T item);
 		IStoredProcedureBuilder StoredProcedure(string storedProcedureName);
 		IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item);
+		IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item);
 		IDbContext EntityFactory(IEntityFactory entityFactory);
 		IDbContext ConnectionString(string connectionString, IDbProvider dbProvider);
 		IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider);

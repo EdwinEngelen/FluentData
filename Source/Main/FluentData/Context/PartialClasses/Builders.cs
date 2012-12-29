@@ -66,5 +66,11 @@ namespace FluentData
 			VerifyStoredProcedureSupport();
 			return new StoredProcedureBuilder<T>(CreateCommand, storedProcedureName, item);
 		}
+
+		public IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item)
+		{
+			VerifyStoredProcedureSupport();
+			return new StoredProcedureBuilderDynamic(CreateCommand, storedProcedureName, item);
+		}
 	}
 }

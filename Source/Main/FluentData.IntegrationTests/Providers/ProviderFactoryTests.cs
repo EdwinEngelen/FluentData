@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Providers
+namespace IntegrationTests.Providers
 {
 	[TestClass]
 	public class ProviderFactoryTests

@@ -5,7 +5,7 @@ namespace FluentData
 {
 	internal class StoredProcedureBuilderDynamic : BaseStoredProcedureBuilder, IStoredProcedureBuilderDynamic
 	{
-		internal StoredProcedureBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
+		internal StoredProcedureBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
 			Data.Item = (IDictionary<string, object>) item;
@@ -26,6 +26,12 @@ namespace FluentData
 		public IStoredProcedureBuilderDynamic ParameterOut(string name, DataTypes parameterType, int size = 0)
 		{
 			Actions.ParameterOutputAction(name, parameterType, size);
+			return this;
+		}
+
+		public IStoredProcedureBuilderDynamic UseMultiResult(bool useMultipleResultsets)
+		{
+			Data.Command.UseMultiResult(useMultipleResultsets);
 			return this;
 		}
 	}

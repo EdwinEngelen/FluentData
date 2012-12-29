@@ -38,7 +38,7 @@ namespace FluentData
 		{
             get
 	        {
-	            var command = CreateCommand.UseMultipleResultset(true);
+	            var command = CreateCommand.UseMultiResult(true);
 	            return command;
 	        }
 	    }

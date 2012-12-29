@@ -93,7 +93,7 @@
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilder.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderDynamic.cs" />
     <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderGeneric.cs" />
-    <Compile Include="Builders\BuilderTableColumn.cs" />
+    <Compile Include="Builders\BuilderColumn.cs" />
     <Compile Include="Builders\Update\BaseUpdateBuilder.cs" />
     <Compile Include="Builders\Update\Interfaces\IUpdateBuilder.cs" />
     <Compile Include="Builders\Update\Interfaces\IUpdateBuilderDynamic.cs" />
@@ -105,6 +105,7 @@
     <Compile Include="Command\DbCommand.cs" />
     <Compile Include="Command\DbCommandData.cs" />
     <Compile Include="Command\DbCommandTypes.cs" />
+    <Compile Include="Command\Handlers\IQueryTypeHandler.cs" />
     <Compile Include="Command\Handlers\QueryCustomEntityHandler.cs" />
     <Compile Include="Command\Handlers\QueryDynamicHandler.cs" />
     <Compile Include="Command\Handlers\QueryScalarHandler.cs" />
@@ -152,23 +153,33 @@
     <Compile Include="Core\FluentDataException.cs" />
     <Compile Include="Core\ReflectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\Access\AccessProvider.cs" />
+    <Compile Include="Providers\AccessProvider.cs" />
     <Compile Include="Providers\Common\ConnectionFactory.cs" />
     <Compile Include="Providers\Common\DbTypeMapper.cs" />
     <Compile Include="Providers\Common\Builders\DeleteBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\Builders\InsertBuilderSqlGenerator.cs" />
     <Compile Include="Providers\Common\Builders\UpdateBuilderSqlGenerator.cs" />
-    <Compile Include="Providers\DB2\DB2Provider.cs" />
-    <Compile Include="Providers\PostgreSql\PostgreSqlProvider.cs" />
-    <Compile Include="Providers\MySql\MySqlProvider.cs" />
+    <Compile Include="Providers\DB2Provider.cs" />
+    <Compile Include="Providers\PostgreSqlProvider.cs" />
+    <Compile Include="Providers\MySqlProvider.cs" />
     <Compile Include="Providers\IDbProvider.cs" />
-    <Compile Include="Providers\Oracle\OracleProvider.cs" />
-    <Compile Include="Providers\SqlAzure\SqlAzureProvider.cs" />
-    <Compile Include="Providers\Sqlite\SqliteProvider.cs" />
-    <Compile Include="Providers\SqlServerCompact\SqlServerCompactProvider.cs" />
-    <Compile Include="Providers\SqlServer\SqlServerProvider.cs" />
+    <Compile Include="Providers\OracleProvider.cs" />
+    <Compile Include="Providers\SqlAzureProvider.cs" />
+    <Compile Include="Providers\SqliteProvider.cs" />
+    <Compile Include="Providers\SqlServerCompactProvider.cs" />
+    <Compile Include="Providers\SqlServerProvider.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Providers\Access\" />
+    <Folder Include="Providers\DB2\" />
+    <Folder Include="Providers\MySql\" />
+    <Folder Include="Providers\Oracle\" />
+    <Folder Include="Providers\PostgreSql\" />
+    <Folder Include="Providers\SqlAzure\" />
+    <Folder Include="Providers\Sqlite\" />
+    <Folder Include="Providers\SqlServerCompact\" />
+    <Folder Include="Providers\SqlServer\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

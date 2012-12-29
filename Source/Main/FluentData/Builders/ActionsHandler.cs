@@ -24,7 +24,7 @@ namespace FluentData
 		{
 			var parameterName = columnName;
 
-			_data.Columns.Add(new BuilderTableColumn(columnName, value, parameterName));
+			_data.Columns.Add(new BuilderColumn(columnName, value, parameterName));
 
 			if(parameterType == DataTypes.Object)
 				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
@@ -106,7 +106,7 @@ namespace FluentData
 			var parameterName = columnName;
 			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, 0);
 
-			_data.Where.Add(new BuilderTableColumn(columnName, value, parameterName));
+			_data.Where.Add(new BuilderColumn(columnName, value, parameterName));
 		}
 
 		internal void WhereAction<T>(Expression<Func<T, object>> expression, DataTypes parameterType, int size)

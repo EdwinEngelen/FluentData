@@ -2,7 +2,7 @@
 
 namespace FluentData
 {
-	public class QueryDynamicHandler<TEntity> : IQueryTypeHandler<TEntity>
+	internal class QueryDynamicHandler<TEntity> : IQueryTypeHandler<TEntity>
 	{
 		private readonly DbCommandData _data;
 		private readonly DynamicTypeAutoMapper _autoMapper;

@@ -1,7 +1,8 @@
-﻿using FluentData._Helpers;
+﻿using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features.AutoMapping
+namespace IntegrationTests.Features.AutoMapping
 {
 	[TestClass]
     public class IgnoreIfAutoMapFailsTests : BaseSqlServerIntegrationTest

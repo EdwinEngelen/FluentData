@@ -1,7 +1,6 @@
-﻿using FluentData._Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Command
+namespace IntegrationTests.Features.Command
 {
 	[TestClass]
     public class MultipleResultsetTests : BaseSqlServerIntegrationTest

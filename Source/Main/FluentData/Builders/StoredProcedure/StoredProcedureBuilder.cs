@@ -20,5 +20,11 @@ namespace FluentData
 			Actions.ParameterOutputAction(name, parameterType, size);
 			return this;
 		}
+
+		public IStoredProcedureBuilder UseMultiResult(bool useMultipleResultsets)
+		{
+			Data.Command.UseMultiResult(useMultipleResultsets);
+			return this;
+		}
 	}	
 }

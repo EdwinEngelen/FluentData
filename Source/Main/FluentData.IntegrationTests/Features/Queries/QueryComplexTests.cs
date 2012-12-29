@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using FluentData._Helpers;
+using FluentData;
+using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentData.Features.Queries
+namespace IntegrationTests.Features.Queries
 {
 	[TestClass]
     public class QueryComplexTests : BaseSqlServerIntegrationTest
