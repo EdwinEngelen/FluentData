@@ -257,7 +257,7 @@ namespace FluentData
 
 		public object GetValue(string name)
 		{
-			return InnerReader.GetValue(GetOrdinal(name));
+			return GetValue(GetOrdinal(name));
 		}
 
 		public int GetValues(object[] values)

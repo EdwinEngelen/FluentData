@@ -87,6 +87,13 @@
     <Compile Include="Features\Builders\Insert\InsertBuilderDynamicTests.cs" />
     <Compile Include="Features\Builders\Insert\InsertBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\Insert\InsertBuilderTests.cs" />
+    <Compile Include="Features\Builders\Select\FromTests.cs" />
+    <Compile Include="Features\Builders\Select\JoinTests.cs" />
+    <Compile Include="Features\Builders\Select\ManualMappingTests.cs" />
+    <Compile Include="Features\Builders\Select\OrderByTests.cs" />
+    <Compile Include="Features\Builders\Select\PagingTests.cs" />
+    <Compile Include="Features\Builders\Select\QueryManyDynamicTests.cs" />
+    <Compile Include="Features\Builders\Select\SelectTests.cs" />
     <Compile Include="Features\Builders\StoredProcedure\StoredProcedureBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\StoredProcedure\StoredProcedureTests.cs" />
     <Compile Include="Features\Builders\Update\UpdateBuilderDynamicTests.cs" />
@@ -107,11 +114,13 @@
     <Compile Include="Features\Parameters\OutParametersTests.cs" />
     <Compile Include="Features\Queries\QueryDynamic.cs" />
     <Compile Include="Features\Queries\QueryDataTableTests.cs" />
+    <Compile Include="Features\Queries\QueryManyTests.cs" />
+    <Compile Include="Features\Queries\QuerySingleTests.cs" />
     <Compile Include="Features\Queries\QueryTests.cs" />
     <Compile Include="Features\Queries\QueryComplexTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Features\Queries\QuerySingleComplexTests.cs" />
+    <Compile Include="Features\Queries\QueryComplexSingleTests.cs" />
     <Compile Include="Features\Settings\CommandTimeoutTests.cs" />
     <Compile Include="Features\Events\OnConnectionClosedTests.cs" />
     <Compile Include="Features\Events\OnConnectionOpenedTests.cs" />
@@ -185,9 +194,8 @@
     <None Include="_Data\FluentDataDB" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Builders\Insert\" />
-    <Folder Include="Builders\StoredProcedure\" />
-    <Folder Include="Builders\Update\" />
+    <Folder Include="Features\Builders\StoredProcedure\Dynamic\" />
+    <Folder Include="Features\Builders\StoredProcedure\Generic\" />
     <Folder Include="Providers\SqlServerCompact\Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

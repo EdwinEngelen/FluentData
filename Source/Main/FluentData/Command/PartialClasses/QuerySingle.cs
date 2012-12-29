@@ -10,7 +10,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleHandler<TEntity>().ExecuteSingle(Data, customMapper, null);
+				item = new QueryManyHandler<TEntity>().ExecuteSingle(Data, customMapper, null);
 			});
 
 			return item;
@@ -22,7 +22,7 @@ namespace FluentData
 
 			Data.ExecuteQueryHandler.ExecuteQuery(true, () =>
 			{
-				item = new QuerySingleHandler<TEntity>().ExecuteSingle(Data, null, customMapper);
+				item = new QueryManyHandler<TEntity>().ExecuteSingle(Data, null, customMapper);
 			});
 
 			return item;

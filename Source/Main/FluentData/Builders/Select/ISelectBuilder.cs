@@ -6,7 +6,7 @@ namespace FluentData
 {
 	public interface ISelectBuilder<TEntity>
 	{
-		BuilderData Data { get; set; }
+		SelectBuilderData Data { get; set; }
 		ISelectBuilder<TEntity> Select(string sql);
 		ISelectBuilder<TEntity> From(string sql);
 		ISelectBuilder<TEntity> Where(string sql);

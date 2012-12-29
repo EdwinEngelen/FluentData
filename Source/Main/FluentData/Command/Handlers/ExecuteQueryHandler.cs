@@ -18,7 +18,6 @@ namespace FluentData
 			try
 			{
 				PrepareDbCommand(useReader);
-
 				action();
 
 				if (_command.Data.Context.Data.OnExecuted != null)

@@ -6,26 +6,23 @@ namespace FluentData
 {
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
 	{
-		public BuilderData Data { get; set; }
+		public SelectBuilderData Data { get; set; }
 		protected ActionsHandler Actions { get; set; }
-
-		private IDbCommand Command
-		{
-			get
-			{
-				if (Data.PagingItemsPerPage > 0
-					&& string.IsNullOrEmpty(Data.OrderBy))
-					throw new FluentDataException("Order by must defined when using Paging.");
-
-				Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
-				return Data.Command;
-			}
-		}
 
 		public SelectBuilder(IDbCommand command)
 		{
-			Data =  new BuilderData(command, "");
+			Data =  new SelectBuilderData(command, "");
 			Actions = new ActionsHandler(Data);
+		}
+
+		private IDbCommand GetPreparedDbCommand()
+		{
+			if (Data.PagingItemsPerPage > 0
+					&& string.IsNullOrEmpty(Data.OrderBy))
+				throw new FluentDataException("Order by must defined when using Paging.");
+
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+			return Data.Command;
 		}
 
 		public ISelectBuilder<TEntity> Select(string sql)
@@ -100,57 +97,57 @@ namespace FluentData
 		}
 		public List<TEntity> QueryMany(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public List<TEntity> QueryMany(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QueryMany<TEntity>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity>(customMapper);
 		}
 
 		public TList QueryMany<TList>(Action<TEntity, IDataReader> customMapper = null) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public TList QueryMany<TList>(Action<TEntity, dynamic> customMapper) where TList : IList<TEntity>
 		{
-			return Command.QueryMany<TEntity, TList>(customMapper);
+			return GetPreparedDbCommand().QueryMany<TEntity, TList>(customMapper);
 		}
 
 		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, IDataReader> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public void QueryComplexMany(IList<TEntity> list, Action<IList<TEntity>, dynamic> customMapper)
 		{
-			Command.QueryComplexMany<TEntity>(list, customMapper);
+			GetPreparedDbCommand().QueryComplexMany<TEntity>(list, customMapper);
 		}
 
 		public TEntity QuerySingle(Action<TEntity, IDataReader> customMapper = null)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QuerySingle(Action<TEntity, dynamic> customMapper)
 		{
-			return Command.QuerySingle<TEntity>(customMapper);
+			return GetPreparedDbCommand().QuerySingle<TEntity>(customMapper);
 		}
 
 		public TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public TEntity QueryComplexSingle(Func<dynamic, TEntity> customMapper)
 		{
-			return Command.QueryComplexSingle(customMapper);
+			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
 
 		public DataTable QueryManyDataTable()
 		{
-			return Command.QueryManyDataTable();
+			return GetPreparedDbCommand().QueryManyDataTable();
 		}
 	}
 }

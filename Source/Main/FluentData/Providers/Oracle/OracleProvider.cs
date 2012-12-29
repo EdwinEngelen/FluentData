@@ -55,7 +55,7 @@ namespace FluentData
 			return name + " " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			if (data.PagingItemsPerPage == 0)
@@ -124,18 +124,19 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.Provider.GetDbTypeForClrType(typeof(T)));
 			command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
-			var lastId = default(T);
+
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
 				command.Data.InnerCommand.ExecuteNonQuery();
 
-				lastId = command.ParameterValue<T>("FluentDataLastId");
+				lastId = command.ParameterValue<object>("FluentDataLastId");
 			});
 
 			return lastId;

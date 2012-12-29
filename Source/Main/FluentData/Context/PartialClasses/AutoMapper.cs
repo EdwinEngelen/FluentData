@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System;
+
+namespace FluentData
 {
 	public partial class DbContext
 	{

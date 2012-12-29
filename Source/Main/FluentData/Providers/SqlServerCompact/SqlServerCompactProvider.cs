@@ -55,7 +55,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = "";
 			sql = "select " + data.Select;
@@ -103,13 +103,20 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				lastId = HandleExecuteReturnLastId<T>(command);
+				var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
+
+				if (recordsAffected > 0)
+				{
+					command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
+
+					lastId = command.Data.InnerCommand.ExecuteScalar();
+				}
 			});
 
 			return lastId;
@@ -122,25 +129,9 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("["))
+				return name;
 			return "[" + name + "]";
-		}
-
-		private T HandleExecuteReturnLastId<T>(IDbCommand command)
-		{
-			var recordsAffected = command.Data.InnerCommand.ExecuteNonQuery();
-
-			var lastId = default(T);
-
-			if (recordsAffected > 0)
-			{
-				command.Data.InnerCommand.CommandText = "select cast(@@identity as int)";
-
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				lastId = (T) value;
-			}
-
-			return lastId;
 		}
 	}
 }

@@ -56,7 +56,7 @@ namespace FluentData
 			return name + " as " + alias;
 		}
 
-		public string GetSqlForSelectBuilder(BuilderData data)
+		public string GetSqlForSelectBuilder(SelectBuilderData data)
 		{
 			var sql = new StringBuilder();
 			if (data.PagingCurrentPage == 1)
@@ -129,23 +129,18 @@ namespace FluentData
 			return new DbTypeMapper().GetDbTypeForClrType(clrType);
 		}
 
-		public T ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
+		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
 			if(command.Data.Sql[command.Data.Sql.Length - 1] != ';')
 				command.Sql(";");
 
 			command.Sql("select SCOPE_IDENTITY()");
 
-			var lastId = default(T);
+			object lastId = null;
 
 			command.Data.ExecuteQueryHandler.ExecuteQuery(false, () =>
 			{
-				var value = command.Data.InnerCommand.ExecuteScalar();
-
-				if (value.GetType() == typeof(T))
-					lastId = (T) value;
-
-				lastId = (T) Convert.ChangeType(value, typeof(T));
+				lastId = command.Data.InnerCommand.ExecuteScalar();
 			});
 
 			return lastId;
@@ -157,6 +152,8 @@ namespace FluentData
 
 		public string EscapeColumnName(string name)
 		{
+			if (name.Contains("["))
+				return name;
 			return "[" + name + "]";
 		}
 	}

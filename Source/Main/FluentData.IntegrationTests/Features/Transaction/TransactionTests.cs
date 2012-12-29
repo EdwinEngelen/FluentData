@@ -1,5 +1,6 @@
 ﻿using FluentData._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace FluentData.Features.Transaction
 {
@@ -63,5 +64,16 @@ namespace FluentData.Features.Transaction
 			}
 		}
 
+		[TestMethod]
+		public void Test()
+		{
+			float test = 1.1f;
+
+			
+			var testInt = (int) Convert.ChangeType(test, TypeCode.Int32);
+			
+			Assert.IsTrue(true);
+			//FluentData.BuilderTableColumn	
+		}
 	}
 }
