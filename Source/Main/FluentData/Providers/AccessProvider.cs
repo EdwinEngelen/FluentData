@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using System.Text;
+using System.Data.Common;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -8,7 +8,19 @@ namespace FluentData
 {
 	public class AccessProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{
 			get
 			{
@@ -39,11 +51,6 @@ namespace FluentData
 		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
 		{
 			get { return true; }
-		}
-
-		public IDbConnection CreateConnection(string connectionString)
-		{
-			return ConnectionFactory.CreateConnection(ProviderName, connectionString);
 		}
 
 		public string GetParameterName(string parameterName)
@@ -107,7 +114,7 @@ namespace FluentData
 
 		public void OnCommandExecuting(IDbCommand command)
 		{
-			
+
 		}
 
 		public string EscapeColumnName(string name)

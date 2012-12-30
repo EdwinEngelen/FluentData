@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Linq;
 
 namespace FluentData
 {
@@ -12,15 +11,20 @@ namespace FluentData
 				IDbConnection connection = null;
 
 				if (Data.UseTransaction
-					|| Data.UseSharedConnection)
+				    || Data.UseSharedConnection)
 				{
 					if (Data.Connection == null)
-						Data.Connection = Data.Provider.CreateConnection(Data.ConnectionString);
+					{
+						Data.Connection = Data.Provider.CreateConnection();
+						Data.Connection.ConnectionString = Data.ConnectionString;
+					}
 					connection = Data.Connection;
 				}
 				else
-					connection = Data.Provider.CreateConnection(Data.ConnectionString);
-
+				{
+					connection = Data.Provider.CreateConnection();
+					connection.ConnectionString = Data.ConnectionString;
+				}
 				var cmd = connection.CreateCommand();
 				cmd.Connection = connection;
 

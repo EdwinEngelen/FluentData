@@ -2609,15 +2609,20 @@ namespace FluentData
 				IDbConnection connection = null;
 
 				if (Data.UseTransaction
-					|| Data.UseSharedConnection)
+				    || Data.UseSharedConnection)
 				{
 					if (Data.Connection == null)
-						Data.Connection = Data.Provider.CreateConnection(Data.ConnectionString);
+					{
+						Data.Connection = Data.Provider.CreateConnection();
+						Data.Connection.ConnectionString = Data.ConnectionString;
+					}
 					connection = Data.Connection;
 				}
 				else
-					connection = Data.Provider.CreateConnection(Data.ConnectionString);
-
+				{
+					connection = Data.Provider.CreateConnection();
+					connection.ConnectionString = Data.ConnectionString;
+				}
 				var cmd = connection.CreateCommand();
 				cmd.Connection = connection;
 
@@ -2897,7 +2902,19 @@ namespace FluentData
 
 	public class AccessProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{
 			get
 			{
@@ -2928,11 +2945,6 @@ namespace FluentData
 		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
 		{
 			get { return true; }
-		}
-
-		public IDbConnection CreateConnection(string connectionString)
-		{
-			return ConnectionFactory.CreateConnection(ProviderName, connectionString);
 		}
 
 		public string GetParameterName(string parameterName)
@@ -2996,7 +3008,7 @@ namespace FluentData
 
 		public void OnCommandExecuting(IDbCommand command)
 		{
-			
+
 		}
 
 		public string EscapeColumnName(string name)
@@ -3149,13 +3161,26 @@ namespace FluentData
 
 	public class DB2Provider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{
 			get
 			{
 				return "IBM.Data.DB2";
 			}
 		}
+
 		public bool SupportsOutputParameters
 		{
 			get { return true; }
@@ -3272,13 +3297,26 @@ namespace FluentData
 
 	public class PostgreSqlProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{ 
 			get
 			{
 				return "Npgsql";
 			} 
 		}
+
 		public bool SupportsOutputParameters
 		{
 			get { return true; }
@@ -3396,13 +3434,26 @@ namespace FluentData
 
 	public class MySqlProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{ 
 			get
 			{
 				return "MySql.Data.MySqlClient";
 			} 
 		}
+
 		public bool SupportsOutputParameters
 		{
 			get { return true; }
@@ -3521,13 +3572,12 @@ namespace FluentData
 
 	public interface IDbProvider
 	{
-		string ProviderName { get; }
+		IDbConnection CreateConnection();
 		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
 		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
-		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
 		string GetSelectBuilderAlias(string name, string alias);
 		string GetSqlForSelectBuilder(SelectBuilderData data);
@@ -3543,7 +3593,19 @@ namespace FluentData
 
 	public class OracleProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+		
+		public static string ProviderName
 		{ 
 			get
 			{
@@ -3699,13 +3761,26 @@ namespace FluentData
 
 	public class SqliteProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{ 
 			get
 			{
 				return "System.Data.SQLite";
 			} 
 		}
+
 		public bool SupportsOutputParameters
 		{
 			get { return true; }
@@ -3824,7 +3899,19 @@ namespace FluentData
 
 	public class SqlServerCompactProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{
 			get
 			{
@@ -3954,7 +4041,19 @@ namespace FluentData
 
 	public class SqlServerProvider : IDbProvider
 	{
-		public string ProviderName
+		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+
+		private static DbProviderFactory CreateDbProviderFactory()
+		{
+			return DbProviderFactories.GetFactory(ProviderName);
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return _dbProviderFactory.Value.CreateConnection();
+		}
+
+		public static string ProviderName
 		{ 
 			get
 			{

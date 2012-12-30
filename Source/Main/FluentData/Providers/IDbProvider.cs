@@ -5,13 +5,12 @@ namespace FluentData
 {
 	public interface IDbProvider
 	{
-		string ProviderName { get; }
+		IDbConnection CreateConnection();
 		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
 		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
-		IDbConnection CreateConnection(string connectionString);
 		string GetParameterName(string parameterName);
 		string GetSelectBuilderAlias(string name, string alias);
 		string GetSqlForSelectBuilder(SelectBuilderData data);
