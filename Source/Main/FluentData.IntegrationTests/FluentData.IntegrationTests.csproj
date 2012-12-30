@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseSqlServerIntegrationTest.cs" />
+    <Compile Include="Documentation\SelectDataTests.cs" />
     <Compile Include="Experiements\Tests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderTests.cs" />
