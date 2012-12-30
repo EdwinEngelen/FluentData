@@ -10,7 +10,6 @@ namespace FluentData
 		long GetBytes(string name, long fieldOffset, byte[] buffer, int bufferoffset, int length);
 		char GetChar(string name);
 		long GetChars(string name, long fieldoffset, char[] buffer, int bufferoffset, int length);
-		global::System.Data.IDataReader GetData(string name);
 		string GetDataTypeName(string name);
 		DateTime GetDateTime(string name);
 		decimal GetDecimal(string name);

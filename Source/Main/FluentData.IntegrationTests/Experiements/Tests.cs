@@ -10,12 +10,7 @@ namespace IntegrationTests.Experiements
 		[TestMethod]
 		public void Test()
 		{
-			// new DbContext().M
-			//var context = new DbContext().ConnectionStringName("Database", new SqlServerProvider());
 
-			//dynamic test = new ExpandoObject();
-			//context.Data.
-			//var categories = FluentData.PropertyExpressionParser<>
 		}
 	}
 }
