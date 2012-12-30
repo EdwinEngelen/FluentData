@@ -1,4 +1,6 @@
-﻿namespace FluentData
+﻿using System;
+
+namespace FluentData
 {
 	internal class UpdateBuilder : BaseUpdateBuilder, IUpdateBuilder, IInsertUpdateBuilder
 	{
@@ -22,6 +24,12 @@
 		IInsertUpdateBuilder IInsertUpdateBuilder.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueAction(columnName, value, parameterType, size);
+			return this;
+		}
+
+		public IUpdateBuilder Fill(Action<IInsertUpdateBuilder> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 	}

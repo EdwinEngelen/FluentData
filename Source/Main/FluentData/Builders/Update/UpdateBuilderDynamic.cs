@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Dynamic;
 
 namespace FluentData
 {
 	internal class UpdateBuilderDynamic : BaseUpdateBuilder, IUpdateBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
+		public dynamic Item { get; private set; }
+
 		internal UpdateBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
 			: base(dbProvider, command, name)
 		{
-			Data.Item = (IDictionary<string, object>) item;
+			Data.Item = item;
+			Item = item;
 		}
 
 		public virtual IUpdateBuilderDynamic Where(string columnName, object value, DataTypes parameterType, int size)
@@ -51,6 +54,12 @@ namespace FluentData
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string propertyName, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
+			return this;
+		}
+
+		public IUpdateBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 	}

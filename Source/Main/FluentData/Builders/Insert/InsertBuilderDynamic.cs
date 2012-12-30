@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Dynamic;
 
 namespace FluentData
 {
 	internal class InsertBuilderDynamic : BaseInsertBuilder, IInsertBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
+		public dynamic Item { get; private set; }
+
 		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
 			Data.Item = item;
+			Item = item;
 		}
 
 		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
@@ -26,6 +29,12 @@ namespace FluentData
 		public IInsertBuilderDynamic AutoMap(params string[] ignoreProperties)
 		{
 			Actions.AutoMapDynamicTypeColumnsAction(ignoreProperties);
+			return this;
+		}
+
+		public IInsertBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 

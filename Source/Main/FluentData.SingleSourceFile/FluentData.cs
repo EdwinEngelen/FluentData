@@ -1,6 +1,6 @@
 ﻿
 // FluentData version 2.4.0.0.
-// Copyright ©  2012 - The Fluent Data Project.
+// Copyright ©  2013 - The Fluent Data Project.
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
 using System;
@@ -214,17 +214,22 @@ namespace FluentData
 
 	public interface IInsertUpdateBuilder
 	{
+		BuilderData Data { get; }
 		IInsertUpdateBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertUpdateBuilderDynamic
 	{
+		BuilderData Data { get; }
+		dynamic Item { get; }
 		IInsertUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
 
 	public interface IInsertUpdateBuilder<T>
 	{
+		BuilderData Data { get; }
+		T Item { get; }
 		IInsertUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 	}
@@ -275,14 +280,23 @@ namespace FluentData
 			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
+
+		public IInsertBuilder Fill(Action<IInsertUpdateBuilder> fillMethod)
+		{
+			fillMethod(this);
+			return this;
+		}
 	}
 
 	internal class InsertBuilderDynamic : BaseInsertBuilder, IInsertBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
+		public dynamic Item { get; private set; }
+
 		internal InsertBuilderDynamic(IDbCommand command, string name, ExpandoObject item)
 			: base(command, name)
 		{
 			Data.Item = item;
+			Item = item;
 		}
 
 		public IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType, int size)
@@ -303,6 +317,12 @@ namespace FluentData
 			return this;
 		}
 
+		public IInsertBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod)
+		{
+			fillMethod(this);
+			return this;
+		}
+
 		IInsertUpdateBuilderDynamic IInsertUpdateBuilderDynamic.Column(string columnName, object value, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueAction(columnName, value, parameterType, size);
@@ -318,10 +338,13 @@ namespace FluentData
 
 	internal class InsertBuilder<T> : BaseInsertBuilder, IInsertBuilder<T>, IInsertUpdateBuilder<T>
 	{
+		public T Item { get; private set; }
+
 		internal InsertBuilder(IDbCommand command, string name, T item)
 			: base(command, name)
 		{
 			Data.Item = item;
+			Item = item;
 		}
 
 		public IInsertBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
@@ -333,6 +356,12 @@ namespace FluentData
 		public IInsertBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueAction(expression, parameterType, size);
+			return this;
+		}
+
+		public IInsertBuilder<T> Fill(Action<IInsertUpdateBuilder<T>> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 
@@ -359,22 +388,27 @@ namespace FluentData
 	{
 		BuilderData Data { get; }
 		IInsertBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertBuilder Fill(Action<IInsertUpdateBuilder> fillMethod);
 	}
 
 	public interface IInsertBuilder<T> : IExecute, IExecuteReturnLastId
 	{
 		BuilderData Data { get; }
+		T Item { get; }
 		IInsertBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IInsertBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertBuilder<T> Fill(Action<IInsertUpdateBuilder<T>> fillMethod);
 	}
 
 	public interface IInsertBuilderDynamic : IExecute, IExecuteReturnLastId
 	{
 		BuilderData Data { get; }
+		dynamic Item { get; }
 		IInsertBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IInsertBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IInsertBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IInsertBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod);	
 	}
 
 	public interface ISelectBuilder<TEntity>
@@ -843,26 +877,31 @@ namespace FluentData
 		BuilderData Data { get; }
 		IUpdateBuilder Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder Fill(Action<IInsertUpdateBuilder> fillMethod);
 	}
 
 	public interface IUpdateBuilderDynamic : IExecute
 	{
 		BuilderData Data { get; }
+		dynamic Item { get; }		
 		IUpdateBuilderDynamic AutoMap(params string[] ignoreProperties);
 		IUpdateBuilderDynamic Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilderDynamic Column(string propertyName, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilderDynamic Where(string name, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilderDynamic Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod);
 	}
 
 	public interface IUpdateBuilder<T> : IExecute
 	{
 		BuilderData Data { get; }
+		T Item { get; }
 		IUpdateBuilder<T> AutoMap(params Expression<Func<T, object>>[] ignoreProperties);
 		IUpdateBuilder<T> Where(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder<T> Where(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType = DataTypes.Object, int size = 0);
 		IUpdateBuilder<T> Column(Expression<Func<T, object>> expression, DataTypes parameterType = DataTypes.Object, int size = 0);
+		IUpdateBuilder<T> Fill(Action<IInsertUpdateBuilder<T>> fillMethod);	
 	}
 
 	internal class UpdateBuilder : BaseUpdateBuilder, IUpdateBuilder, IInsertUpdateBuilder
@@ -889,14 +928,23 @@ namespace FluentData
 			Actions.ColumnValueAction(columnName, value, parameterType, size);
 			return this;
 		}
+
+		public IUpdateBuilder Fill(Action<IInsertUpdateBuilder> fillMethod)
+		{
+			fillMethod(this);
+			return this;
+		}
 	}
 
 	internal class UpdateBuilderDynamic : BaseUpdateBuilder, IUpdateBuilderDynamic, IInsertUpdateBuilderDynamic
 	{
+		public dynamic Item { get; private set; }
+
 		internal UpdateBuilderDynamic(IDbProvider dbProvider, IDbCommand command, string name, ExpandoObject item)
 			: base(dbProvider, command, name)
 		{
-			Data.Item = (IDictionary<string, object>) item;
+			Data.Item = item;
+			Item = item;
 		}
 
 		public virtual IUpdateBuilderDynamic Where(string columnName, object value, DataTypes parameterType, int size)
@@ -941,14 +989,23 @@ namespace FluentData
 			Actions.ColumnValueDynamic((ExpandoObject)Data.Item, propertyName, parameterType, size);
 			return this;
 		}
+
+		public IUpdateBuilderDynamic Fill(Action<IInsertUpdateBuilderDynamic> fillMethod)
+		{
+			fillMethod(this);
+			return this;
+		}
 	}
 
 	internal class UpdateBuilder<T> : BaseUpdateBuilder, IUpdateBuilder<T>, IInsertUpdateBuilder<T>
 	{
+		public T Item { get; private set; }
+
 		internal UpdateBuilder(IDbProvider provider, IDbCommand command, string name, T item)
 			: base(provider, command, name)
 		{
 			Data.Item = item;
+			Item = item;
 		}
 
 		public IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
@@ -990,6 +1047,12 @@ namespace FluentData
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueAction(expression, parameterType, size);
+			return this;
+		}
+
+		public IUpdateBuilder<T> Fill(Action<IInsertUpdateBuilder<T>> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 	}
@@ -1571,8 +1634,8 @@ namespace FluentData
 	{
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
-				throw new FluentDataException("The selected database does not support this method.");
+			if (Data.Context.Data.Provider.RequiresIdentityColumn && string.IsNullOrEmpty(identityColumnName))
+				throw new FluentDataException("The identity column must be given");
 
 			var value = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
 			T lastId;
@@ -2902,7 +2965,7 @@ namespace FluentData
 
 	public class AccessProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -2942,9 +3005,9 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public string GetParameterName(string parameterName)
@@ -3161,7 +3224,7 @@ namespace FluentData
 
 	public class DB2Provider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3201,9 +3264,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -3297,7 +3360,7 @@ namespace FluentData
 
 	public class PostgreSqlProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3337,9 +3400,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -3434,7 +3497,7 @@ namespace FluentData
 
 	public class MySqlProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3474,9 +3537,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -3577,7 +3640,7 @@ namespace FluentData
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
-		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
+		bool RequiresIdentityColumn { get; }
 		string GetParameterName(string parameterName);
 		string GetSelectBuilderAlias(string name, string alias);
 		string GetSqlForSelectBuilder(SelectBuilderData data);
@@ -3593,7 +3656,7 @@ namespace FluentData
 
 	public class OracleProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3604,7 +3667,7 @@ namespace FluentData
 		{
 			return _dbProviderFactory.Value.CreateConnection();
 		}
-		
+
 		public static string ProviderName
 		{ 
 			get
@@ -3633,9 +3696,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -3761,7 +3824,7 @@ namespace FluentData
 
 	public class SqliteProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3801,9 +3864,9 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -3899,7 +3962,7 @@ namespace FluentData
 
 	public class SqlServerCompactProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -3939,9 +4002,9 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)
@@ -4041,7 +4104,7 @@ namespace FluentData
 
 	public class SqlServerProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -4081,9 +4144,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)

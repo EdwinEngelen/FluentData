@@ -18,7 +18,7 @@
 string sourcePath = @"C:\CodePlex\FluentData\Source\Main\FluentData\";
 
 WriteLine(string.Format("// {0} version {1}.", assemblyInfoProperty(sourcePath, "AssemblyTitle"), assemblyInfoProperty(sourcePath, "AssemblyVersion")));
-WriteLine("// Copyright ©  2012 - The Fluent Data Project.");
+WriteLine("// Copyright ©  2013 - The Fluent Data Project.");
 WriteLine("// See http://fluentdata.codeplex.com for more information and licensing terms.");
 #>
 

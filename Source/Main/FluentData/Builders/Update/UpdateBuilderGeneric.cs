@@ -5,10 +5,13 @@ namespace FluentData
 {
 	internal class UpdateBuilder<T> : BaseUpdateBuilder, IUpdateBuilder<T>, IInsertUpdateBuilder<T>
 	{
+		public T Item { get; private set; }
+
 		internal UpdateBuilder(IDbProvider provider, IDbCommand command, string name, T item)
 			: base(provider, command, name)
 		{
 			Data.Item = item;
+			Item = item;
 		}
 
 		public IUpdateBuilder<T> Column(string columnName, object value, DataTypes parameterType, int size)
@@ -50,6 +53,12 @@ namespace FluentData
 		IInsertUpdateBuilder<T> IInsertUpdateBuilder<T>.Column(Expression<Func<T, object>> expression, DataTypes parameterType, int size)
 		{
 			Actions.ColumnValueAction(expression, parameterType, size);
+			return this;
+		}
+
+		public IUpdateBuilder<T> Fill(Action<IInsertUpdateBuilder<T>> fillMethod)
+		{
+			fillMethod(this);
 			return this;
 		}
 	}

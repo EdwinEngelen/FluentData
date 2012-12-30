@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Documentation
 {
 	[TestClass]
-    public class InsertUpdateDataTests : BaseSqlServerIntegrationTest
+	public class InsertUpdateDataTests : BaseSqlServerIntegrationTest
 	{
 		[TestMethod]
 		public void Test()
@@ -14,16 +14,13 @@ namespace IntegrationTests.Documentation
 			product.Name = "The Warren Buffet Way";
 			product.CategoryId = 1;
 
-			var insertBuilder = Context.Insert<Product>("Product", product);
-			FillBuilder((IInsertUpdateBuilder<Product>) insertBuilder);
-			product.ProductId = insertBuilder.ExecuteReturnLastId<int>();
+			product.ProductId = Context.Insert<Product>("Product", product)
+												.Fill(FillBuilder)
+												.ExecuteReturnLastId<int>();
 
 			Assert.IsTrue(product.ProductId > 0);
 
-			var updateBuilder = Context.Update<Product>("Product", product);
-			FillBuilder((IInsertUpdateBuilder<Product>) updateBuilder);
-
-			int rowsAffected = updateBuilder.Where(x => x.ProductId).Execute();
+			var rowsAffected = Context.Update<Product>("Product", product).Fill(FillBuilder).Where(x => x.ProductId).Execute();
 
 			Assert.IsTrue(rowsAffected > 0);
 		}
