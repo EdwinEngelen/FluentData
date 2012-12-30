@@ -9,7 +9,7 @@ namespace FluentData
 {
 	public class SqliteProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -49,9 +49,9 @@ namespace FluentData
 			get { return false; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)

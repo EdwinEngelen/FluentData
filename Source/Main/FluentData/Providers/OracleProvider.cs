@@ -8,7 +8,7 @@ namespace FluentData
 {
 	public class OracleProvider : IDbProvider
 	{
-		private static Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
+		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
 
 		private static DbProviderFactory CreateDbProviderFactory()
 		{
@@ -19,7 +19,7 @@ namespace FluentData
 		{
 			return _dbProviderFactory.Value.CreateConnection();
 		}
-		
+
 		public static string ProviderName
 		{ 
 			get
@@ -48,9 +48,9 @@ namespace FluentData
 			get { return true; }
 		}
 
-		public bool SupportsExecuteReturnLastIdWithNoIdentityColumn
+		public bool RequiresIdentityColumn
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public IDbConnection CreateConnection(string connectionString)

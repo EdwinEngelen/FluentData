@@ -6,8 +6,8 @@ namespace FluentData
 	{
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (!Data.Context.Data.Provider.SupportsExecuteReturnLastIdWithNoIdentityColumn && string.IsNullOrEmpty(identityColumnName))
-				throw new FluentDataException("The selected database does not support this method.");
+			if (Data.Context.Data.Provider.RequiresIdentityColumn && string.IsNullOrEmpty(identityColumnName))
+				throw new FluentDataException("The identity column must be given");
 
 			var value = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
 			T lastId;

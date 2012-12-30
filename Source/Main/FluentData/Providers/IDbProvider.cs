@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 
 namespace FluentData
 {
@@ -10,7 +11,7 @@ namespace FluentData
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
 		bool SupportsStoredProcedures { get; }
-		bool SupportsExecuteReturnLastIdWithNoIdentityColumn { get; }
+		bool RequiresIdentityColumn { get; }
 		string GetParameterName(string parameterName);
 		string GetSelectBuilderAlias(string name, string alias);
 		string GetSqlForSelectBuilder(SelectBuilderData data);
