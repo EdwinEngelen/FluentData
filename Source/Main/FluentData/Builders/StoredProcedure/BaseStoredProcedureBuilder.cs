@@ -86,10 +86,5 @@ namespace FluentData
 		{
 			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
-
-		public DataTable QueryManyDataTable()
-		{
-			return GetPreparedDbCommand().QueryManyDataTable();
-		}
 	}
 }

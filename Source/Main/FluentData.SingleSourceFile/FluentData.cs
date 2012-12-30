@@ -1,5 +1,5 @@
 ﻿
-// FluentData version 2.4.0.0.
+// FluentData version 3.0.0.0.
 // Copyright ©  2013 - The Fluent Data Project.
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
@@ -436,7 +436,6 @@ namespace FluentData
 		TEntity QuerySingle(Action<TEntity, dynamic> customMapper);
 		TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper);
 		TEntity QueryComplexSingle(Func<dynamic, TEntity> customMapper);
-		DataTable QueryManyDataTable();
 	}
 
 	internal class SelectBuilder<TEntity> : ISelectBuilder<TEntity>
@@ -579,11 +578,6 @@ namespace FluentData
 		{
 			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
 		}
-
-		public DataTable QueryManyDataTable()
-		{
-			return GetPreparedDbCommand().QueryManyDataTable();
-		}
 	}
 
 	public class SelectBuilderData : BuilderData
@@ -701,11 +695,6 @@ namespace FluentData
 		public TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper)
 		{
 			return GetPreparedDbCommand().QueryComplexSingle(customMapper);
-		}
-
-		public DataTable QueryManyDataTable()
-		{
-			return GetPreparedDbCommand().QueryManyDataTable();
 		}
 	}
 
@@ -1269,9 +1258,30 @@ namespace FluentData
 		TableDirect = 512,
 	}
 
+	internal class QueryDataTableHandler<TEntity> : IQueryTypeHandler<TEntity>
+	{
+		private readonly DbCommandData _data;
+
+		public bool IterateDataReader { get { return false; } }
+
+		public QueryDataTableHandler(DbCommandData data)
+		{
+			_data = data;
+		}
+
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		{
+			var dataTable = new DataTable();
+			dataTable.Load(_data.Reader.InnerReader, LoadOption.OverwriteChanges);
+			
+			return dataTable;
+		}
+	}
+
 	internal interface IQueryTypeHandler<TEntity>
 	{
-		TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
+		bool IterateDataReader { get; }
+		object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
 	}
 
 	internal class QueryCustomEntityHandler<TEntity> : IQueryTypeHandler<TEntity>
@@ -1285,7 +1295,9 @@ namespace FluentData
 			_autoMapper = new AutoMapper(_data, typeof(TEntity));
 		}
 
-		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		public bool IterateDataReader { get { return true; } }
+
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var item = (TEntity)_data.Context.Data.EntityFactory.Create(typeof(TEntity));
 
@@ -1304,15 +1316,17 @@ namespace FluentData
 		private readonly DbCommandData _data;
 		private readonly DynamicTypeAutoMapper _autoMapper;
 
+		public bool IterateDataReader { get { return true; } }
+
 		public QueryDynamicHandler(DbCommandData data)
 		{
 			_data = data;
 			_autoMapper = new DynamicTypeAutoMapper(_data.Reader.InnerReader);
 		}
 
-		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
-			dynamic item = _autoMapper.AutoMap();
+			var item = _autoMapper.AutoMap();
 			return item;
 		}
 	}
@@ -1322,12 +1336,14 @@ namespace FluentData
 		private readonly DbCommandData _data;
 		private Type _fieldType;
 
+		public bool IterateDataReader { get { return true; } }
+
 		public QueryScalarHandler(DbCommandData data)
 		{
 			_data = data;
 		}
 
-		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var value = _data.Reader.GetValue(0);
 			if (_fieldType == null)
@@ -1380,7 +1396,6 @@ namespace FluentData
         TEntity QuerySingle<TEntity>(Action<TEntity, dynamic> customMapper);
         TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
         TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper);
-        DataTable QueryManyDataTable();
     }
 
 	internal class AutoMapper
@@ -1989,6 +2004,8 @@ namespace FluentData
 		    _data = data;
 			if (typeof(TEntity) == typeof(object) || typeof(TEntity) == typeof(ExpandoObject))
 				_typeHandler = new QueryDynamicHandler<TEntity>(data);
+			else if (typeof(TEntity) == typeof(DataTable))
+				_typeHandler = new QueryDataTableHandler<TEntity>(data);
 			else if (ReflectionHelper.IsCustomEntity<TEntity>())
 				_typeHandler = new QueryCustomEntityHandler<TEntity>(data);
 			else
@@ -2002,9 +2019,18 @@ namespace FluentData
 		{
 			var items = (TList)_data.Context.Data.EntityFactory.Create(typeof(TList));
 		    var reader = _data.Reader.InnerReader;
-			while (reader.Read())
+			
+			if (_typeHandler.IterateDataReader)
 			{
-				var item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+				while (reader.Read())
+				{
+					var item = (TEntity) _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+					items.Add(item);
+				}
+			}
+			else
+			{
+				var item = (TEntity)_typeHandler.HandleType(customMapperReader, customMapperDynamic);
 				items.Add(item);
 			}
 
@@ -2015,8 +2041,8 @@ namespace FluentData
 								   Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var item = default(TEntity);
-			if (_data.Reader.InnerReader.Read())
-				item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+			if (!_typeHandler.IterateDataReader || _data.Reader.InnerReader.Read())
+				item = (TEntity) _typeHandler.HandleType(customMapperReader, customMapperDynamic);
 				
 			return item;
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 
 namespace FluentData
@@ -14,6 +15,8 @@ namespace FluentData
 		    _data = data;
 			if (typeof(TEntity) == typeof(object) || typeof(TEntity) == typeof(ExpandoObject))
 				_typeHandler = new QueryDynamicHandler<TEntity>(data);
+			else if (typeof(TEntity) == typeof(DataTable))
+				_typeHandler = new QueryDataTableHandler<TEntity>(data);
 			else if (ReflectionHelper.IsCustomEntity<TEntity>())
 				_typeHandler = new QueryCustomEntityHandler<TEntity>(data);
 			else
@@ -27,9 +30,18 @@ namespace FluentData
 		{
 			var items = (TList)_data.Context.Data.EntityFactory.Create(typeof(TList));
 		    var reader = _data.Reader.InnerReader;
-			while (reader.Read())
+			
+			if (_typeHandler.IterateDataReader)
 			{
-				var item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+				while (reader.Read())
+				{
+					var item = (TEntity) _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+					items.Add(item);
+				}
+			}
+			else
+			{
+				var item = (TEntity)_typeHandler.HandleType(customMapperReader, customMapperDynamic);
 				items.Add(item);
 			}
 
@@ -40,8 +52,8 @@ namespace FluentData
 								   Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var item = default(TEntity);
-			if (_data.Reader.InnerReader.Read())
-				item = _typeHandler.HandleType(customMapperReader, customMapperDynamic);
+			if (!_typeHandler.IterateDataReader || _data.Reader.InnerReader.Read())
+				item = (TEntity) _typeHandler.HandleType(customMapperReader, customMapperDynamic);
 				
 			return item;
 		}

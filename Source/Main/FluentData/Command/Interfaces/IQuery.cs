@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace FluentData
 {
@@ -16,6 +15,5 @@ namespace FluentData
         TEntity QuerySingle<TEntity>(Action<TEntity, dynamic> customMapper);
         TEntity QueryComplexSingle<TEntity>(Func<IDataReader, TEntity> customMapper);
         TEntity QueryComplexSingle<TEntity>(Func<dynamic, TEntity> customMapper);
-        DataTable QueryManyDataTable();
     }
 }

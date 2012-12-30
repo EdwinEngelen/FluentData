@@ -13,7 +13,9 @@ namespace FluentData
 			_autoMapper = new AutoMapper(_data, typeof(TEntity));
 		}
 
-		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		public bool IterateDataReader { get { return true; } }
+
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
 			var item = (TEntity)_data.Context.Data.EntityFactory.Create(typeof(TEntity));
 

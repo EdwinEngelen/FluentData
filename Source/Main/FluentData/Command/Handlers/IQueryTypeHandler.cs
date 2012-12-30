@@ -4,6 +4,7 @@ namespace FluentData
 {
 	internal interface IQueryTypeHandler<TEntity>
 	{
-		TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
+		bool IterateDataReader { get; }
+		object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic);
 	}
 }

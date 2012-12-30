@@ -7,15 +7,17 @@ namespace FluentData
 		private readonly DbCommandData _data;
 		private readonly DynamicTypeAutoMapper _autoMapper;
 
+		public bool IterateDataReader { get { return true; } }
+
 		public QueryDynamicHandler(DbCommandData data)
 		{
 			_data = data;
 			_autoMapper = new DynamicTypeAutoMapper(_data.Reader.InnerReader);
 		}
 
-		public TEntity HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
+		public object HandleType(Action<TEntity, IDataReader> customMapperReader, Action<TEntity, dynamic> customMapperDynamic)
 		{
-			dynamic item = _autoMapper.AutoMap();
+			var item = _autoMapper.AutoMap();
 			return item;
 		}
 	}

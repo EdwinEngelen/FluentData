@@ -29,6 +29,5 @@ namespace FluentData
 		TEntity QuerySingle(Action<TEntity, dynamic> customMapper);
 		TEntity QueryComplexSingle(Func<IDataReader, TEntity> customMapper);
 		TEntity QueryComplexSingle(Func<dynamic, TEntity> customMapper);
-		DataTable QueryManyDataTable();
 	}
 }

@@ -105,6 +105,7 @@
     <Compile Include="Command\DbCommand.cs" />
     <Compile Include="Command\DbCommandData.cs" />
     <Compile Include="Command\DbCommandTypes.cs" />
+    <Compile Include="Command\Handlers\QueryDataTableHandler.cs" />
     <Compile Include="Command\Handlers\IQueryTypeHandler.cs" />
     <Compile Include="Command\Handlers\QueryCustomEntityHandler.cs" />
     <Compile Include="Command\Handlers\QueryDynamicHandler.cs" />
