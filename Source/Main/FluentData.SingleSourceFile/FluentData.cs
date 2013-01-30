@@ -2374,6 +2374,7 @@ namespace FluentData
 		string GetName(string name);
 		string GetString(string name);
 		object GetValue(string name);
+		bool IsDBNull(string name);
 	}
 
 	public class ConnectionEventArgs : EventArgs
