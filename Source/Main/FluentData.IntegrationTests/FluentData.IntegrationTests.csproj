@@ -84,6 +84,7 @@
     <Compile Include="BaseSqlServerIntegrationTest.cs" />
     <Compile Include="Documentation\SelectDataTests.cs" />
     <Compile Include="Experiements\Tests.cs" />
+    <Compile Include="Features\Builders\MultipleCallToAutoMapTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderTests.cs" />
     <Compile Include="Features\Builders\Insert\InsertBuilderDynamicTests.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Features\Events\OnExecutedTests.cs" />
     <Compile Include="Features\Events\OnExecutingTests.cs" />
     <Compile Include="Features\Queries\QueryValuesTests.cs" />
+    <Compile Include="Features\Sql\LikeTests.cs" />
     <Compile Include="Features\Transaction\RollbackUpdatedData.cs" />
     <Compile Include="Features\Transaction\TransactionTests.cs" />
     <Compile Include="Features\UsingTests.cs" />

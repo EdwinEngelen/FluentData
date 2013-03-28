@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,6 +22,16 @@ namespace IntegrationTests.Documentation
 			dynamic products = Context.Sql("select * from Product where ProductId = @0 or ProductId = @1").Parameters(1, 2).QueryMany<dynamic>();
 
 			Assert.AreEqual(2, products.Count);
+		}
+
+		[TestMethod]
+		public void IndexedParametersAlternativeInsertQuery()
+		{
+			var productId = Context.Sql(@"insert into Product(Name,CategoryId) 
+                       values(@0,@1)")
+					.Parameters("sampleData", 2)
+					.ExecuteReturnLastId<Int32>();
+			Assert.IsTrue(productId > 0);
 		}
 
 		[TestMethod]

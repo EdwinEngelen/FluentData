@@ -21,6 +21,8 @@ namespace FluentData
 {
 	internal class ActionsHandler
 	{
+		private bool _autoMappedAlreadyCalled = false;
+
 		private readonly BuilderData _data;
 
 		internal ActionsHandler(BuilderData data)
@@ -59,8 +61,17 @@ namespace FluentData
 			ColumnAction(propertyName, propertyValue, typeof(object), parameterType, size);
 		}
 
+		private void VerifyAutoMapAlreadyCalled()
+		{
+			if (_autoMappedAlreadyCalled)
+				throw new FluentDataException("AutoMap cannot be called more than once.");
+			_autoMappedAlreadyCalled = true;
+		}
+
 		internal void AutoMapColumnsAction<T>(params Expression<Func<T, object>>[] ignorePropertyExpressions)
 		{
+			VerifyAutoMapAlreadyCalled();
+
 			var properties = ReflectionHelper.GetProperties(_data.Item.GetType());
 			var ignorePropertyNames = new HashSet<string>();
 			if (ignorePropertyExpressions != null)
@@ -87,6 +98,8 @@ namespace FluentData
 
 		internal void AutoMapDynamicTypeColumnsAction(params string[] ignorePropertyExpressions)
 		{
+			VerifyAutoMapAlreadyCalled();
+
 			var properties = (IDictionary<string, object>) _data.Item;
 			var ignorePropertyNames = new HashSet<string>();
 			if (ignorePropertyExpressions != null)
