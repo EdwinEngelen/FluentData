@@ -1,0 +1,336 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #><#@ assembly name="System.Data" #><#@ assembly name="System.xml" #><#@ import namespace="System.Collections.Generic" #><#@ import namespace="System.Data.SqlClient" #><#@ import namespace="System.Data" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#
+ string ns = Host.ResolveParameterValue(null, null, "ns");
+ string connectionString = Host.ResolveParameterValue(null, null, "cs");
+ string connectionStringName = Host.ResolveParameterValue(null, null, "csn");
+#>
+namespace <#=ns#>
+{
+	using FluentData;
+    using System;
+    using System.Collections.Generic;
+<#
+	Dictionary<Type, string> Aliases =
+    new Dictionary<Type, string>()
+	{
+		{ typeof(byte), "byte" },
+		{ typeof(sbyte), "sbyte" },
+		{ typeof(short), "short" },
+		{ typeof(ushort), "ushort" },
+		{ typeof(int), "int" },
+		{ typeof(uint), "uint" },
+		{ typeof(long), "long" },
+		{ typeof(ulong), "ulong" },
+		{ typeof(float), "float" },
+		{ typeof(double), "double" },
+		{ typeof(decimal), "decimal" },
+		{ typeof(object), "object" },
+		{ typeof(bool), "bool" },
+		{ typeof(char), "char" },
+		{ typeof(string), "string" },
+		{ typeof(DateTime), "DateTime" }
+	};
+
+	System.Data.DataSet ds = new DataSet();
+	SqlConnection conn = new SqlConnection(connectionString);
+	try
+	{
+	conn.Open();
+	System.Data.DataTable schema = conn.GetSchema("TABLES");
+	string selectQuery = string.Empty;
+	foreach(System.Data.DataRow row in schema.Rows)
+	{
+		selectQuery += string.Format("SET FMTONLY ON; select * from {0}; SET FMTONLY OFF;", row["TABLE_NAME"]);
+	}
+
+	SqlCommand command = new SqlCommand(selectQuery,conn);
+	SqlDataAdapter ad = new SqlDataAdapter(command);
+	ad.FillSchema(ds, SchemaType.Mapped);
+	int i=0;
+	foreach(System.Data.DataRow row in schema.Rows)
+	{
+		ds.Tables[i].TableName = row["TABLE_NAME"].ToString();
+		i++;
+	}
+	}
+	catch
+	{
+	}
+	finally
+	{
+		conn.Close();
+	}
+             
+	foreach(DataTable table in ds.Tables)
+	{
+#>
+
+	#region <#=table.TableName#>
+
+	/// <summary>
+    /// <#=table.TableName#> entity class
+    /// </summary>
+	public partial class <#=table.TableName#>    
+	{
+		<#
+		PushIndent("		");
+		foreach (DataColumn dc in table.Columns) 
+		{
+			WriteLine("public " + Aliases[dc.DataType] + " " + dc.ColumnName + " { get; set; }");
+		}
+		PopIndent();
+		#>
+	}
+	
+	/// <summary>
+    /// <#=table.TableName#> gateway class
+    /// </summary>
+	public partial class <#=table.TableName#>Gateway
+	{<#
+		string fkQuery = " SELECT f.name AS ForeignKey,";
+		fkQuery += " OBJECT_NAME(f.parent_object_id) AS TableName, ";
+		fkQuery += " COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, ";
+		fkQuery += " OBJECT_NAME (f.referenced_object_id) AS ReferenceTableName, ";
+		fkQuery += " COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName ";
+		fkQuery += " FROM ";
+		fkQuery += " sys.foreign_keys AS f ";
+		fkQuery += " INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id ";
+		fkQuery += " where OBJECT_NAME(f.parent_object_id) = '" + table.TableName +"'";
+
+		List<string> fkColumnNames = new List<string>();
+		Dictionary<string, string> parentTables = new Dictionary<string, string>();
+		try
+		{
+		conn.Open();
+		SqlCommand command = new SqlCommand(fkQuery,conn);
+		using(var dr = command.ExecuteReader())
+		{
+			while(dr.Read())
+			{
+				fkColumnNames.Add(dr["ColumnName"].ToString());
+				parentTables.Add(dr["ColumnName"].ToString(), dr["ReferenceTableName"].ToString());
+			}
+			dr.Close();
+		}
+		}
+		catch
+		{
+		}
+		finally
+		{
+			conn.Close();
+		}
+
+		List<DataColumn> fkColumns = new List<DataColumn>();
+		foreach(string fkColumnName in fkColumnNames)
+		{
+			foreach (DataColumn dc in table.Columns) 
+			{
+				if(dc.ColumnName == fkColumnName)
+					fkColumns.Add(dc);
+			}
+		}
+
+		List<string> primaryKeyParamsWithTypes = new List<string>();
+		List<string> primaryKeyParams = new List<string>();
+		List<string> whereItems = new List<string>();
+		List<string> automapItems = new List<string>();
+		foreach(DataColumn pk in table.PrimaryKey)
+		{
+			primaryKeyParamsWithTypes.Add(string.Format("{0} {1}", Aliases[pk.DataType], this.ToCamelCase(pk.ColumnName)));
+			primaryKeyParams.Add(pk.ColumnName);
+			whereItems.Add(string.Format("{0} = @{1}", pk.ColumnName, pk.ColumnName.ToLower()));
+			automapItems.Add(string.Format("x.{0}", pk.ColumnName));
+		}
+
+		string updateAutomap = string.Empty;
+		if(automapItems.Count > 1)
+			updateAutomap = "new { " + string.Join(", ", automapItems.ToArray()) + " }";
+		else
+			updateAutomap = automapItems[0];
+		#>
+
+		private static IDbContext Context()
+        {
+            return new DbContext().ConnectionStringName("<#=connectionStringName#>",
+                    new SqlServerProvider());
+        }
+
+		public static <#=table.TableName#> Select(<#=string.Join(", ", primaryKeyParamsWithTypes.ToArray())#>)
+		{
+			using(var context = Context())
+            {
+                return context.Sql(" SELECT * FROM <#=table.TableName#> WHERE <#=string.Join(" AND ", whereItems.ToArray())#> ")
+					<#foreach(string pkp in primaryKeyParams) 
+					{
+						WriteLine(".Parameter(\"" + pkp.ToLower() + "\", " + this.ToCamelCase(pkp) + ")");
+					}
+					#>
+                    .QuerySingle<<#=table.TableName#>>();
+            }
+		}
+
+		public static List<<#=table.TableName#>> SelectAll()
+        {
+            return SelectAll(string.Empty);
+        }
+
+        public static List<<#=table.TableName#>> SelectAll(string sortExpression)
+        {
+            return SelectAll(0, 0, sortExpression);
+        }
+
+        public static List<<#=table.TableName#>> SelectAll(int startRowIndex, int maximumRows, string sortExpression)
+        {
+            using (var context = Context())
+            {
+                var select = context.Select<<#=table.TableName#>>(" * ")
+                    .From(" <#=table.TableName#> ");
+
+                if (maximumRows > 0)
+                {
+                    if (startRowIndex == 0) 
+                        startRowIndex = 1;
+
+                    select.Paging(startRowIndex, maximumRows);
+                }
+
+                if (!string.IsNullOrEmpty(sortExpression))
+                    select.OrderBy(sortExpression);
+
+                return select.QueryMany();
+            }
+        }
+
+		public static int CountAll()
+        {
+            using (var context = Context())
+            {
+                return context.Sql(" SELECT COUNT(*) FROM <#=table.TableName#> ")
+                    .QuerySingle<int>();
+            }
+        }
+
+		<#
+		foreach(DataColumn dc in fkColumns)
+		{
+		#>
+
+		public static List<<#=table.TableName#>> SelectBy<#=parentTables[dc.ColumnName]#>(<#=Aliases[dc.DataType]#> <#=this.ToCamelCase(dc.ColumnName)#>)
+        {
+            return SelectBy<#=parentTables[dc.ColumnName]#>(<#=this.ToCamelCase(dc.ColumnName)#>, string.Empty);
+        }
+
+        public static List<<#=table.TableName#>> SelectBy<#=parentTables[dc.ColumnName]#>(<#=Aliases[dc.DataType]#> <#=this.ToCamelCase(dc.ColumnName)#>, string sortExpression)
+        {
+            return SelectBy<#=parentTables[dc.ColumnName]#>(<#=this.ToCamelCase(dc.ColumnName)#>, 0, 0, sortExpression);
+        }
+
+		public static List<<#=table.TableName#>> SelectBy<#=parentTables[dc.ColumnName]#>(<#=Aliases[dc.DataType]#> <#=this.ToCamelCase(dc.ColumnName)#>, int startRowIndex, int maximumRows, string sortExpression)
+        {
+            using (var context = Context())
+            {
+                var select = context.Select<<#=table.TableName#>>(" * ")
+                    .From(" <#=table.TableName#> ")
+					.Where(" <#=dc.ColumnName#> = @<#=dc.ColumnName.ToLower()#> ")
+					.Parameter("<#=dc.ColumnName.ToLower()#>", <#=this.ToCamelCase(dc.ColumnName)#>);
+
+                if (maximumRows > 0)
+                {
+                    if (startRowIndex == 0) 
+                        startRowIndex = 1;
+
+                    select.Paging(startRowIndex, maximumRows);
+                }
+
+                if (!string.IsNullOrEmpty(sortExpression))
+                    select.OrderBy(sortExpression);
+
+                return select.QueryMany();
+            }
+        }
+
+		public static int CountBy<#=parentTables[dc.ColumnName]#>(<#=Aliases[dc.DataType]#> <#=this.ToCamelCase(dc.ColumnName)#>)
+        {
+            using (var context = Context())
+            {
+                return context.Sql(" SELECT COUNT(*) FROM <#=table.TableName#> WHERE <#=dc.ColumnName#> = @<#=dc.ColumnName.ToLower()#>")
+					.Parameter("<#=dc.ColumnName.ToLower()#>", <#=this.ToCamelCase(dc.ColumnName)#>)
+                    .QuerySingle<int>();
+            }
+        }
+		<#}#>
+
+<#if(table.PrimaryKey != null && table.PrimaryKey.Length == 1 && table.PrimaryKey[0].AutoIncrement) {#>
+		public static bool Insert(<#=table.TableName#> <#=this.ToCamelCase(table.TableName)#>) 
+        {
+            using (var context = Context())
+            {
+                int id = context.Insert<<#=table.TableName#>>("<#=table.TableName#>", <#=this.ToCamelCase(table.TableName)#>)
+                    .AutoMap(x => x.<#=primaryKeyParams[0]#>)
+                    .ExecuteReturnLastId<int>();
+
+                <#=this.ToCamelCase(table.TableName)#>.<#=primaryKeyParams[0]#> = id;
+                return id > 0;
+            }
+        }
+<#
+}
+else
+{
+#>
+		public static bool Insert(<#=table.TableName#> <#=this.ToCamelCase(table.TableName)#>) 
+        {
+            using (var context = Context())
+            {
+                return context.Insert<<#=table.TableName#>>("<#=table.TableName#>", <#=this.ToCamelCase(table.TableName)#>)
+					.Execute() > 0;
+            }
+        }
+<#}#>
+		public static bool Update(<#=table.TableName#> <#=this.ToCamelCase(table.TableName)#>)
+        {
+            using (var context = Context())
+            {
+                return context.Update<<#=table.TableName#>>("<#=table.TableName#>", <#=this.ToCamelCase(table.TableName)#>)
+                    .AutoMap(x => <#=updateAutomap#>)
+                    .Execute() > 0;
+            }
+        }
+
+		public static bool Delete(<#=table.TableName#> <#=this.ToCamelCase(table.TableName)#>) 
+        {
+            return Delete(<#=string.Join(", ", primaryKeyParams.Select(x=> this.ToCamelCase(table.TableName) + "." + x).ToArray())#>);
+        }
+
+        public static bool Delete(<#=string.Join(", ", primaryKeyParamsWithTypes.ToArray())#>)
+        {
+            using (var context = Context())
+            {
+                return context.Sql(" DELETE FROM Product WHERE <#=string.Join(" AND ", whereItems.ToArray())#> ")
+                    <#foreach(string pkp in primaryKeyParams) {
+						WriteLine(".Parameter(\"" + pkp.ToLower() + "\", " + this.ToCamelCase(pkp) + ")");
+					}#>
+                    .Execute() > 0;
+            }
+        }
+	}
+	
+	#endregion
+	<#    
+	}  #>     
+}
+
+<#+
+    public string ToCamelCase(string value)
+    {
+		if(string.IsNullOrEmpty(value)) 
+			return string.Empty;
+        
+		string firstLetter = value.Substring(0, 1);
+		string rest = value.Substring(1, value.Length - 1);
+		return firstLetter.ToLower() + rest;
+    }
+#>
