@@ -78,7 +78,7 @@ namespace <#=ns#>
 		PushIndent("		");
 		foreach (DataColumn dc in table.Columns) 
 		{
-			WriteLine("public " + Aliases[dc.DataType] + " " + dc.ColumnName + " { get; set; }");
+			WriteLine("public " + Aliases[dc.DataType] + (dc.AllowDBNull && Aliases[dc.DataType] != "string" ? "? ": " ") + dc.ColumnName + " { get; set; }");
 		}
 		PopIndent();
 		#>
@@ -296,6 +296,9 @@ else
             {
                 return context.Update<<#=table.TableName#>>("<#=table.TableName#>", <#=this.ToCamelCase(table.TableName)#>)
                     .AutoMap(x => <#=updateAutomap#>)
+					<#foreach(string pkp in primaryKeyParams){#>
+					.Where("<#=pkp#>", <#=this.ToCamelCase(table.TableName)#>.<#=pkp#>)
+					<#}#>
                     .Execute() > 0;
             }
         }
