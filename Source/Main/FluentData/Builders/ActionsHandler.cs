@@ -29,7 +29,7 @@ namespace FluentData
 			_data.Columns.Add(new BuilderColumn(columnName, value, parameterName));
 
 			if(parameterType == DataTypes.Object)
-				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
+				parameterType = _data.Command.Data.Context.Data.FluentDataProvider.GetDbTypeForClrType(type);
 
 			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, size);
 		}

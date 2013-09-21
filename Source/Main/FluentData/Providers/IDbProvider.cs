@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Data;
-using System.Data.Common;
 
 namespace FluentData
 {
 	public interface IDbProvider
 	{
-		IDbConnection CreateConnection();
+		string ProviderName { get; }
 		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }

@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Providers.DB2
 {
 	[TestClass]
+	[Ignore]
 	public class DB2ProviderTests : IDbProviderTests
 	{
 		public DB2ProviderTests()

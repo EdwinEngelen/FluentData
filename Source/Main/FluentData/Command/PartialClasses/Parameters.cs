@@ -53,7 +53,7 @@ namespace FluentData
 			}
 			newInStatement.Append(")");
 
-			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
+			var oldInStatement = string.Format(" in({0})", Data.Context.Data.FluentDataProvider.GetParameterName(name));
 			Data.Sql.Replace(oldInStatement, newInStatement.ToString());
 		}
 
@@ -67,11 +67,11 @@ namespace FluentData
 
 			var dbParameter = Data.InnerCommand.CreateParameter();
 			if (parameterType == DataTypes.Object)
-				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.Provider.GetDbTypeForClrType(value.GetType());
+				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.FluentDataProvider.GetDbTypeForClrType(value.GetType());
 			else
 				dbParameter.DbType = (System.Data.DbType) parameterType;
 
-			dbParameter.ParameterName = Data.Context.Data.Provider.GetParameterName(name);
+			dbParameter.ParameterName = Data.Context.Data.FluentDataProvider.GetParameterName(name);
 			dbParameter.Direction = (System.Data.ParameterDirection) direction;
 			dbParameter.Value = value;
 			if (size > 0)
@@ -83,7 +83,7 @@ namespace FluentData
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
-			if (!Data.Context.Data.Provider.SupportsOutputParameters)
+			if (!Data.Context.Data.FluentDataProvider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
 			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
@@ -91,7 +91,7 @@ namespace FluentData
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			outputParameterName = Data.Context.Data.Provider.GetParameterName(outputParameterName);
+			outputParameterName = Data.Context.Data.FluentDataProvider.GetParameterName(outputParameterName);
 			if (!Data.InnerCommand.Parameters.Contains(outputParameterName))
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 

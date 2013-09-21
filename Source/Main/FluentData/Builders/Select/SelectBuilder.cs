@@ -20,7 +20,7 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 				throw new FluentDataException("Order by must defined when using Paging.");
 
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForSelectBuilder(Data));
 			return Data.Command;
 		}
 

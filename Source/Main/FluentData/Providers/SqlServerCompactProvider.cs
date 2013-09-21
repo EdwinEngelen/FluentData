@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Data.Common;
 using FluentData.Providers.Common;
 using FluentData.Providers.Common.Builders;
 
@@ -8,19 +7,7 @@ namespace FluentData
 {
 	public class SqlServerCompactProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{
 			get
 			{

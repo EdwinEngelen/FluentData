@@ -15,14 +15,14 @@ namespace FluentData
 				{
 					if (Data.Connection == null)
 					{
-						Data.Connection = Data.Provider.CreateConnection();
+						Data.Connection = (IDbConnection) Data.AdoNetProvider.CreateConnection();
 						Data.Connection.ConnectionString = Data.ConnectionString;
 					}
 					connection = Data.Connection;
 				}
 				else
 				{
-					connection = Data.Provider.CreateConnection();
+					connection = (IDbConnection)Data.AdoNetProvider.CreateConnection();
 					connection.ConnectionString = Data.ConnectionString;
 				}
 				var cmd = connection.CreateCommand();

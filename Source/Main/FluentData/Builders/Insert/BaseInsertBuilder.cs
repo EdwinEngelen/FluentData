@@ -13,7 +13,7 @@
 
 		private IDbCommand GetPreparedCommand()
 		{
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForInsertBuilder(Data));
 			return Data.Command;
 		}
 

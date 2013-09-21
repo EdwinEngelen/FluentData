@@ -7,9 +7,10 @@ namespace FluentData
 		public bool UseTransaction { get; set; }
 		public bool UseSharedConnection { get; set; }
 		public System.Data.IDbConnection Connection { get; set; }
+		public System.Data.Common.DbProviderFactory AdoNetProvider { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }
-		public IDbProvider Provider { get; set; }
+		public IDbProvider FluentDataProvider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
 		public bool IgnoreIfAutoMapFails { get; set; }

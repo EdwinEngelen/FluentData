@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Providers.MySql
 {
 	[TestClass]
+	[Ignore]
 	public class MySqlTests : IDbProviderTests
 	{
 		public MySqlTests()

@@ -13,7 +13,7 @@
 
 		public int Execute()
 		{
-			Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));			
+			Data.Command.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForDeleteBuilder(Data));			
 
 			return Data.Command.Execute();
 		}

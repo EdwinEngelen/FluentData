@@ -26,17 +26,17 @@ namespace FluentData
 
 		public IUpdateBuilder Update(string tableName)
 		{
-			return new UpdateBuilder(Data.Provider, CreateCommand, tableName);
+			return new UpdateBuilder(Data.FluentDataProvider, CreateCommand, tableName);
 		}
 
 		public IUpdateBuilder<T> Update<T>(string tableName, T item)
 		{
-			return new UpdateBuilder<T>(Data.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilder<T>(Data.FluentDataProvider, CreateCommand, tableName, item);
 		}
 
 		public IUpdateBuilderDynamic Update(string tableName, ExpandoObject item)
 		{
-			return new UpdateBuilderDynamic(Data.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilderDynamic(Data.FluentDataProvider, CreateCommand, tableName, item);
 		}
 
 		public IDeleteBuilder Delete(string tableName)
@@ -51,7 +51,7 @@ namespace FluentData
 
 		private void VerifyStoredProcedureSupport()
 		{
-			if (!Data.Provider.SupportsStoredProcedures)
+			if (!Data.FluentDataProvider.SupportsStoredProcedures)
 				throw new FluentDataException("The selected database does not support stored procedures.");
 		}
 

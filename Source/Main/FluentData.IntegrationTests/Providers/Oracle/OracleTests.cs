@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Providers.Oracle
 {
 	[TestClass]
+	[Ignore]
 	public class OracleTests : IDbProviderTests
 	{
 		protected IDbContext Context

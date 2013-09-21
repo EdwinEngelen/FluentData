@@ -25,7 +25,8 @@ namespace FluentData
 		IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item);
 		IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item);
 		IDbContext EntityFactory(IEntityFactory entityFactory);
-		IDbContext ConnectionString(string connectionString, IDbProvider dbProvider);
+		IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, string providerName = null);
+		IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, System.Data.Common.DbProviderFactory adoNetProviderFactory);
 		IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider);
 		IDbContext IsolationLevel(IsolationLevel isolationLevel);
 		IDbContext Commit();

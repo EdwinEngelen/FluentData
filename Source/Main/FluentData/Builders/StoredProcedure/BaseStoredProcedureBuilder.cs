@@ -18,7 +18,7 @@ namespace FluentData
 		private IDbCommand GetPreparedDbCommand()
 		{
 			Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForStoredProcedureBuilder(Data));
 			return Data.Command;
 		}
 

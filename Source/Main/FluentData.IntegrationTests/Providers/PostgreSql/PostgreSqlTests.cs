@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Providers.PostgreSql
 {
 	[TestClass]
+	[Ignore]
 	public class PostgreSqlTests : IDbProviderTests
 	{
 		public PostgreSqlTests()

@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace IntegrationTests.Providers.SqlAzure
 {
 	[TestClass]
+	[Ignore]
 	public class SqlAzureTests : IDbProviderTests
 	{
 		public SqlAzureTests()
