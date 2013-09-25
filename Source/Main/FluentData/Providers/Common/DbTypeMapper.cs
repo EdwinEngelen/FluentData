@@ -18,7 +18,6 @@ namespace FluentData.Providers.Common
 					if (_types == null)
 					{
 						_types = new Dictionary<Type, DataTypes>();
-
 						_types.Add(typeof(Int16), DataTypes.Int16);
 						_types.Add(typeof(Int32), DataTypes.Int32);
 						_types.Add(typeof(Int64), DataTypes.Int64);
@@ -32,6 +31,7 @@ namespace FluentData.Providers.Common
 						_types.Add(typeof(DBNull), DataTypes.String);
 						_types.Add(typeof(float), DataTypes.Single);
 						_types.Add(typeof(double), DataTypes.Double);
+						_types.Add(typeof(byte[]), DataTypes.Binary);
 					}
 				}
 			}

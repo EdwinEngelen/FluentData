@@ -18,5 +18,6 @@ namespace IntegrationTests._Helpers
 		public decimal DecimalValue { get; set; }
 		public DateTime DateTimeValue { get; set; }
 		public float FloatValue { get; set; }
+		public byte[] ByteValues { get; set; }
 	}
 }

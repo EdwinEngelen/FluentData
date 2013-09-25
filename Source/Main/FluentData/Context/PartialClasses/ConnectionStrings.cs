@@ -6,7 +6,7 @@ namespace FluentData
 	{
 		public IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, string providerName = null)
 		{
-			if(providerName == null)
+			if(string.IsNullOrEmpty(providerName))
 				providerName = fluentDataProvider.ProviderName;
 			var adoNetProvider = System.Data.Common.DbProviderFactories.GetFactory(providerName);
 			return ConnectionString(connectionString, fluentDataProvider, adoNetProvider);

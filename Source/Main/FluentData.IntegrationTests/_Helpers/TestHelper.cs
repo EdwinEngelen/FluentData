@@ -64,7 +64,8 @@ namespace IntegrationTests._Helpers
 							StringValue nvarchar(50) null,
 							DecimalValue numeric(18, 0) null,
 							DatetimeValue datetime null,
-							FloatValue real null)
+							FloatValue real null,
+							VarBinaryValue varbinary(max) null)
 
 						create table [Table With Space](
 							Id int Identity(1,1) not null primary key,

@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentData;
 using IntegrationTests._Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -212,6 +213,18 @@ namespace IntegrationTests.Features.Builders
 						.Execute();
 
 				Assert.IsTrue(value.Id > 0);
+			}
+		}
+
+
+		[TestMethod]
+		public void ByteArrayTest()
+		{
+			using(var context = Context.UseTransaction(true))
+			{
+				context.Insert("DataTypeValue")
+					.Column("VarBinaryValue", new byte[10000])
+					.Execute();
 			}
 		}
 	}

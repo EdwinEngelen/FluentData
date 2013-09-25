@@ -25,6 +25,14 @@ namespace IntegrationTests.Features.Providers
 			Assert.AreEqual("AnyConnectionString", context.Data.ConnectionString);
 			Assert.AreEqual(typeof(SqlClientFactory), context.Data.AdoNetProvider.GetType());
 		}
+
+		[TestMethod]
+		public void Test3()
+		{
+			var context = new DbContext().ConnectionStringName("ProviderTest2", new SqlServerProvider());
+			Assert.AreEqual("AnyConnectionString", context.Data.ConnectionString);
+			Assert.AreEqual(typeof(SqlClientFactory), context.Data.AdoNetProvider.GetType());
+		}
 	}
 
 	public class CustomDbProviderFactory : System.Data.Common.DbProviderFactory

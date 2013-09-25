@@ -10,7 +10,9 @@ namespace FluentData
 	{
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
 		{
-			if (ReflectionHelper.IsList(value))
+			if (parameterType != DataTypes.Binary
+				&& !(value is byte[])
+				&& ReflectionHelper.IsList(value))
 				AddListParameterToInnerCommand(name, value);
 			else
 				AddParameterToInnerCommand(name, value, parameterType, direction, size);
