@@ -42,7 +42,7 @@ namespace FluentData
 			_data.Columns.Add(new BuilderColumn(columnName, value, parameterName));
 
 			if(parameterType == DataTypes.Object)
-				parameterType = _data.Command.Data.Context.Data.Provider.GetDbTypeForClrType(type);
+				parameterType = _data.Command.Data.Context.Data.FluentDataProvider.GetDbTypeForClrType(type);
 
 			ParameterAction(parameterName, value, parameterType, ParameterDirection.Input, size);
 		}
@@ -172,7 +172,7 @@ namespace FluentData
 
 		public int Execute()
 		{
-			Data.Command.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForDeleteBuilder(Data));			
+			Data.Command.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForDeleteBuilder(Data));			
 
 			return Data.Command.Execute();
 		}
@@ -260,7 +260,7 @@ namespace FluentData
 
 		private IDbCommand GetPreparedCommand()
 		{
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForInsertBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForInsertBuilder(Data));
 			return Data.Command;
 		}
 
@@ -468,7 +468,7 @@ namespace FluentData
 					&& string.IsNullOrEmpty(Data.OrderBy))
 				throw new FluentDataException("Order by must defined when using Paging.");
 
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForSelectBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForSelectBuilder(Data));
 			return Data.Command;
 		}
 
@@ -641,7 +641,7 @@ namespace FluentData
 		private IDbCommand GetPreparedDbCommand()
 		{
 			Data.Command.CommandType(DbCommandTypes.StoredProcedure);
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForStoredProcedureBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForStoredProcedureBuilder(Data));
 			return Data.Command;
 		}
 
@@ -868,7 +868,7 @@ namespace FluentData
 					   || Data.Where.Count == 0)
 				throw new FluentDataException("Columns or where filter have not yet been added.");
 
-			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.Provider.GetSqlForUpdateBuilder(Data));
+			Data.Command.ClearSql.Sql(Data.Command.Data.Context.Data.FluentDataProvider.GetSqlForUpdateBuilder(Data));
 		
 			return Data.Command.Execute();
 		}
@@ -1204,7 +1204,7 @@ namespace FluentData
 
 		public IDbCommand UseMultiResult(bool useMultipleResultset)
 		{
-			if (useMultipleResultset && !Data.Context.Data.Provider.SupportsMultipleResultsets)
+			if (useMultipleResultset && !Data.Context.Data.FluentDataProvider.SupportsMultipleResultsets)
 				throw new FluentDataException("The selected database does not support multiple resultset");
 
 			Data.UseMultipleResultsets = useMultipleResultset;
@@ -1662,10 +1662,10 @@ namespace FluentData
 	{
 		public T ExecuteReturnLastId<T>(string identityColumnName = null)
 		{
-			if (Data.Context.Data.Provider.RequiresIdentityColumn && string.IsNullOrEmpty(identityColumnName))
+			if (Data.Context.Data.FluentDataProvider.RequiresIdentityColumn && string.IsNullOrEmpty(identityColumnName))
 				throw new FluentDataException("The identity column must be given");
 
-			var value = Data.Context.Data.Provider.ExecuteReturnLastId<T>(this, identityColumnName);
+			var value = Data.Context.Data.FluentDataProvider.ExecuteReturnLastId<T>(this, identityColumnName);
 			T lastId;
 
 			if (value.GetType() == typeof(T))
@@ -1740,7 +1740,9 @@ namespace FluentData
 	{
 		public IDbCommand Parameter(string name, object value, DataTypes parameterType = DataTypes.Object, ParameterDirection direction = ParameterDirection.Input, int size = 0)
 		{
-			if (ReflectionHelper.IsList(value))
+			if (parameterType != DataTypes.Binary
+				&& !(value is byte[])
+				&& ReflectionHelper.IsList(value))
 				AddListParameterToInnerCommand(name, value);
 			else
 				AddParameterToInnerCommand(name, value, parameterType, direction, size);
@@ -1783,7 +1785,7 @@ namespace FluentData
 			}
 			newInStatement.Append(")");
 
-			var oldInStatement = string.Format(" in({0})", Data.Context.Data.Provider.GetParameterName(name));
+			var oldInStatement = string.Format(" in({0})", Data.Context.Data.FluentDataProvider.GetParameterName(name));
 			Data.Sql.Replace(oldInStatement, newInStatement.ToString());
 		}
 
@@ -1797,11 +1799,11 @@ namespace FluentData
 
 			var dbParameter = Data.InnerCommand.CreateParameter();
 			if (parameterType == DataTypes.Object)
-				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.Provider.GetDbTypeForClrType(value.GetType());
+				dbParameter.DbType = (System.Data.DbType) Data.Context.Data.FluentDataProvider.GetDbTypeForClrType(value.GetType());
 			else
 				dbParameter.DbType = (System.Data.DbType) parameterType;
 
-			dbParameter.ParameterName = Data.Context.Data.Provider.GetParameterName(name);
+			dbParameter.ParameterName = Data.Context.Data.FluentDataProvider.GetParameterName(name);
 			dbParameter.Direction = (System.Data.ParameterDirection) direction;
 			dbParameter.Value = value;
 			if (size > 0)
@@ -1813,7 +1815,7 @@ namespace FluentData
 
 		public IDbCommand ParameterOut(string name, DataTypes parameterType, int size)
 		{
-			if (!Data.Context.Data.Provider.SupportsOutputParameters)
+			if (!Data.Context.Data.FluentDataProvider.SupportsOutputParameters)
 				throw new FluentDataException("The selected database does not support output parameters");
 			Parameter(name, null, parameterType, ParameterDirection.Output, size);
 			return this;
@@ -1821,7 +1823,7 @@ namespace FluentData
 
 		public TParameterType ParameterValue<TParameterType>(string outputParameterName)
 		{
-			outputParameterName = Data.Context.Data.Provider.GetParameterName(outputParameterName);
+			outputParameterName = Data.Context.Data.FluentDataProvider.GetParameterName(outputParameterName);
 			if (!Data.InnerCommand.Parameters.Contains(outputParameterName))
 				throw new FluentDataException(string.Format("Parameter {0} not found", outputParameterName));
 
@@ -2457,9 +2459,10 @@ namespace FluentData
 		public bool UseTransaction { get; set; }
 		public bool UseSharedConnection { get; set; }
 		public System.Data.IDbConnection Connection { get; set; }
+		public System.Data.Common.DbProviderFactory AdoNetProvider { get; set; }
 		public IsolationLevel IsolationLevel { get; set; }
 		public System.Data.IDbTransaction Transaction { get; set; }
-		public IDbProvider Provider { get; set; }
+		public IDbProvider FluentDataProvider { get; set; }
 		public string ConnectionString { get; set; }
 		public IEntityFactory EntityFactory { get; set; }
 		public bool IgnoreIfAutoMapFails { get; set; }
@@ -2511,7 +2514,8 @@ namespace FluentData
 		IStoredProcedureBuilder<T> StoredProcedure<T>(string storedProcedureName, T item);
 		IStoredProcedureBuilderDynamic StoredProcedure(string storedProcedureName, ExpandoObject item);
 		IDbContext EntityFactory(IEntityFactory entityFactory);
-		IDbContext ConnectionString(string connectionString, IDbProvider dbProvider);
+		IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, string providerName = null);
+		IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, System.Data.Common.DbProviderFactory adoNetProviderFactory);
 		IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider);
 		IDbContext IsolationLevel(IsolationLevel isolationLevel);
 		IDbContext Commit();
@@ -2573,17 +2577,17 @@ namespace FluentData
 
 		public IUpdateBuilder Update(string tableName)
 		{
-			return new UpdateBuilder(Data.Provider, CreateCommand, tableName);
+			return new UpdateBuilder(Data.FluentDataProvider, CreateCommand, tableName);
 		}
 
 		public IUpdateBuilder<T> Update<T>(string tableName, T item)
 		{
-			return new UpdateBuilder<T>(Data.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilder<T>(Data.FluentDataProvider, CreateCommand, tableName, item);
 		}
 
 		public IUpdateBuilderDynamic Update(string tableName, ExpandoObject item)
 		{
-			return new UpdateBuilderDynamic(Data.Provider, CreateCommand, tableName, item);
+			return new UpdateBuilderDynamic(Data.FluentDataProvider, CreateCommand, tableName, item);
 		}
 
 		public IDeleteBuilder Delete(string tableName)
@@ -2598,7 +2602,7 @@ namespace FluentData
 
 		private void VerifyStoredProcedureSupport()
 		{
-			if (!Data.Provider.SupportsStoredProcedures)
+			if (!Data.FluentDataProvider.SupportsStoredProcedures)
 				throw new FluentDataException("The selected database does not support stored procedures.");
 		}
 
@@ -2632,25 +2636,30 @@ namespace FluentData
 
 	public partial class DbContext
 	{
-		public IDbContext ConnectionString(string connectionString, IDbProvider dbProvider)
+		public IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, string providerName = null)
+		{
+			if(string.IsNullOrEmpty(providerName))
+				providerName = fluentDataProvider.ProviderName;
+			var adoNetProvider = System.Data.Common.DbProviderFactories.GetFactory(providerName);
+			return ConnectionString(connectionString, fluentDataProvider, adoNetProvider);
+		}
+
+		public IDbContext ConnectionString(string connectionString, IDbProvider fluentDataProvider, System.Data.Common.DbProviderFactory adoNetProviderFactory)
 		{
 			Data.ConnectionString = connectionString;
-			Data.Provider = dbProvider;
+			Data.FluentDataProvider = fluentDataProvider;
+			Data.AdoNetProvider = adoNetProviderFactory;
 			return this;
 		}
 
 		public IDbContext ConnectionStringName(string connectionstringName, IDbProvider dbProvider)
 		{
-			ConnectionString(GetConnectionStringFromConfig(connectionstringName), dbProvider);
-			return this;
-		}
-
-		private string GetConnectionStringFromConfig(string connectionStringName)
-		{
-			var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
-			if (settings == null)
+			var settings = ConfigurationManager.ConnectionStrings[connectionstringName];
+			if(settings == null)
 				throw new FluentDataException("A connectionstring with the specified name was not found in the .config file");
-			return settings.ConnectionString;
+			
+			ConnectionString(settings.ConnectionString, dbProvider, settings.ProviderName);
+			return this;
 		}
 	}
 
@@ -2715,14 +2724,14 @@ namespace FluentData
 				{
 					if (Data.Connection == null)
 					{
-						Data.Connection = Data.Provider.CreateConnection();
+						Data.Connection = (IDbConnection) Data.AdoNetProvider.CreateConnection();
 						Data.Connection.ConnectionString = Data.ConnectionString;
 					}
 					connection = Data.Connection;
 				}
 				else
 				{
-					connection = Data.Provider.CreateConnection();
+					connection = (IDbConnection)Data.AdoNetProvider.CreateConnection();
 					connection.ConnectionString = Data.ConnectionString;
 				}
 				var cmd = connection.CreateCommand();
@@ -3004,19 +3013,7 @@ namespace FluentData
 
 	public class AccessProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{
 			get
 			{
@@ -3152,7 +3149,6 @@ namespace FluentData
 					if (_types == null)
 					{
 						_types = new Dictionary<Type, DataTypes>();
-
 						_types.Add(typeof(Int16), DataTypes.Int16);
 						_types.Add(typeof(Int32), DataTypes.Int32);
 						_types.Add(typeof(Int64), DataTypes.Int64);
@@ -3166,6 +3162,7 @@ namespace FluentData
 						_types.Add(typeof(DBNull), DataTypes.String);
 						_types.Add(typeof(float), DataTypes.Single);
 						_types.Add(typeof(double), DataTypes.Double);
+						_types.Add(typeof(byte[]), DataTypes.Binary);
 					}
 				}
 			}
@@ -3263,19 +3260,7 @@ namespace FluentData
 
 	public class DB2Provider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{
 			get
 			{
@@ -3399,19 +3384,7 @@ namespace FluentData
 
 	public class PostgreSqlProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{ 
 			get
 			{
@@ -3536,19 +3509,7 @@ namespace FluentData
 
 	public class MySqlProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{ 
 			get
 			{
@@ -3674,7 +3635,7 @@ namespace FluentData
 
 	public interface IDbProvider
 	{
-		IDbConnection CreateConnection();
+		string ProviderName { get; }
 		bool SupportsMultipleResultsets { get; }
 		bool SupportsMultipleQueries { get; }
 		bool SupportsOutputParameters { get; }
@@ -3695,19 +3656,7 @@ namespace FluentData
 
 	public class OracleProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{ 
 			get
 			{
@@ -3826,7 +3775,7 @@ namespace FluentData
 
 		public object ExecuteReturnLastId<T>(IDbCommand command, string identityColumnName = null)
 		{
-			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.Provider.GetDbTypeForClrType(typeof(T)));
+			command.ParameterOut("FluentDataLastId", command.Data.Context.Data.FluentDataProvider.GetDbTypeForClrType(typeof(T)));
 			command.Sql(" returning " + identityColumnName + " into :FluentDataLastId");
 
 
@@ -3863,19 +3812,7 @@ namespace FluentData
 
 	public class SqliteProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{ 
 			get
 			{
@@ -4001,19 +3938,7 @@ namespace FluentData
 
 	public class SqlServerCompactProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{
 			get
 			{
@@ -4143,19 +4068,7 @@ namespace FluentData
 
 	public class SqlServerProvider : IDbProvider
 	{
-		private static readonly Lazy<DbProviderFactory> _dbProviderFactory = new Lazy<DbProviderFactory>(CreateDbProviderFactory, true);
-
-		private static DbProviderFactory CreateDbProviderFactory()
-		{
-			return DbProviderFactories.GetFactory(ProviderName);
-		}
-
-		public IDbConnection CreateConnection()
-		{
-			return _dbProviderFactory.Value.CreateConnection();
-		}
-
-		public static string ProviderName
+		public string ProviderName
 		{ 
 			get
 			{
