@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Atrributes\IgnoreAttribute.cs" />
     <Compile Include="Builders\ActionsHandler.cs" />
     <Compile Include="Builders\BuilderData.cs" />
     <Compile Include="Builders\Delete\BaseDeleteBuilder.cs" />
