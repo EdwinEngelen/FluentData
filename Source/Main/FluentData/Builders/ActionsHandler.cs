@@ -75,21 +75,6 @@ namespace FluentData
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
-
-                var customAttributes = property.Value.GetCustomAttributes(true);
-				var hasIgnoreAttribute = false;
-                foreach (var attribute in customAttributes)
-	            {
-                    var ignoreAttribute = attribute as IgnoreProperty;
-                    if (ignoreAttribute != null)
-                    {
-						hasIgnoreAttribute = true;
-                        break;
-                    }
-	            }
-
-				if(hasIgnoreAttribute)
-                    continue;
                 
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 

@@ -1,6 +1,6 @@
 ﻿
-// FluentData version 3.0.0.0.
-// Copyright ©  2013 - The Fluent Data Project.
+// FluentData version 3.0.1.0.
+// Copyright ©  2015 - The Fluent Data Project.
 // See http://fluentdata.codeplex.com for more information and licensing terms.
 
 using System;
@@ -88,7 +88,7 @@ namespace FluentData
 				var ignoreProperty = ignorePropertyNames.SingleOrDefault(x => x.Equals(property.Value.Name, StringComparison.CurrentCultureIgnoreCase));
 				if (ignoreProperty != null)
 					continue;
-
+                
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);
 
 				var propertyValue = ReflectionHelper.GetPropertyValue(_data.Item, property.Value);
