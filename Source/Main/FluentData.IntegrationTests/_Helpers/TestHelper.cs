@@ -160,7 +160,7 @@ namespace IntegrationTests._Helpers
 
 		public static string GetConnectionStringValue(string key)
 		{
-			var appSettings = XDocument.Load(@"C:\Google Drive\AppSettings\FluentData.IntegrationTests\App.config");
+			var appSettings = XDocument.Load(@"d:\OneDrive\AppSettings\FluentData.IntegrationTests\App.config");
 			var addElements = appSettings.Element("configuration").Element("connectionStrings").Elements("add");
 			var addElement = addElements.Single(x => x.Attribute("name").Value == key);
 			return addElement.Attribute("connectionString").Value;

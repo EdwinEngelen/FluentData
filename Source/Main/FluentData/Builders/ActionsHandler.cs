@@ -1,5 +1,4 @@
-﻿using FluentData.Atrributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -77,21 +76,19 @@ namespace FluentData
 				if (ignoreProperty != null)
 					continue;
 
-                //valid DataColumn attribute to skip no operate column.
-                var ats = property.Value.Attributes;
-                var cts = property.Value.GetCustomAttributes(true);
-                bool isBreak = false;
-                foreach (var attr in cts)
+                var customAttributes = property.Value.GetCustomAttributes(true);
+				var hasIgnoreAttribute = false;
+                foreach (var attribute in customAttributes)
 	            {
-                    IgnoreAttribute ign= attr as IgnoreAttribute;
-                    if(ign != null)
+                    var ignoreAttribute = attribute as IgnoreProperty;
+                    if (ignoreAttribute != null)
                     {
-                        isBreak = true;
+						hasIgnoreAttribute = true;
                         break;
                     }
 	            }
 
-                if (isBreak)
+				if(hasIgnoreAttribute)
                     continue;
                 
 				var propertyType = ReflectionHelper.GetPropertyType(property.Value);

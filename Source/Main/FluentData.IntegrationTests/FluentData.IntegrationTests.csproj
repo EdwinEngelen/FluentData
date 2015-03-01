@@ -84,6 +84,7 @@
     <Compile Include="BaseSqlServerIntegrationTest.cs" />
     <Compile Include="Documentation\SelectDataTests.cs" />
     <Compile Include="Experiements\Tests.cs" />
+    <Compile Include="Features\Attributes\AttributeTests.cs" />
     <Compile Include="Features\Builders\MultipleCallToAutoMapTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderGenericTests.cs" />
     <Compile Include="Features\Builders\Delete\DeleteBuilderTests.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="_Helpers\OrderReport.cs" />
     <Compile Include="_Helpers\Product.cs" />
     <Compile Include="_Helpers\ProductionCollection.cs" />
+    <Compile Include="_Helpers\ProductWithIgnoreAttribute.cs" />
     <Compile Include="_Helpers\ProductWithCategoryEnum.cs" />
     <Compile Include="_Helpers\TestHelper.cs" />
   </ItemGroup>
