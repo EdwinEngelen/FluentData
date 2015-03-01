@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B5AE821B-7728-49B3-9119-3BBC4C8E58E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FluentData</RootNamespace>
+    <AssemblyName>FluentData</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Test\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Test\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\IgnoreProperty.cs" />
+    <Compile Include="Builders\ActionsHandler.cs" />
+    <Compile Include="Builders\BuilderData.cs" />
+    <Compile Include="Builders\Delete\BaseDeleteBuilder.cs" />
+    <Compile Include="Builders\Delete\DeleteBuilder.cs" />
+    <Compile Include="Builders\Delete\DeleteBuilderGeneric.cs" />
+    <Compile Include="Builders\Delete\Interfaces\IDeleteBuilder.cs" />
+    <Compile Include="Builders\Delete\Interfaces\IDeleteBuilderGeneric.cs" />
+    <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilder.cs" />
+    <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilderDynamic.cs" />
+    <Compile Include="Builders\InsertUpdate\IInsertUpdateBuilderGeneric.cs" />
+    <Compile Include="Builders\Insert\BaseInsertBuilder.cs" />
+    <Compile Include="Builders\Insert\InsertBuilder.cs" />
+    <Compile Include="Builders\Insert\InsertBuilderDynamic.cs" />
+    <Compile Include="Builders\Insert\InsertBuilderGeneric.cs" />
+    <Compile Include="Builders\Insert\Interfaces\IInsertBuilder.cs" />
+    <Compile Include="Builders\Insert\Interfaces\IInsertBuilderGeneric.cs" />
+    <Compile Include="Builders\Insert\Interfaces\IInsertDynamic.cs" />
+    <Compile Include="Builders\Select\ISelectBuilder.cs" />
+    <Compile Include="Builders\Select\SelectBuilder.cs" />
+    <Compile Include="Builders\Select\SelectBuilderData.cs" />
+    <Compile Include="Builders\StoredProcedure\BaseStoredProcedureBuilder.cs" />
+    <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilder.cs" />
+    <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilderDynamic.cs" />
+    <Compile Include="Builders\StoredProcedure\Interfaces\IStoredProcedureBuilderGeneric.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureBuilder.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderDynamic.cs" />
+    <Compile Include="Builders\StoredProcedure\StoredProcedureBuilderGeneric.cs" />
+    <Compile Include="Builders\BuilderColumn.cs" />
+    <Compile Include="Builders\Update\BaseUpdateBuilder.cs" />
+    <Compile Include="Builders\Update\Interfaces\IUpdateBuilder.cs" />
+    <Compile Include="Builders\Update\Interfaces\IUpdateBuilderDynamic.cs" />
+    <Compile Include="Builders\Update\Interfaces\IUpdateBuilderGeneric.cs" />
+    <Compile Include="Builders\Update\UpdateBuilder.cs" />
+    <Compile Include="Builders\Update\UpdateBuilderDynamic.cs" />
+    <Compile Include="Builders\Update\UpdateBuilderGeneric.cs" />
+    <Compile Include="Command\DataTypes.cs" />
+    <Compile Include="Command\DbCommand.cs" />
+    <Compile Include="Command\DbCommandData.cs" />
+    <Compile Include="Command\DbCommandTypes.cs" />
+    <Compile Include="Command\Handlers\QueryDataTableHandler.cs" />
+    <Compile Include="Command\Handlers\IQueryTypeHandler.cs" />
+    <Compile Include="Command\Handlers\QueryCustomEntityHandler.cs" />
+    <Compile Include="Command\Handlers\QueryDynamicHandler.cs" />
+    <Compile Include="Command\Handlers\QueryScalarHandler.cs" />
+    <Compile Include="Command\Interfaces\IDbCommand.cs" />
+    <Compile Include="Command\Interfaces\IExecute.cs" />
+    <Compile Include="Command\Interfaces\IExecuteReturnLastId.cs" />
+    <Compile Include="Command\Interfaces\IParameterValue.cs" />
+    <Compile Include="Command\Interfaces\IQuery.cs" />
+    <Compile Include="Command\Mappers\AutoMapper.cs" />
+    <Compile Include="Command\Mappers\DataReaderField.cs" />
+    <Compile Include="Command\Mappers\DynamicTypeAutoMapper.cs" />
+    <Compile Include="Command\ParameterDirection.cs" />
+    <Compile Include="Command\PartialClasses\QueryComplexSingle.cs" />
+    <Compile Include="Command\PartialClasses\ExecuteReturnLastId.cs" />
+    <Compile Include="Command\PartialClasses\QuerySingle.cs" />
+    <Compile Include="Command\PartialClasses\Sql.cs" />
+    <Compile Include="Command\PartialClasses\Execute.cs" />
+    <Compile Include="Command\PartialClasses\Parameters.cs" />
+    <Compile Include="Command\PartialClasses\QueryMany.cs" />
+    <Compile Include="Command\PartialClasses\QueryComplexMany.cs" />
+    <Compile Include="Command\Handlers\ExecuteQueryHandler.cs" />
+    <Compile Include="Command\Handlers\QueryHandler.cs" />
+    <Compile Include="Command\Reader\DataReader.cs" />
+    <Compile Include="Command\Reader\DynamicDataReader.cs" />
+    <Compile Include="Command\Reader\IDataReader.cs" />
+    <Compile Include="Context\ConnectionEventArgs.cs" />
+    <Compile Include="Context\CommandEventArgs.cs" />
+    <Compile Include="Context\ErrorEventArgs.cs" />
+    <Compile Include="Context\DbContext.cs" />
+    <Compile Include="Context\DbContextData.cs" />
+    <Compile Include="Context\EntityFactory.cs" />
+    <Compile Include="Context\IDbContext.cs" />
+    <Compile Include="Context\IEntityFactory.cs" />
+    <Compile Include="Context\IsolationLevel.cs" />
+    <Compile Include="Context\PartialClasses\AutoMapper.cs" />
+    <Compile Include="Context\PartialClasses\Builders.cs" />
+    <Compile Include="Context\PartialClasses\CommandSettings.cs" />
+    <Compile Include="Context\PartialClasses\ConnectionStrings.cs" />
+    <Compile Include="Context\PartialClasses\EntityFactory.cs" />
+    <Compile Include="Context\PartialClasses\Events.cs" />
+    <Compile Include="Context\PartialClasses\Sql.cs" />
+    <Compile Include="Context\PartialClasses\Transactions.cs" />
+    <Compile Include="Core\DataReaderHelper.cs" />
+    <Compile Include="Core\PropertyExpressionParser.cs" />
+    <Compile Include="Core\FluentDataException.cs" />
+    <Compile Include="Core\ReflectionHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\AccessProvider.cs" />
+    <Compile Include="Providers\Common\ConnectionFactory.cs" />
+    <Compile Include="Providers\Common\DbTypeMapper.cs" />
+    <Compile Include="Providers\Common\Builders\DeleteBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\Common\Builders\InsertBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\Common\Builders\UpdateBuilderSqlGenerator.cs" />
+    <Compile Include="Providers\DB2Provider.cs" />
+    <Compile Include="Providers\PostgreSqlProvider.cs" />
+    <Compile Include="Providers\MySqlProvider.cs" />
+    <Compile Include="Providers\IDbProvider.cs" />
+    <Compile Include="Providers\OracleProvider.cs" />
+    <Compile Include="Providers\SqlAzureProvider.cs" />
+    <Compile Include="Providers\SqliteProvider.cs" />
+    <Compile Include="Providers\SqlServerCompactProvider.cs" />
+    <Compile Include="Providers\SqlServerProvider.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

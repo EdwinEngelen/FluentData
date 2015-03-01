@@ -1,0 +1,141 @@
+﻿<#@ template language="C#" hostspecific="false" debug="true" #>
+<#@ assembly name="C:\CodePlex\FluentData\Source\Main\FluentData\bin\Debug\FluentData.dll" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="Microsoft.CSharp" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="FluentData" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="Microsoft.CSharp" #>
+<#@ import namespace="System.Reflection" #>
+<#@ output extension=".cs" #>
+
+<#
+string sourcePath = @"C:\CodePlex\FluentData\Source\Main\FluentData\";
+
+WriteLine(string.Format("// {0} version {1}.", assemblyInfoProperty(sourcePath, "AssemblyTitle"), assemblyInfoProperty(sourcePath, "AssemblyVersion")));
+WriteLine("// Copyright ©  2013 - The Fluent Data Project.");
+WriteLine("// See http://fluentdata.codeplex.com for more information and licensing terms.");
+#>
+
+using System;
+using System.Collections;
+<#@ import namespace="System.Collections.Generic" #>
+using System.Configuration;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Dynamic;
+using System.Reflection;
+using System.Text;
+using System.Xml.Linq;
+
+namespace FluentData
+{
+<#
+	foreach (var sourceFile in GetFiles(sourcePath))
+	{
+	WriteLine(sourceFile);
+	}
+	#>
+}
+
+<#+
+List<string> GetFiles(string sourcePath)
+{
+	var projectFile = XElement.Load(sourcePath + "FluentData.csproj");
+
+	XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
+
+	var sourceFiles = new List<string>();
+
+	foreach (var itemGroupElements in projectFile.Elements(ns + "ItemGroup"))
+	{
+		var compileElements = itemGroupElements.Elements(ns + "Compile");
+		foreach (var compileElement in compileElements)
+		{
+			var filePath = sourcePath + compileElement.Attribute("Include").Value;
+			if (filePath.Contains("AssemblyInfo.cs"))
+				continue;
+
+			var fileContent = GetFileContent(filePath);
+
+			sourceFiles.Add(fileContent.ToString());
+		}
+	}
+
+	return sourceFiles;
+}
+
+string GetFileContent(string filePath)
+{
+	var csLines = File.ReadAllLines(filePath);
+
+	int firstLine = GetFirstLine(csLines);
+	int lastLine = GetLastLine(csLines);
+			
+	var fileContent = new StringBuilder();
+	for (int i = firstLine; i <= lastLine; i++)
+	{
+		fileContent.AppendLine(csLines[i]);
+	}
+
+	return fileContent.ToString();
+}
+
+int GetFirstLine(string[] csLines)
+{
+	for (int i = 0; i < csLines.Count(); i++)
+		if (csLines[i].Contains("{"))
+			return i + 1;
+
+	throw new Exception("Beginning of file not found");
+}
+
+int GetLastLine(string[] csLines)
+{
+	for (int i = (csLines.Count() - 1); i >= 0; i--)
+		if (csLines[i].Contains("}"))
+			return i - 1;
+
+	throw new Exception("End of file not found");
+}
+
+string GetAppSettingsValue(string configPath, string key)
+{
+	var appSettings = XDocument.Load(configPath);
+	var addElements = appSettings.Element("configuration").Element("appSettings").Elements("add");
+	var addElement = addElements.Single(x => x.Attribute("key").Value == key);
+
+	return addElement.Attribute("value").Value;
+}
+
+string GetVersionNumber(string sourcePath)
+{
+	return assemblyInfoProperty(sourcePath, "AssemblyVersion");
+}
+
+string assemblyInfoProperty(string sourcePath, string propertyName)
+{
+	var assemblyInfoLines = File.ReadAllLines(sourcePath + @"Properties\AssemblyInfo.cs");
+	foreach (var line in assemblyInfoLines)
+	{
+		if (line.IndexOf("[assembly: " + propertyName) == 0)
+		{
+			var value = line.Substring(line.IndexOf("\"") + 1);
+			value = value.Substring(0, value.IndexOf("\""));
+
+			return value;
+		}
+	}
+	throw new Exception("Property " + propertyName + " was not found in AssemblyInfo.cs");
+}
+
+#>

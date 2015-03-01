@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EEE8E9AB-3AA5-4DF8-AC2F-B806532F546C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IntegrationTests</RootNamespace>
+    <AssemblyName>FluentData.IntegrationTests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Test\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Test\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.1.0.82.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseSqlServerIntegrationTest.cs" />
+    <Compile Include="Documentation\SelectDataTests.cs" />
+    <Compile Include="Experiements\Tests.cs" />
+    <Compile Include="Features\Attributes\AttributeTests.cs" />
+    <Compile Include="Features\Builders\MultipleCallToAutoMapTests.cs" />
+    <Compile Include="Features\Builders\Delete\DeleteBuilderGenericTests.cs" />
+    <Compile Include="Features\Builders\Delete\DeleteBuilderTests.cs" />
+    <Compile Include="Features\Builders\Insert\InsertBuilderDynamicTests.cs" />
+    <Compile Include="Features\Builders\Insert\InsertBuilderGenericTests.cs" />
+    <Compile Include="Features\Builders\Insert\InsertBuilderTests.cs" />
+    <Compile Include="Features\Builders\Select\FromTests.cs" />
+    <Compile Include="Features\Builders\Select\JoinTests.cs" />
+    <Compile Include="Features\Builders\Select\ManualMappingTests.cs" />
+    <Compile Include="Features\Builders\Select\OrderByTests.cs" />
+    <Compile Include="Features\Builders\Select\PagingTests.cs" />
+    <Compile Include="Features\Builders\Select\QueryManyDynamicTests.cs" />
+    <Compile Include="Features\Builders\Select\SelectTests.cs" />
+    <Compile Include="Features\Builders\StoredProcedure\StoredProcedureBuilderGenericTests.cs" />
+    <Compile Include="Features\Builders\StoredProcedure\StoredProcedureTests.cs" />
+    <Compile Include="Features\Builders\Update\UpdateBuilderDynamicTests.cs" />
+    <Compile Include="Features\Builders\Update\UpdateBuilderGenericTests.cs" />
+    <Compile Include="Features\Builders\Update\UpdateBuilderTests.cs" />
+    <Compile Include="Features\AutoMapping\EnumTests.cs" />
+    <Compile Include="Features\Command\MultipleResultsetTests.cs" />
+    <Compile Include="Features\Command\PotentialErrorsTests.cs" />
+    <Compile Include="Features\AutoMapping\NestedPropertyTests.cs" />
+    <Compile Include="Features\AutoMapping\PropertyNameWithUnderscoreTests.cs" />
+    <Compile Include="Features\AutoMapping\IgnoreIfAutoMapFailsTests.cs" />
+    <Compile Include="Features\Builders\Select\GeneralTests.cs" />
+    <Compile Include="Features\Builders\StoredProcedure\ParameterTests.cs" />
+    <Compile Include="Features\Builders\Update\AutoMapTests.cs" />
+    <Compile Include="Features\Builders\Insert\AutoMapTests.cs" />
+    <Compile Include="Features\Builders\DataTypesTests.cs" />
+    <Compile Include="Features\Connection\SharedConnectionTests.cs" />
+    <Compile Include="Features\Parameters\OutParametersTests.cs" />
+    <Compile Include="Features\Providers\AdoNetProviderTests.cs" />
+    <Compile Include="Features\Queries\QueryDynamic.cs" />
+    <Compile Include="Features\Queries\QueryDataTableTests.cs" />
+    <Compile Include="Features\Queries\QueryManyTests.cs" />
+    <Compile Include="Features\Queries\QuerySingleTests.cs" />
+    <Compile Include="Features\Queries\QueryTests.cs" />
+    <Compile Include="Features\Queries\QueryComplexTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Features\Queries\QueryComplexSingleTests.cs" />
+    <Compile Include="Features\Settings\CommandTimeoutTests.cs" />
+    <Compile Include="Features\Events\OnConnectionClosedTests.cs" />
+    <Compile Include="Features\Events\OnConnectionOpenedTests.cs" />
+    <Compile Include="Features\Events\OnConnectionOpeningTests.cs" />
+    <Compile Include="Features\Events\OnErrorTests.cs" />
+    <Compile Include="Features\Events\OnExecutedTests.cs" />
+    <Compile Include="Features\Events\OnExecutingTests.cs" />
+    <Compile Include="Features\Queries\QueryValuesTests.cs" />
+    <Compile Include="Features\Sql\LikeTests.cs" />
+    <Compile Include="Features\Transaction\RollbackUpdatedData.cs" />
+    <Compile Include="Features\Transaction\TransactionTests.cs" />
+    <Compile Include="Features\UsingTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\Access\AccessTests.cs" />
+    <Compile Include="Providers\DB2\DB2ProviderTests.cs" />
+    <Compile Include="Providers\MySql\MySqlProduct.cs" />
+    <Compile Include="Providers\MySql\MySqlTests.cs" />
+    <Compile Include="Providers\IDbProviderTests.cs" />
+    <Compile Include="Providers\Oracle\OracleTests.cs" />
+    <Compile Include="Providers\PostgreSql\PostgreSqlTests.cs" />
+    <Compile Include="Providers\ProviderFactoryTests.cs" />
+    <Compile Include="Providers\SqlAzure\SqlAzureTests.cs" />
+    <Compile Include="Providers\Sqlite\SqliteTests.cs" />
+    <Compile Include="Providers\SqlServerCompact\SqlServerCompactTests.cs" />
+    <Compile Include="Providers\SqlServer\SqlServerTests.cs" />
+    <Compile Include="Documentation\QueryValueTests.cs" />
+    <Compile Include="Documentation\DeleteDataTests.cs" />
+    <Compile Include="Documentation\EntityFactoryTests.cs" />
+    <Compile Include="Documentation\InsertDataTests.cs" />
+    <Compile Include="Documentation\InsertUpdateDataTests.cs" />
+    <Compile Include="Documentation\MappingTests.cs" />
+    <Compile Include="Documentation\MultipleResultsetsTests.cs" />
+    <Compile Include="Documentation\ParametersTests.cs" />
+    <Compile Include="Documentation\QueryTests.cs" />
+    <Compile Include="Documentation\QuerySingle.cs" />
+    <Compile Include="Documentation\QueryValuesTests.cs" />
+    <Compile Include="Documentation\StoredProcedureTests.cs" />
+    <Compile Include="Documentation\SampleCodeTests.cs" />
+    <Compile Include="Documentation\TransactionsTests.cs" />
+    <Compile Include="Documentation\UpdateDataTests.cs" />
+    <Compile Include="_Helpers\Categories.cs" />
+    <Compile Include="_Helpers\Category.cs" />
+    <Compile Include="_Helpers\DataTypeValue.cs" />
+    <Compile Include="_Helpers\Order.cs" />
+    <Compile Include="_Helpers\OrderReport.cs" />
+    <Compile Include="_Helpers\Product.cs" />
+    <Compile Include="_Helpers\ProductionCollection.cs" />
+    <Compile Include="_Helpers\ProductWithIgnoreAttribute.cs" />
+    <Compile Include="_Helpers\ProductWithCategoryEnum.cs" />
+    <Compile Include="_Helpers\TestHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FluentData\FluentData.csproj">
+      <Project>{B5AE821B-7728-49B3-9119-3BBC4C8E58E9}</Project>
+      <Name>FluentData</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="_Data\FluentDataDB.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="_Data\FluentDataDB.sdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="_Data\FluentDataDB" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Providers\SqlServerCompact\Data\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
